@@ -8,6 +8,23 @@
 
 #include <iostream>
 
+#include <atomic>
+#include <condition_variable>
+#include <cstdint>
+#include <filesystem>
+#include <mutex>
+#include <optional>
+#include <thread>
+#include <vector>
+#include <csignal>
+#include <iostream>
+
+// #define CPPHTTPLIB_OPENSSL_SUPPORT
+#include "httplib.h"
+#include "json.hpp"
+
+using json = nlohmann::json;
+
 #include "pixels.hpp"
 
 using namespace std;
