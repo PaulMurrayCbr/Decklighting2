@@ -10,9 +10,6 @@
 #include <csignal>
 #include <iostream>
 
-#include "httplib.h"
-#include "json.hpp"
-
 #include "state.hpp"
 #include "webserver.hpp"
 
