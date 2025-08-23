@@ -52,7 +52,7 @@ endif
 
 save: $(EXECUTABLE)
 	git add .
-	git commit -m 'Makefile build succeeded' && git push || true
+	git commit -m 'Makefile build succeeded' && git push --all || true
 	
 
 send:
