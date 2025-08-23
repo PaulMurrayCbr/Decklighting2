@@ -16,7 +16,13 @@
 #include "state.hpp"
 #include "webserver.hpp"
 
+#ifdef __APPLE__
 namespace fs = std::__fs::filesystem;
+#endif
+
+#ifdef __LINUX__
+namespace fs = std::filesystem;
+#endif
 
 using json = nlohmann::json;
 
