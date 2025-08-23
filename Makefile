@@ -42,11 +42,18 @@ help:
 	@echo -e "\thelp:\tthis help"
 	@echo
 
-all: $(EXECUTABLE) save
+all: $(EXECUTABLE) maybe_save
+
+ifeq ($(UNAME_S),Darwin)
+maybe_save: save
+else
+maybe_save: 
+endif
 
 save: $(EXECUTABLE)
 	git add .
 	git commit -m 'Makefile build succeeded' && git push || true
+	
 
 send:
 	rsync -av --exclude='*.o' src/ p@neopixel.local:/home/p/decklighting2/src
