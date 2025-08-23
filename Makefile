@@ -46,8 +46,7 @@ all: $(EXECUTABLE) save
 
 save: $(EXECUTABLE)
 	git add .
-	git commit -m 'Makefile build succeeded'
-	git push
+	git commit -m 'Makefile build succeeded' && git push || true
 
 send:
 	rsync -av --exclude='*.o' src/ p@neopixel.local:/home/p/decklighting2/src
