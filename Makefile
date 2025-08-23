@@ -42,7 +42,7 @@ help:
 	@echo -e "\thelp:\tthis help"
 	@echo
 
-all: $(EXECUTABLE) maybe_save
+all: $(EXECUTABLE) # maybe_save
 
 ifeq ($(UNAME_S),Darwin)
 maybe_save: save
