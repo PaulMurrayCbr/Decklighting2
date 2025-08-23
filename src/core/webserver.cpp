@@ -29,19 +29,19 @@ class Webserver {
 	httplib::Response json_response(std::pair<int, json> api_result) {
 
 		json result;
+		result["application"] = "Decklighting 2";
 		result["version"] = "0.1";
 		result["instance"] = getpid();
 		result["serial"] = ++request_serial;
 		result["status"] = api_result.first;
 		result["result"] = api_result.second;
-		result["server-error"] = false;
 
 		httplib::Response r;
 		r.status = api_result.first;
 		r.set_content(result.dump(), "application/json");
 		return r;
-	}
-	;
+	};
+
 
 public:
 	void start() {
@@ -59,41 +59,35 @@ public:
 					"text/javascript");
 			svr.set_file_extension_and_mimetype_mapping("css", "text/css");
 
-			//        svr.set_not_found_handler([&](const httplib::Request& req, httplib::Response& res) {
-			//            if (req.path.rfind("/api/", 0) == 0) {
-			//                res.status = 404;
-			//                res.set_content("Not found", "text/plain");
-			//            } else {
-			//                std::string index_path = static_dir + "/index.html";
-			//                std::ifstream f(index_path, std::ios::binary);
-			//                if (f) {
-			//                    std::stringstream ss; ss << f.rdbuf();
-			//                    res.set_content(ss.str(), "text/html");
-			//                } else {
-			//                    res.status = 404;
-			//                    res.set_content("index.html not found", "text/plain");
-			//                }
-			//            }
-			//        });
 		} else {
 			std::cerr << "Warning: static dir '" << static_dir
 					<< "' not found; only /api/* will work.\n";
 		}
 
-		svr.Get("/api/.*",
-				[&](const httplib::Request &req, httplib::Response &res) {
-					json request_json = json::object();
-					std::pair<int, json> api_response = api(req.path, req.params, request_json);
-					res = json_response(api_response);
-				});
+		svr.set_error_handler([](const httplib::Request& req, httplib::Response& res) {
+		    // Check if the path starts with the static mount point
+		    if (res.status == 404 && req.path != "/api" && req.path.rfind("/api/", 0) != 0) { // doesn't start with /api
+		    	res.set_content("<html><body>" + std::to_string(res.status) + ": <tt>" + req.path + "</tt> Not Found.</body></html>", "text/html");
+		    }
+		    // else: let normal routes or default 404 happen
+		});
 
-		// POST /api/
-		svr.Post("/api/.*",
-				[&](const httplib::Request &req, httplib::Response &res) {
-					json request_json = json::parse(req.body);
-					std::pair<int, json> api_response = api(req.path, req.params, request_json);
-					res = json_response(api_response);
-				});
+		auto doGet  = [&](const httplib::Request &req, httplib::Response &res) {
+			json request_json = json::object();
+			std::pair<int, json> api_response = api(req.path, req.params, request_json);
+			res = json_response(api_response);
+		};
+
+		auto doPost = [&](const httplib::Request &req, httplib::Response &res) {
+			json request_json = json::parse(req.body);
+			std::pair<int, json> api_response = api(req.path, req.params, request_json);
+			res = json_response(api_response);
+		};
+
+		svr.Get("/api", doGet);
+		svr.Get("/api/.*", doGet);
+		svr.Post("/api", doPost);
+		svr.Post("/api/.*", doPost);
 
 		http_thread = std::thread([&] {
 			std::cout << "HTTP on http://0.0.0.0:" << PORT << "\n";

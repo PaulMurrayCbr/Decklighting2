@@ -9,6 +9,6 @@
 
 std::pair<int, json> api(const std::string &path, const std::multimap<std::string, std::string> &params, json& command) {
 	json j = "Not Implemented: " + path;
-	return {400, j};
+	return {404, j};
 
 }
