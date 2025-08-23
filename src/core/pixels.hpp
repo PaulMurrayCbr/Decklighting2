@@ -1,5 +1,5 @@
-#ifndef PIXELS_HPP
-#define PIXELS_HPP
+#ifndef SRC_CORE_PIXELS_HPP
+#define SRC_CORE_PIXELS_HPP
 
 const char* helloWorld();
 

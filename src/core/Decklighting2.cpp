@@ -6,6 +6,7 @@
 
 #include "state.hpp"
 #include "webserver.hpp"
+#include "pixelloop.hpp"
 
 #ifdef __APPLE__
 namespace fs = std::__fs::filesystem;
@@ -24,6 +25,7 @@ int main() {
     std::cout << "Starting ...\n";
 
 	start_webserver();
+	start_pixelloop();
 
     // Graceful shutdown
     std::signal(SIGINT, handle_signal);
@@ -35,6 +37,7 @@ int main() {
     while (!g_stop.load()) std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     std::cout << "Stopping ...\n";
 
+	stop_pixelloop();
     stop_webserver();
 
 //    pixels.stop();
