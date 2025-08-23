@@ -18,9 +18,7 @@
 
 #ifdef __APPLE__
 namespace fs = std::__fs::filesystem;
-#endif
-
-#ifdef __LINUX__
+#else
 namespace fs = std::filesystem;
 #endif
 

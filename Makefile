@@ -57,6 +57,7 @@ save: $(EXECUTABLE)
 
 send:
 	rsync -av --exclude='*.o' src/ p@neopixel.local:/home/p/decklighting2/src
+	rsync -av web/ p@neopixel.local:/home/p/decklighting2/web
 	rsync -av Makefile p@neopixel.local:/home/p/decklighting2/Makefile
 
 
