@@ -1,12 +1,6 @@
-//#include <atomic>
-//#include <condition_variable>
 #include <cstdint>
 #include <filesystem>
-//#include <mutex>
-//#include <optional>
 #include <thread>
-//#include <vector>
-//#include <csignal>
 #include <iostream>
 
 #include "httplib.h"
