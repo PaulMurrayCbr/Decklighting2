@@ -27,14 +27,19 @@ int main() {
 //    const int GPIO_PIN = 18;      // PWM0 (requires level shifter to 5V on data)
 //    const int LED_COUNT = 60;
 
+    std::cout << "Starting ...\n";
+
 	start_webserver();
 
     // Graceful shutdown
     std::signal(SIGINT, handle_signal);
     std::signal(SIGTERM, handle_signal);
 
+    std::cout << "Started ...\n";
+
     // Poll for stop signal
-    while (!g_stop.load()) std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    while (!g_stop.load()) std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    std::cout << "Stopping ...\n";
 
     stop_webserver();
 
