@@ -75,7 +75,6 @@ push: $(EXECUTABLE) save
 	git checkout saved
 	git merge --ff-only temp-squash
 	git branch -D temp-squash
-	git push origin saved	
 	git checkout main
 	
 	git push --all
