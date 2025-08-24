@@ -61,11 +61,8 @@ save: $(EXECUTABLE)
 	git commit -m "$(LABEL)" && git push --all || true
 	
 push: $(EXECUTABLE) save
-	@echo LABEL "[$(LABEL)]"
-	@echo STRIPPEDLABEL "[$(STRIPPEDLABEL)]"
-	@echo DASHEDLABEL "[$(DASHEDLABEL)]"
 	@if [ "$(LABEL)" = "Makefile build succeeded" ]; then \
-	    echo "Error: MYVAR cannot be 'forbidden'"; \
+	    echo "Error: Set LABEL'"; \
 	    exit 1; \
 	fi
 	git branch -f "feature/$(shell echo $(NAME) | sed -E 's/ +/-/g')"
