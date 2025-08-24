@@ -66,6 +66,18 @@ push: $(EXECUTABLE) save
 	    exit 1; \
 	fi
 	git branch -f "feature/$(shell echo $(LABEL) | sed -E 's/ +/-/g')"
+	
+	git show-ref --quiet refs/heads/saved || git branch saved
+	git checkout main
+	git checkout -b temp-squash
+	git reset --soft saved
+	git commit -m "$(LABEL)"
+	git checkout saved
+	git merge --ff-only temp-squash
+	git branch -D temp-squash
+	git push origin saved	
+	git checkout main
+	
 	git push --all
 
 send:
