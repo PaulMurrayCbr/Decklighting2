@@ -63,6 +63,9 @@ save: $(EXECUTABLE)
 	git commit -m "$(LABEL)" && git push --all || true
 	
 push: $(EXECUTABLE) save
+	@echo LABEL "[$(LABEL)]"
+	@echo STRIPPEDLABEL "[$(STRIPPEDLABEL)]"
+	@echo DASHEDLABEL "[$(DASHEDLABEL)]"
 	@if [ "$(LABEL)" = "Makefile build succeeded" ]; then \
 	    echo "Error: MYVAR cannot be 'forbidden'"; \
 	    exit 1; \
