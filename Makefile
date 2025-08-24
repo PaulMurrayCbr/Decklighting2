@@ -29,7 +29,7 @@ EXECUTABLE := decklighting2
 # default git label
 LABEL=Makefile build succeeded
 STRIPPEDLABEL  := $(strip $(LABEL))
-DASHEDLABEL := $(shell echo $(NAME) | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$$//' -e 's/[[:space:]]\+/-/g')
+DASHEDLABEL := $(shell echo $(NAME) | sed -e 's/[[:space:]]+/-/g')
 
 # The main clean target
 clean:
