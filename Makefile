@@ -28,8 +28,6 @@ EXECUTABLE := decklighting2
 
 # default git label
 LABEL=Makefile build succeeded
-STRIPPEDLABEL  := $(strip $(LABEL))
-DASHEDLABEL := $(shell echo $(NAME) | sed -e 's/[[:space:]]+/-/g')
 
 # The main clean target
 clean:
@@ -70,9 +68,8 @@ push: $(EXECUTABLE) save
 	    echo "Error: MYVAR cannot be 'forbidden'"; \
 	    exit 1; \
 	fi
-	git branch -f "feature/$(DASHEDLABEL)"
+	git branch -f "feature/$(shell echo $(NAME) | sed -E 's/ +/-/g')"
 	git push --all
-	
 
 send:
 	rsync -av --exclude='*.o' src/ p@neopixel.local:/home/p/decklighting2/src
