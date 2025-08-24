@@ -8,8 +8,8 @@
  *
  *
  * TODO: save and load config. Now that we have a filesystem, it would be nice to be able to save an load effect state and global state
- * with usefl names. Effect state should not include which section - it should just be 'Dusk Ambience', global state would be
- * 'brighness 16, Dusk Ambience for FrontDoor, GameRoom merged, everything else off'
+ * with useful names. Effect state should not include which section - it should just be 'Dusk Ambience', global state would be
+ * 'brightness 16, Dusk Ambience for FrontDoor, GameRoom merged, everything else off'
  *
  * Ugh - so the state for a section could either be 'loaded from a file', with a default of plain white, and an 'edited' flag.
  * This might be too hard.
