@@ -29,7 +29,7 @@ EXECUTABLE := decklighting2
 # default git label
 LABEL=Makefile build succeeded
 STRIPPEDLABEL  := $(strip $(LABEL))
-DASHEDLABEL := $(subst $(space),-,$(STRIPPEDLABEL))
+DASHEDLABEL := $(subst ' ',-,$(STRIPPEDLABEL))
 
 # The main clean target
 clean:
