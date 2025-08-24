@@ -26,6 +26,9 @@ SOURCES := $(foreach dir,$(SRCDIRS),$(wildcard $(dir)/*.cpp))
 OBJECTS := $(SOURCES:.cpp=.o)
 EXECUTABLE := decklighting2
 
+# default git label
+LABEL=Makefile build succeeded
+
 
 # The main clean target
 clean:
@@ -51,8 +54,20 @@ maybe_save:
 endif
 
 save: $(EXECUTABLE)
+	@if [ -z "$(LABEL)" ]; then \
+	    echo "Error: LABEL cannot be blank"; \
+	    exit 1; \
+	fi
 	git add .
-	git commit -m 'Makefile build succeeded' && git push --all || true
+	git commit -m "$(LABEL)" && git push --all || true
+	
+push: $(EXECUTABLE) save
+	@if [ "$(LABEL)" = "Makefile build succeeded" ]; then \
+	    echo "Error: MYVAR cannot be 'forbidden'"; \
+	    exit 1; \
+	fi
+	git branch -f "$(LABEL)"
+	git push --all
 	
 
 send:
