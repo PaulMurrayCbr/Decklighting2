@@ -80,6 +80,7 @@ push: $(EXECUTABLE) save
 	git checkout main
 	
 	git push --all
+	git checkout main
 
 send:
 	rsync -av --exclude='*.o' src/ p@neopixel.local:/home/p/decklighting2/src
