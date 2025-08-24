@@ -46,33 +46,18 @@
 #ifndef SRC_CORE_API_HPP_
 #define SRC_CORE_API_HPP_
 
+#include <cstdint>
+
 #include "json.hpp"
+#include "state.hpp"
 
 using json = nlohmann::json;
 
 std::pair<int, json> api(const std::string &path, const std::multimap<std::string, std::string>& params, json& command);
 
 
-#include <cstdint>
-
-enum class SectionEffectType {
-	SOLID, THEATRE
-};
-
-enum class RgbInterpolationType {
-	FADE
-};
-
-struct RGB {
-	uint8_t r { 0 }, g { 0 }, b { 0 };
-};
-
 enum class SectionCommandType {
 	Off, On, Out, Set, Color
-};
-
-enum class Section {
-	Door, Game, Theatre, Deck, Back
 };
 
 class SectionGlobalCommand {
