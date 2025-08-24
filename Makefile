@@ -69,7 +69,7 @@ push: $(EXECUTABLE) save
 	
 	git show-ref --quiet refs/heads/saved || git branch saved
 	git checkout main
-	git checkout -b temp-squash
+	git checkout -bf temp-squash
 	git reset --soft saved
 	git commit -m "$(LABEL)"
 	git checkout saved
