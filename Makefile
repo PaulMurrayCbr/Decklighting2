@@ -68,6 +68,7 @@ push: $(EXECUTABLE) save
 	git branch -f "feature/$(shell echo $(LABEL) | sed -E 's/ +/-/g')"
 	
 	git show-ref --quiet refs/heads/saved || git branch saved
+	git show-ref --quiet refs/heads/temp-squash && git branch -D temp-squash || true
 	git checkout main
 	git checkout -b temp-squash
 	git reset --soft saved
