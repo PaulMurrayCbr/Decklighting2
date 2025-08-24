@@ -120,6 +120,7 @@ struct ColorRangeState {
 	AnimationState animation;
 	RGB from;
 	RGB to;
+	bool seamless;
 };
 
 
