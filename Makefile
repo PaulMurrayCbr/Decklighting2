@@ -28,7 +28,8 @@ EXECUTABLE := decklighting2
 
 # default git label
 LABEL=Makefile build succeeded
-DASHEDLABEL := $(subst $(space),-,$(strip $(LABEL)))
+STRIPPEDLABEL  := $(strip $(LABEL))
+DASHEDLABEL := $(subst $(space),-,$(STRIPPEDLABEL))
 
 # The main clean target
 clean:
@@ -66,7 +67,7 @@ push: $(EXECUTABLE) save
 	    echo "Error: MYVAR cannot be 'forbidden'"; \
 	    exit 1; \
 	fi
-	git branch -f feature/"$(DASHEDLABEL)"
+	git branch -f "feature/$(DASHEDLABEL)"
 	git push --all
 	
 
