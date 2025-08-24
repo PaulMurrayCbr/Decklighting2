@@ -65,7 +65,7 @@ push: $(EXECUTABLE) save
 	    echo "Error: Set LABEL'"; \
 	    exit 1; \
 	fi
-	git branch -f "feature/$(shell echo $(NAME) | sed -E 's/ +/-/g')"
+	git branch -f "feature/$(shell echo $(LABEL) | sed -E 's/ +/-/g')"
 	git push --all
 
 send:
