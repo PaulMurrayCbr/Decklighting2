@@ -70,7 +70,6 @@ struct RGB {
 
 struct AnimationState {
 	bool animating;
-	int animationFrame;
 	std::chrono::milliseconds frameDuration;
 	std::chrono::time_point<std::chrono::steady_clock> previousFrameTime;
 
@@ -120,6 +119,9 @@ struct ColorRangeState {
 	AnimationState animation;
 	RGB from;
 	RGB to;
+	double midpoint; // >0 to <1 default .5 Solve toget the quadratic coeficients
+	bool seamless;
+	std::chrono::milliseconds cycleSpeed;
 };
 
 
@@ -130,7 +132,6 @@ struct SectionState {
 	bool needsReset;
 
 	SectionEffectType effect;
-	AnimationState animation;
 
 	ColorRangeState colors[NCOLORANGES];
 
