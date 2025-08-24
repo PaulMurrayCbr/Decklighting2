@@ -66,7 +66,7 @@ push: $(EXECUTABLE) save
 	    echo "Error: MYVAR cannot be 'forbidden'"; \
 	    exit 1; \
 	fi
-	git branch -f "$(LABEL)"
+	git branch -f feature/"$(LABEL)"
 	git push --all
 	
 
