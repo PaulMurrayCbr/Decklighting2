@@ -63,7 +63,6 @@ enum class SectionCommandType {
 class SectionGlobalCommand {
 	int brightness;
 	int density;
-	int speed;
 	SectionEffectType effect;
 };
 
@@ -84,7 +83,11 @@ class SectionColorCommand: SectionColorRangeCommand {
 };
 class SectionInterpolationCommand: SectionColorRangeCommand {
 	RgbInterpolationType interpolation;
-	int speed;
+	double midpoint; // >0 to <1 default .5 Solve to get the quadratic coeficients
+	bool seamless;
+	bool animating;
+	int frameDuration;
+	int cycleSpeed;
 };
 class SectionSetCommand : SectionGlobalCommand {
 };
