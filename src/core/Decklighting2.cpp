@@ -42,13 +42,6 @@ int main() {
 	}
 
 
-//	for (auto const& [k, v] : SECTION_NAME_OF) {
-//	    std::cout << k << " → " << v << "\n";
-//	}
-//	for (auto const& [k, v] : SECTION_ENUM_OF) {
-//	    std::cout << k << " → " << v << "\n";
-//	}
-
     std::cout << "Starting ...\n";
 
 	start_webserver();
