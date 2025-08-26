@@ -22,6 +22,26 @@ int main() {
 //    const int GPIO_PIN = 18;      // PWM0 (requires level shifter to 5V on data)
 //    const int LED_COUNT = 60;
 
+	for (auto const& pair : EFFECT_TYPE_NAME_OF) {
+			    std::cout << static_cast<int>(pair.first) << " → " << pair.second << "\n";
+	}
+	for (auto const& pair : EFFECT_TYPE_ENUM_OF) {
+			    std::cout << pair.first << " → " << static_cast<int>(pair.second) << "\n";
+	}
+	for (auto const& pair : INTERPOLATION_TYPE_NAME_OF) {
+			    std::cout << static_cast<int>(pair.first) << " → " << pair.second << "\n";
+	}
+	for (auto const& pair : INTERPOLATION_TYPE_ENUM_OF) {
+			    std::cout << pair.first << " → " << static_cast<int>(pair.second) << "\n";
+	}
+	for (auto const& pair : SECTION_NAME_OF) {
+			    std::cout << static_cast<int>(pair.first) << " → " << pair.second << "\n";
+	}
+	for (auto const& pair : SECTION_ENUM_OF) {
+			    std::cout << pair.first << " → " << static_cast<int>(pair.second) << "\n";
+	}
+
+
     std::cout << "Starting ...\n";
 
 	start_webserver();
