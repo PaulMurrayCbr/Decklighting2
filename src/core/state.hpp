@@ -11,6 +11,7 @@
 #include <mutex>
 #include <unordered_map>
 #include <map>
+#include <functional>
 
 
 /*
@@ -31,7 +32,8 @@
     EFFECT(THEATRE)
 
 #define INTERPOLATION_TYPE_LIST \
-	INTERPOLATION(FADE)
+	INTERPOLATION(FADE) \
+	INTERPOLATION(QFADE)
 
 #define SECTION_LIST \
 	SECTION(Door) \
