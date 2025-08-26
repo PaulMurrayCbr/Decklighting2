@@ -9,6 +9,8 @@
 #include <cstdint>
 #include <chrono>
 #include <mutex>
+#include <unordered_map>
+#include <map>
 
 
 /*
@@ -59,9 +61,26 @@ enum class Section {
 #undef SECTION
 };
 
-extern const std::string EFFECT_NAME[];
-extern const std::string INTERPOLATION_NAME[];
+struct EnumClassHash {
+    template <typename T>
+    std::size_t operator()(T t) const {
+        return static_cast<std::size_t>(t);
+    }
+};
+
+
+extern const std::string EFFECT_TYPE_NAME[];
+extern const std::string INTERPOLATION_TYPE_NAME[];
 extern const std::string SECTION_NAME[];
+
+extern const std::unordered_map<SectionEffectType, std::string, EnumClassHash> EFFECT_TYPE_NAME_OF ;
+extern const std::map<std::string, SectionEffectType> EFFECT_TYPE_ENUM_OF;
+extern const std::unordered_map<RgbInterpolationType, std::string, EnumClassHash> INTERPOLATION_TYPE_NAME_OF ;
+extern const std::map<std::string, RgbInterpolationType> INTERPOLATION_TYPE_ENUM_OF;
+extern const std::unordered_map<Section, std::string, EnumClassHash> SECTION_NAME_OF;
+extern const std::map<std::string, Section> SECTION_ENUM_OF ;
+
+
 
 enum class SectionMode { on, off, out };
 
