@@ -13,7 +13,6 @@
 #include <map>
 #include <functional>
 
-
 /*
  * so:
  * #define STR(x) #x
@@ -47,82 +46,108 @@ static const int NCOLORANGES = 2;
 
 enum class SectionEffectType {
 #define EFFECT(name) name,
-	EFFECT_TYPE_LIST
+    EFFECT_TYPE_LIST
 #undef EFFECT
 };
 
 enum class RgbInterpolationType {
 #define INTERPOLATION(name) name,
-	INTERPOLATION_TYPE_LIST
+    INTERPOLATION_TYPE_LIST
 #undef INTERPOLATION
 };
 
 enum class Section {
 #define SECTION(name) name,
-	SECTION_LIST
+    SECTION_LIST
 #undef SECTION
 };
 
 struct EnumClassHash {
-    template <typename T>
+    template<typename T>
     std::size_t operator()(T t) const {
         return static_cast<std::size_t>(t);
     }
 };
 
-
 extern const std::string EFFECT_TYPE_NAME[];
 extern const std::string INTERPOLATION_TYPE_NAME[];
 extern const std::string SECTION_NAME[];
 
-extern const std::unordered_map<SectionEffectType, std::string, EnumClassHash> EFFECT_TYPE_NAME_OF ;
+extern const std::unordered_map<SectionEffectType, std::string, EnumClassHash> EFFECT_TYPE_NAME_OF;
 extern const std::map<std::string, SectionEffectType> EFFECT_TYPE_ENUM_OF;
-extern const std::unordered_map<RgbInterpolationType, std::string, EnumClassHash> INTERPOLATION_TYPE_NAME_OF ;
+extern const std::unordered_map<RgbInterpolationType, std::string, EnumClassHash> INTERPOLATION_TYPE_NAME_OF;
 extern const std::map<std::string, RgbInterpolationType> INTERPOLATION_TYPE_ENUM_OF;
 extern const std::unordered_map<Section, std::string, EnumClassHash> SECTION_NAME_OF;
-extern const std::map<std::string, Section> SECTION_ENUM_OF ;
+extern const std::map<std::string, Section> SECTION_ENUM_OF;
+
+// throw std::out_of_range("map::at");
+
+inline std::string sectionName(int section) {
+    return SECTION_NAME_OF.at(static_cast<Section>(section));
+}
+inline std::string sectionName(Section section) {
+    return SECTION_NAME_OF.at(section);
+}
+inline std::string effectName(int effect) {
+    return EFFECT_TYPE_NAME_OF.at(static_cast<SectionEffectType>(effect));
+}
+inline std::string effectName(SectionEffectType effect) {
+    return EFFECT_TYPE_NAME_OF.at(effect);
+}
+inline std::string interpolationName(int interpolation) {
+    return INTERPOLATION_TYPE_NAME_OF.at(static_cast<RgbInterpolationType>(interpolation));
+}
+inline std::string interpolationName(RgbInterpolationType interpolation) {
+    return INTERPOLATION_TYPE_NAME_OF.at(interpolation);
+}
+inline Section sectionLookup(std::string name) {
+    return SECTION_ENUM_OF.at(name);
+}
+inline SectionEffectType effectLookup(std::string name) {
+    return EFFECT_TYPE_ENUM_OF.at(name);
+}
+inline RgbInterpolationType interpolationLookup(std::string name) {
+    return INTERPOLATION_TYPE_ENUM_OF.at(name);
+}
 
 
-
-enum class SectionMode { on, off, out };
-
+enum class SectionMode {
+    on, off, out
+};
 
 // these state values need to be structures that can be assigned with =
 
-
 struct RGB {
-	uint8_t r { 0 }, g { 0 }, b { 0 };
+    uint8_t r { 0 }, g { 0 }, b { 0 };
 };
 
-
 struct AnimationState {
-	bool animating;
-	std::chrono::milliseconds frameDuration;
-	std::chrono::time_point<std::chrono::steady_clock> previousFrameTime;
+    bool animating;
+    std::chrono::milliseconds frameDuration;
+    std::chrono::time_point<std::chrono::steady_clock> previousFrameTime;
 
-	void setFrameDuration(double ms) {
-		frameDuration = std::chrono::milliseconds(static_cast<int64_t>(ms));
-	}
+    void setFrameDuration(double ms) {
+        frameDuration = std::chrono::milliseconds(static_cast<int64_t>(ms));
+    }
 
-	void restart() {
-		previousFrameTime = std::chrono::steady_clock::now() - frameDuration;
-	}
+    void restart() {
+        previousFrameTime = std::chrono::steady_clock::now() - frameDuration;
+    }
 
-	/** note that this method sets the current frame time if it returns true
-	 * We do this immediately so that the frame rate is not affected by the time i takes to render the animation
-	 */
+    /** note that this method sets the current frame time if it returns true
+     * We do this immediately so that the frame rate is not affected by the time i takes to render the animation
+     */
 
-	bool nextFrameReady() {
-		auto now = std::chrono::steady_clock::now();
+    bool nextFrameReady() {
+        auto now = std::chrono::steady_clock::now();
 
-		if(now - previousFrameTime >= frameDuration) {
-			previousFrameTime = now;
-			return true;
-		}
-		else {
-			return false;
-		}
-	}
+        if (now - previousFrameTime >= frameDuration) {
+            previousFrameTime = now;
+            return true;
+        } else {
+            return false;
+        }
+    }
 };
 
 // dont need this here
@@ -141,49 +166,47 @@ struct EffectTHEATREState {
 };
 
 struct ColorRangeState {
-	AnimationState animation;
-	RGB from;
-	RGB to;
-	double midpoint; // >0 to <1 default .5 Solve toget the quadratic coeficients
-	bool seamless;
-	std::chrono::milliseconds cycleSpeed;
+    AnimationState animation;
+    RGB from;
+    RGB to;
+    double midpoint; // >0 to <1 default .5 Solve toget the quadratic coeficients
+    bool seamless;
+    std::chrono::milliseconds cycleSpeed;
 };
 
-
 struct SectionState {
-	SectionMode mode;
-	int brightness;
-	int density;
-	bool touched;
-	bool needsReset;
+    SectionMode mode;
+    int brightness;
+    int density;
+    bool touched;
+    bool needsRepaint;
 
-	SectionEffectType effect;
+    SectionEffectType effect;
 
-	ColorRangeState colors[NCOLORANGES];
+    ColorRangeState colors[NCOLORANGES];
 
-	union {
+    union {
 #define EFFECT(name) Effect##name##State name;
-		EFFECT_TYPE_LIST
+        EFFECT_TYPE_LIST
 #undef EFFECT
-	} effectState;
+    } effectState;
 };
 
 struct GlobalState {
-	bool on;
-	int brightness;
-	bool touched;
-	bool needsReset;
+    bool on;
+    int brightness;
+    bool touched;
+    bool needsRepaint;
 
-	struct SectionState section[NSECTIONS];
+    struct SectionState section[NSECTIONS];
 
 };
 
 extern GlobalState sharedState;
 extern std::mutex sharedStateMutex;
 
-
 inline void inSharedStateMutex(std::function<void()> f) {
-	std::lock_guard<std::mutex> lock(sharedStateMutex);
+    std::lock_guard<std::mutex> lock(sharedStateMutex);
     f();
 }
 

@@ -38,7 +38,7 @@ namespace {
                 sharedState.brightness = cmd.brightness;
             }
             sharedState.touched = true;
-            sharedState.needsReset = true;
+            sharedState.needsRepaint = true;
         });
     }
 
@@ -46,7 +46,7 @@ namespace {
         inSharedStateMutex([&] {
             sharedState.on = false;
             sharedState.touched = true;
-            sharedState.needsReset = true;
+            sharedState.needsRepaint = true;
         });
     }
 
@@ -140,7 +140,12 @@ namespace {
 }
 
 std::pair<int, json> api(const std::string &path, const std::multimap<std::string, std::string> &params, json &command) {
-    std::cout << "path is " << path << "\n";
-    std::stringstream ss(path);
-    return handle_root(ss, params, command);
+    try {
+        std::cout << "path is " << path << "\n";
+        std::stringstream ss(path);
+        return handle_root(ss, params, command);
+    } catch (const std::exception &e) {
+        std::cerr << "Caught exception: " << e.what() << "\n";
+        return {500, e.what()};
+    }
 }
