@@ -53,20 +53,20 @@
 
 using json = nlohmann::json;
 
-std::pair<int, json> api(const std::string &path, const std::multimap<std::string, std::string>& params, json& command);
-
+std::pair<int, json> api(const std::string &path, const std::multimap<std::string, std::string> &params, json &command);
 
 enum class SectionCommandType {
-	Off, On, Out, Set, Color
+    Off, On, Out, Set, Color
 };
 
 class SectionGlobalCommand {
-	int brightness;
-	int density;
-	SectionEffectType effect;
+public:
+    int brightness;
+    int density;
+    SectionEffectType effect;
 };
 
-class SectionOnCommand : SectionGlobalCommand {
+class SectionOnCommand: SectionGlobalCommand {
 };
 class SectionOffCommand {
 };
@@ -74,67 +74,75 @@ class SectionOutCommand {
 };
 
 class SectionColorRangeCommand {
-	int index;
+    int index;
 };
 
 class SectionColorCommand: SectionColorRangeCommand {
-	bool isFrom;
-	RGB rgb;
+    bool isFrom;
+    RGB rgb;
 };
 class SectionInterpolationCommand: SectionColorRangeCommand {
-	RgbInterpolationType interpolation;
-	double midpoint; // >0 to <1 default .5 Solve to get the quadratic coeficients
-	bool seamless;
-	bool animating;
-	int frameDuration;
-	int cycleSpeed;
+    RgbInterpolationType interpolation;
+    double midpoint; // >0 to <1 default .5 Solve to get the quadratic coeficients
+    bool seamless;
+    bool animating;
+    int frameDuration;
+    int cycleSpeed;
 };
-class SectionSetCommand : SectionGlobalCommand {
+class SectionSetCommand: SectionGlobalCommand {
 };
 
 class SectionStateCommand {
-	SectionCommandType type;
-	Section section;
-	union {
-		SectionOnCommand on;
-		SectionOffCommand off;
-		SectionOutCommand out;
-		SectionColorCommand color;
-		SectionInterpolationCommand interpolation;
-		SectionSetCommand set;
-	} command;
+    SectionCommandType type;
+    Section section;
+    union {
+        SectionOnCommand on;
+        SectionOffCommand off;
+        SectionOutCommand out;
+        SectionColorCommand color;
+        SectionInterpolationCommand interpolation;
+        SectionSetCommand set;
+    } command;
 
 };
 
 enum class GlobalCommandType {
-	Off, On
+    Off, On
 };
 
 class GlobalOnCommand {
-	int brightness;
+public:
+    int brightness;
+
+    GlobalOnCommand(int b) :
+            brightness(b) {
+    }
 };
+
 class GlobalOffCommand {
+public:
 };
 
 struct GlobalStateCommand {
-	GlobalCommandType type;
-	union {
-		GlobalOnCommand on;
-		GlobalOffCommand off;
-	};
+public:
+    GlobalCommandType type;
+    union {
+        GlobalOnCommand on;
+        GlobalOffCommand off;
+    };
 };
 
 enum class CmdIsGlobal {
-	Global, Section
+    Global, Section
 };
 
 struct Command {
-	CmdIsGlobal type;
-	union {
-		GlobalStateCommand global;
-		SectionStateCommand section;
-	};
+public:
+    CmdIsGlobal type;
+    union {
+        GlobalStateCommand global;
+        SectionStateCommand section;
+    };
 };
-
 
 #endif /* SRC_CORE_API_HPP_ */

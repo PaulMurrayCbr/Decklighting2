@@ -135,11 +135,9 @@ struct AnimationState {
 //#undef EFFECT
 
 struct EffectSOLIDState {
-
 };
 
 struct EffectTHEATREState {
-
 };
 
 struct ColorRangeState {
