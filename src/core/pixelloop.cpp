@@ -29,13 +29,16 @@ class PixelLoop {
 
 			inSharedStateMutex([&] {
 				state = sharedState;
-				state.touched = false;
-				state.needsReset = false;
+				sharedState.touched = false;
+				sharedState.needsReset = false;
 				for (SectionState *section = sharedState.section; section < sharedState.section + NSECTIONS;  section++) {
 					section->touched = false;
 					section->needsReset = false;
 				}
 			});
+
+			if(state.touched) std::cout << "global state touched";
+					if(state.needsReset) std::cout << "global state needs reset";
 
 			std::this_thread::yield();
 		}

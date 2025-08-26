@@ -47,7 +47,6 @@ enum class SectionEffectType {
 #undef EFFECT
 };
 
-
 enum class RgbInterpolationType {
 #define INTERPOLATION(name) name,
 	INTERPOLATION_TYPE_LIST
@@ -60,9 +59,15 @@ enum class Section {
 #undef SECTION
 };
 
+extern const std::string EFFECT_NAME[];
+extern const std::string INTERPOLATION_NAME[];
+extern const std::string SECTION_NAME[];
+
 enum class SectionMode { on, off, out };
 
+
 // these state values need to be structures that can be assigned with =
+
 
 struct RGB {
 	uint8_t r { 0 }, g { 0 }, b { 0 };
