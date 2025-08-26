@@ -8,6 +8,7 @@
 
 #include <cstdint>
 #include <chrono>
+#include <mutex>
 
 
 /*
@@ -129,6 +130,7 @@ struct SectionState {
 	SectionMode mode;
 	int brightness;
 	int density;
+	bool touched;
 	bool needsReset;
 
 	SectionEffectType effect;
@@ -145,10 +147,20 @@ struct SectionState {
 struct GlobalState {
 	bool on;
 	int brightness;
+	bool touched;
 	bool needsReset;
 
 	struct SectionState section[NSECTIONS];
 
 };
+
+extern GlobalState sharedState;
+extern std::mutex sharedStateMutex;
+
+
+inline void inSharedStateMutex(std::function<void()> f) {
+	std::lock_guard<std::mutex> lock(sharedStateMutex);
+    f();
+}
 
 #endif

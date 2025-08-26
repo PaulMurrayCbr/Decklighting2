@@ -6,5 +6,7 @@
  */
 
 
-
 #include "state.hpp"
+
+GlobalState sharedState;
+std::mutex sharedStateMutex;
