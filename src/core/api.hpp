@@ -21,7 +21,6 @@
  * /<section>/on
  *   ?brightness=0-255 (default -1 = no change)
  *   ?density= int (default -1 = no change)
- *   ?speed
  * /<section>/off
  * /<section>/out
  * /<section>/color/<index currently 1 or 2>/<from or to>
@@ -64,9 +63,17 @@ public:
     int brightness;
     int density;
     SectionEffectType effect;
+
+    SectionGlobalCommand(int b, int d, SectionEffectType e) :
+            brightness(b), density(d), effect(e) {
+    }
 };
 
 class SectionOnCommand: SectionGlobalCommand {
+public:
+    SectionOnCommand(int b, int d, SectionEffectType e) :
+            SectionGlobalCommand(b, d, e) {
+    }
 };
 class SectionOffCommand {
 };
