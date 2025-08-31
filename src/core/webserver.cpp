@@ -8,6 +8,7 @@
 #include "httplib.h"
 #include "json.hpp"
 
+#import "common.hpp"
 #include "webserver.hpp"
 #include "api.hpp"
 

@@ -26,34 +26,28 @@
 
 #include "api.hpp"
 #include "state.hpp"
+#include "commands.hpp"
 
 GlobalState state;
 
 namespace {
 
-    extern void handleCommand(GlobalOnCommand cmd) {
-        inSharedStateMutex([&] {
-            sharedState.on = true;
-            if (cmd.brightness != -1) {
-                sharedState.brightness = cmd.brightness;
-            }
-            sharedState.touched = true;
-            sharedState.needsReset = true;
-        });
-    }
-
-    extern void handleCommand(GlobalOffCommand cmd) {
-        inSharedStateMutex([&] {
-            sharedState.on = false;
-            sharedState.touched = true;
-            sharedState.needsReset = true;
-        });
-    }
-
     std::pair<int, json> sample(std::stringstream &path, const std::multimap<std::string, std::string> &params, json &command) {
         json j = "Not Implemented: ";
         return {404, j};
 
+    }
+
+    int toInt(const std::string &s, int min, int max) {
+        int v = std::stoi(s);
+        if (v < min || v > max) {
+            throw std::out_of_range(s + " must be " + std::to_string(min) + "-" + std::to_string(max));
+        }
+        return v;
+    }
+
+    int toByte(const std::string &s) {
+        return toInt(s, 0, 255);
     }
 
     std::pair<int, json> handle_global_on(std::stringstream &path, const std::multimap<std::string, std::string> &params, json &command) {
@@ -62,17 +56,7 @@ namespace {
 
         auto p = params.find("brightness");
         if (p != params.end()) {
-            try {
-                brightness = std::stoi(p->second);       // convert string to int
-
-                if (brightness < 0 || brightness > 255) {
-                    return {400, "bad brightness value: " + p->second};
-                }
-            } catch (const std::invalid_argument &e) {
-                return {400, "bad brightness value: " + p->second};
-            } catch (const std::out_of_range &e) {
-                return {400, "bad brightness value: " + p->second};
-            }
+            brightness = toByte(p->second);
         }
 
         handleCommand(GlobalOnCommand(brightness));
@@ -85,6 +69,56 @@ namespace {
         return {200, "should be turning off real soon"};
 
     }
+    std::pair<int, json> handle_section_on(Section section, std::stringstream &path, const std::multimap<std::string, std::string> &params, json &command) {
+        json j = "Not Implemented: ";
+        return {404, j};
+
+    }
+    std::pair<int, json> handle_section_off(Section section, std::stringstream &path, const std::multimap<std::string, std::string> &params, json &command) {
+        json j = "Not Implemented: ";
+        return {404, j};
+
+    }
+    std::pair<int, json> handle_section_out(Section section, std::stringstream &path, const std::multimap<std::string, std::string> &params, json &command) {
+        json j = "Not Implemented: ";
+        return {404, j};
+
+    }
+    std::pair<int, json> handle_section_color(Section section, std::stringstream &path, const std::multimap<std::string, std::string> &params, json &command) {
+        json j = "Not Implemented: ";
+        return {404, j};
+
+    }
+    std::pair<int, json> handle_section_set(Section section, std::stringstream &path, const std::multimap<std::string, std::string> &params, json &command) {
+        json j = "Not Implemented: ";
+        return {404, j};
+
+    }
+
+    std::pair<int, json> handle_section(Section section, std::stringstream &path, const std::multimap<std::string, std::string> &params, json &command) {
+        std::string frag;
+        std::getline(path, frag, '/');
+
+        if (frag.empty() || frag == "status") {
+            return {200, "this is the section  " + sectionName(section) + " status json"};
+
+        } else if (frag == "on") {
+            return handle_section_on(section, path, params, command);
+        } else if (frag == "off") {
+            return handle_section_off(section, path, params, command);
+        } else if (frag == "out") {
+            return handle_section_out(section, path, params, command);
+        } else if (frag == "color" || frag == "c" || frag == "colour") {
+            return handle_section_color(section, path, params, command);
+        } else if (frag == "set") {
+            return handle_section_set(section, path, params, command);
+        } else {
+            throw std::out_of_range(frag + " is not a section command");
+        }
+
+        return {404, "handling section " + sectionName(section) + " command " + frag + " not implemented"};
+
+    }
 
     std::pair<int, json> handle_api(std::stringstream &path, const std::multimap<std::string, std::string> &params, json &command) {
 
@@ -94,7 +128,7 @@ namespace {
         std::cout << "fragment at handle_api " << frag << "\n";
 
         if (!path || frag.empty() || frag == "status") {
-            json j = "This is the status json";
+            json j = "This is the global status json";
             return {200, j};
         } else if (frag == "on") {
             return handle_global_on(path, params, command);
@@ -103,12 +137,10 @@ namespace {
             return handle_global_off(path, params, command);
 
         } else {
-            json j = "Not Implemented: " + frag;
-            return {404, j};
-        }
+            // if it's not a global on or off, then it must be a section
 
-        json j = "Not Implemented: ";
-        return {404, j};
+            return handle_section(sectionLookup(frag), path, params, command);
+        }
 
     }
 
@@ -140,7 +172,13 @@ namespace {
 }
 
 std::pair<int, json> api(const std::string &path, const std::multimap<std::string, std::string> &params, json &command) {
-    std::cout << "path is " << path << "\n";
-    std::stringstream ss(path);
-    return handle_root(ss, params, command);
+    try {
+        std::cout << "path is " << path << "\n";
+        std::stringstream ss(path);
+        return handle_root(ss, params, command);
+    } catch (const std::out_of_range &e) {
+        return {400, e.what()};
+    } catch (const std::exception &e) {
+        return {500, e.what()};
+    }
 }

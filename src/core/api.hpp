@@ -21,7 +21,6 @@
  * /<section>/on
  *   ?brightness=0-255 (default -1 = no change)
  *   ?density= int (default -1 = no change)
- *   ?speed
  * /<section>/off
  * /<section>/out
  * /<section>/color/<index currently 1 or 2>/<from or to>
@@ -48,101 +47,13 @@
 
 #include <cstdint>
 
+#import "common.hpp"
 #include "json.hpp"
 #include "state.hpp"
+#include "commands.hpp"
 
 using json = nlohmann::json;
 
 std::pair<int, json> api(const std::string &path, const std::multimap<std::string, std::string> &params, json &command);
-
-enum class SectionCommandType {
-    Off, On, Out, Set, Color
-};
-
-class SectionGlobalCommand {
-public:
-    int brightness;
-    int density;
-    SectionEffectType effect;
-};
-
-class SectionOnCommand: SectionGlobalCommand {
-};
-class SectionOffCommand {
-};
-class SectionOutCommand {
-};
-
-class SectionColorRangeCommand {
-    int index;
-};
-
-class SectionColorCommand: SectionColorRangeCommand {
-    bool isFrom;
-    RGB rgb;
-};
-class SectionInterpolationCommand: SectionColorRangeCommand {
-    RgbInterpolationType interpolation;
-    double midpoint; // >0 to <1 default .5 Solve to get the quadratic coeficients
-    bool seamless;
-    bool animating;
-    int frameDuration;
-    int cycleSpeed;
-};
-class SectionSetCommand: SectionGlobalCommand {
-};
-
-class SectionStateCommand {
-    SectionCommandType type;
-    Section section;
-    union {
-        SectionOnCommand on;
-        SectionOffCommand off;
-        SectionOutCommand out;
-        SectionColorCommand color;
-        SectionInterpolationCommand interpolation;
-        SectionSetCommand set;
-    } command;
-
-};
-
-enum class GlobalCommandType {
-    Off, On
-};
-
-class GlobalOnCommand {
-public:
-    int brightness;
-
-    GlobalOnCommand(int b) :
-            brightness(b) {
-    }
-};
-
-class GlobalOffCommand {
-public:
-};
-
-struct GlobalStateCommand {
-public:
-    GlobalCommandType type;
-    union {
-        GlobalOnCommand on;
-        GlobalOffCommand off;
-    };
-};
-
-enum class CmdIsGlobal {
-    Global, Section
-};
-
-struct Command {
-public:
-    CmdIsGlobal type;
-    union {
-        GlobalStateCommand global;
-        SectionStateCommand section;
-    };
-};
 
 #endif /* SRC_CORE_API_HPP_ */

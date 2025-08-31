@@ -44,7 +44,7 @@ help:
 	@echo -e "\thelp:\tthis help"
 	@echo
 
-all: $(EXECUTABLE) # maybe_save
+all: clear $(EXECUTABLE) # maybe_save
 
 ifeq ($(UNAME_S),Darwin)
 maybe_save: save
@@ -93,5 +93,7 @@ $(EXECUTABLE): $(OBJECTS)
 %.o: %.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
+clear:
+	clear && printf '\e[3J'
 
 

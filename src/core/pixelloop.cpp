@@ -9,6 +9,7 @@
 #include <thread>
 #include <iostream>
 
+#import "common.hpp"
 #include "state.hpp"
 #include "pixelloop.hpp"
 
@@ -30,17 +31,26 @@ class PixelLoop {
             inSharedStateMutex([&] {
                 state = sharedState;
                 sharedState.touched = false;
-                sharedState.needsReset = false;
+                sharedState.needsRepaint = false;
                 for (SectionState *section = sharedState.section; section < sharedState.section + NSECTIONS; section++) {
                     section->touched = false;
-                    section->needsReset = false;
+                    section->needsRepaint = false;
                 }
             });
 
             if (state.touched)
                 std::cout << "global state touched\n";
-            if (state.needsReset)
-                std::cout << "global state needs reset\n";
+            if (state.needsRepaint)
+                std::cout << "global state needs repaint\n";
+
+            for (int i = 0; i < NSECTIONS; i++) {
+                if (state.section[i].touched) {
+                    std::cout << sectionName(i) << " touched";
+                }
+                if (state.section[i].needsRepaint) {
+                    std::cout << sectionName(i) << " needs repaint";
+                }
+            }
 
             std::this_thread::yield();
         }
