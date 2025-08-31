@@ -45,12 +45,12 @@
 #ifndef SRC_CORE_API_HPP_
 #define SRC_CORE_API_HPP_
 
-#include <cstdint>
+#include <string>
+#include <map>
+
+#import "json.hpp"
 
 #import "common.hpp"
-#include "json.hpp"
-#include "state.hpp"
-#include "commands.hpp"
 
 using json = nlohmann::json;
 

@@ -24,11 +24,9 @@
 #include <iostream>
 #include <sstream>
 
-#include "api.hpp"
-#include "state.hpp"
 #include "commands.hpp"
 
-GlobalState state;
+#include "api.hpp"
 
 namespace {
 

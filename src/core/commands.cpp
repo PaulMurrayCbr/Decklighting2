@@ -6,6 +6,7 @@
  */
 
 #import "common.hpp"
+#import "state.hpp"
 #import "commands.hpp"
 
 void handleCommand(const GlobalOnCommand &cmd) {
