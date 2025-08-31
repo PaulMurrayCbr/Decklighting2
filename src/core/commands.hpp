@@ -9,7 +9,6 @@
 #define SRC_CORE_COMMANDS_HPP_
 
 #import "common.hpp"
-#include "state.hpp"
 
 enum class SectionCommandType {
     Off, On, Out, Set, Color
