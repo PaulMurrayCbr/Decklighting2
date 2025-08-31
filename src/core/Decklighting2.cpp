@@ -4,6 +4,7 @@
 #include <csignal>
 #include <iostream>
 
+#import "common.hpp"
 #include "state.hpp"
 #include "webserver.hpp"
 #include "pixelloop.hpp"

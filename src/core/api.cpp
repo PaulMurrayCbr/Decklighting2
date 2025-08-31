@@ -26,29 +26,11 @@
 
 #include "api.hpp"
 #include "state.hpp"
+#include "commands.hpp"
 
 GlobalState state;
 
 namespace {
-
-    extern void handleCommand(GlobalOnCommand cmd) {
-        inSharedStateMutex([&] {
-            sharedState.on = true;
-            if (cmd.brightness != -1) {
-                sharedState.brightness = cmd.brightness;
-            }
-            sharedState.touched = true;
-            sharedState.needsRepaint = true;
-        });
-    }
-
-    extern void handleCommand(GlobalOffCommand cmd) {
-        inSharedStateMutex([&] {
-            sharedState.on = false;
-            sharedState.touched = true;
-            sharedState.needsRepaint = true;
-        });
-    }
 
     std::pair<int, json> sample(std::stringstream &path, const std::multimap<std::string, std::string> &params, json &command) {
         json j = "Not Implemented: ";
@@ -132,10 +114,8 @@ namespace {
             return handle_section_set(section, path, params, command);
         } else {
             throw std::out_of_range(frag + " is not a section command");
-
         }
 
-        handleCommand(GlobalOffCommand());
         return {404, "handling section " + sectionName(section) + " command " + frag + " not implemented"};
 
     }
