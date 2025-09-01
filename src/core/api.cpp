@@ -25,6 +25,7 @@
 #include <sstream>
 
 #include "commands.hpp"
+#import "state.hpp"
 
 #include "api.hpp"
 
@@ -58,13 +59,13 @@ namespace {
         }
 
         handleCommand(GlobalOnCommand(brightness));
-        return {200, "should be turning on real soon"};
+        return {200, getGlobalState()};
 
     }
 
     std::pair<int, json> handle_global_off(std::stringstream &path, const std::multimap<std::string, std::string> &params, json &command) {
         handleCommand(GlobalOffCommand());
-        return {200, "should be turning off real soon"};
+        return {200,  getGlobalState()};
 
     }
     std::pair<int, json> handle_section_on(Section section, std::stringstream &path, const std::multimap<std::string, std::string> &params, json &command) {
@@ -98,7 +99,7 @@ namespace {
         std::getline(path, frag, '/');
 
         if (frag.empty() || frag == "status") {
-            return {200, "this is the section  " + sectionName(section) + " status json"};
+            return {200, getSectionState(section)};
 
         } else if (frag == "on") {
             return handle_section_on(section, path, params, command);
@@ -126,8 +127,7 @@ namespace {
         std::cout << "fragment at handle_api " << frag << "\n";
 
         if (!path || frag.empty() || frag == "status") {
-            json j = "This is the global status json";
-            return {200, j};
+            return {200, getGlobalState()};
         } else if (frag == "on") {
             return handle_global_on(path, params, command);
 
