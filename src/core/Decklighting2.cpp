@@ -7,6 +7,7 @@
 #include "common.hpp"
 
 #include "webserver.hpp"
+#include "state.hpp"
 #include "pixelloop.hpp"
 
 #ifdef __APPLE__
@@ -25,8 +26,17 @@ int main() {
 //    const int GPIO_PIN = 18;      // PWM0 (requires level shifter to 5V on data)
 //    const int LED_COUNT = 60;
 
-
     std::cout << "Starting ...\n";
+
+    // initialise the sections
+
+    int at = 0;
+    for (int i = 0; i < NSECTIONS; i++) {
+        SECTION_START[i] = at;
+        at += SECTION_LEN[i];
+        sharedState.section[i].length = SECTION_LEN[i];
+        sharedState.section[i].mode = SectionMode::on;
+    }
 
     start_webserver();
     start_pixelloop();
