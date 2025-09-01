@@ -11,6 +11,7 @@
 
 #import "common.hpp"
 #include "state.hpp"
+#include "effect.hpp"
 #include "pixelloop.hpp"
 
 class PixelLoop {
@@ -22,10 +23,6 @@ class PixelLoop {
 
         int n = 0;
         while (running.load()) {
-            if (n++ < 10) {
-                std::cerr << "Pixel loop running\n";
-            }
-
             GlobalState state;
 
             inSharedStateMutex([&] {

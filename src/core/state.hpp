@@ -77,6 +77,7 @@ struct SectionState {
     int density;
     bool touched;
     bool needsRepaint;
+    int length; // this gets computed when a section is brought in or taken out. And at startup, obviously.
 
     SectionEffectType effect;
 
@@ -93,7 +94,7 @@ struct GlobalState {
     bool on;
     int brightness;
     bool touched;
-    bool needsRepaint;
+    bool needsRepaint = true;
 
     struct SectionState section[NSECTIONS];
 
