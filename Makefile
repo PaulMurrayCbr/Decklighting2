@@ -12,11 +12,11 @@ SHELL = /bin/bash
 UNAME_S := $(shell uname -s)
 
 ifeq ($(UNAME_S),Darwin)
-    SRCDIRS := src/core src/osx
+    SRCDIRS := src/core src/lib src/osx
     CXX := clang++
     CXXFLAGS := -std=c++11
 else ifeq ($(UNAME_S),Linux)
-    SRCDIRS := src/core src/pi
+    SRCDIRS := src/core src/lib src/pi
 else
     $(error Unsupported platform: $(UNAME_S))
 endif
