@@ -10,6 +10,10 @@
 
 #include "effect.hpp"
 
-void effectRunner_THEATRE(SectionState &s, bool repaint_required) {
+namespace {
+    void run(SectionState &s, bool repaint_required) {
+    }
 
 }
+
+void (*effectRunner_THEATRE)(SectionState &s, bool repaint_required) = run;

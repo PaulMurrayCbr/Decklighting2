@@ -13,8 +13,8 @@
 
 #include "effect.hpp"
 
-extern void effectRunner_SOLID(SectionState&, bool);
-extern void effectRunner_THEATRE(SectionState&, bool);
+extern void (*effectRunner_SOLID)(SectionState&, bool);
+extern void (*effectRunner_THEATRE)(SectionState&, bool);
 
 const std::unordered_map<SectionEffectType, void (*)(SectionState&, bool), EnumClassHash> EFFECT_RUNNERS = //
         { //
