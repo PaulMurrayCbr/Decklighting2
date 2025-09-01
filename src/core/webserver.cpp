@@ -5,8 +5,8 @@
 #include <atomic>
 #include <unistd.h>
 
-#include "httplib.h"
-#include "json.hpp"
+#include "../lib/httplib.h"
+#include "../lib/json.hpp"
 
 #import "common.hpp"
 #include "webserver.hpp"

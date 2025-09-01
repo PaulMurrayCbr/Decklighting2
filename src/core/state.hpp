@@ -13,6 +13,9 @@
 #include <map>
 #include <functional>
 
+#import "../lib/json.hpp"
+using json = nlohmann::json;
+
 #import "common.hpp"
 
 struct AnimationState {
@@ -98,6 +101,8 @@ struct GlobalState {
 
 extern GlobalState sharedState;
 extern std::mutex sharedStateMutex;
+extern json getGlobalState();
+extern json getSectionState(Section section);
 
 inline void inSharedStateMutex(std::function<void()> f) {
     std::lock_guard<std::mutex> lock(sharedStateMutex);
