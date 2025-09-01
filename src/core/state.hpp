@@ -13,10 +13,10 @@
 #include <map>
 #include <functional>
 
-#import "../lib/json.hpp"
+#include "../lib/json.hpp"
 using json = nlohmann::json;
 
-#import "common.hpp"
+#include "common.hpp"
 
 struct AnimationState {
     bool animating;

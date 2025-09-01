@@ -8,7 +8,7 @@
 #ifndef SRC_CORE_PIXELLOOP_HPP_
 #define SRC_CORE_PIXELLOOP_HPP_
 
-#import "common.hpp"
+#include "common.hpp"
 
 void start_pixelloop();
 void stop_pixelloop();

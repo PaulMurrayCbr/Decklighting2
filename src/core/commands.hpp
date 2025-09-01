@@ -8,7 +8,7 @@
 #ifndef SRC_CORE_COMMANDS_HPP_
 #define SRC_CORE_COMMANDS_HPP_
 
-#import "common.hpp"
+#include "common.hpp"
 
 enum class SectionCommandType {
     Off, On, Out, Set, Color

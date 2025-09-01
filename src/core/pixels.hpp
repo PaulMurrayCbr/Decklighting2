@@ -1,7 +1,7 @@
 #ifndef SRC_CORE_PIXELS_HPP
 #define SRC_CORE_PIXELS_HPP
 
-#import "common.hpp"
+#include "common.hpp"
 
 const char* helloWorld();
 

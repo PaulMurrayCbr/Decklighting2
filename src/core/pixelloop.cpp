@@ -9,7 +9,7 @@
 #include <thread>
 #include <iostream>
 
-#import "common.hpp"
+#include "common.hpp"
 #include "state.hpp"
 #include "effect.hpp"
 #include "pixelloop.hpp"

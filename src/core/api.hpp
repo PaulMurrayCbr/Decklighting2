@@ -48,9 +48,9 @@
 #include <string>
 #include <map>
 
-#import "../lib/json.hpp"
+#include "../lib/json.hpp"
 
-#import "common.hpp"
+#include "common.hpp"
 
 using json = nlohmann::json;
 

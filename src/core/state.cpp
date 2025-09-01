@@ -9,7 +9,7 @@
 #include <string>    // for std::string
 #include <iomanip>   // for std::setw, std::setfill
 
-#import "common.hpp"
+#include "common.hpp"
 #include "state.hpp"
 
 GlobalState sharedState;
