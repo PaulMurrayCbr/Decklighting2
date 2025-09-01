@@ -52,7 +52,7 @@ else
 maybe_save: 
 endif
 
-save: $(EXECUTABLE)
+save: clean $(EXECUTABLE)
 	@if [ -z "$(LABEL)" ]; then \
 	    echo "Error: LABEL cannot be blank"; \
 	    exit 1; \
@@ -60,7 +60,7 @@ save: $(EXECUTABLE)
 	git add .
 	git commit -m "$(LABEL)" && git push --all || true
 	
-push: $(EXECUTABLE) save
+push: clean $(EXECUTABLE) save
 	@if [ "$(LABEL)" = "Makefile build succeeded" ]; then \
 	    echo "Error: Set LABEL'"; \
 	    exit 1; \
