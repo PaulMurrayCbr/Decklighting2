@@ -44,12 +44,18 @@ help:
 	@echo -e "\thelp:\tthis help"
 	@echo
 
-all: clear $(EXECUTABLE) # maybe_save
+all: clear $(EXECUTABLE) maybe_doc # maybe_save
 
 ifeq ($(UNAME_S),Darwin)
 maybe_save: save
 else
 maybe_save: 
+endif
+
+ifeq ($(UNAME_S),Darwin)
+maybe_doc: doc
+else
+maybe_doc: 
 endif
 
 save: $(EXECUTABLE)
@@ -60,7 +66,7 @@ save: $(EXECUTABLE)
 	git add .
 	git commit -m "$(LABEL)" && git push --all || true
 	
-push: $(EXECUTABLE) save
+push: clean $(EXECUTABLE) save
 	@if [ "$(LABEL)" = "Makefile build succeeded" ]; then \
 	    echo "Error: Set LABEL'"; \
 	    exit 1; \
@@ -95,5 +101,10 @@ $(EXECUTABLE): $(OBJECTS)
 
 clear:
 	clear && printf '\e[3J'
+
+doc: src/core/doc.png
+
+src/core/doc.png: src/core/doc.dot
+	dot -Tpng -o $@ $<
 
 

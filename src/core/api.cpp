@@ -25,7 +25,7 @@
 #include <sstream>
 
 #include "commands.hpp"
-#import "state.hpp"
+#include "state.hpp"
 
 #include "api.hpp"
 
@@ -49,49 +49,85 @@ namespace {
         return toInt(s, 0, 255);
     }
 
-    std::pair<int, json> handle_global_on(std::stringstream &path, const std::multimap<std::string, std::string> &params, json &command) {
-
-        int brightness = -1;
-
-        auto p = params.find("brightness");
-        if (p != params.end()) {
-            brightness = toByte(p->second);
+    inline void ifHasByteParam(const std::multimap<std::string, std::string> &params, const std::string &key, const std::function<void(int)> &f) {
+        auto it = params.find(key);
+        if (it != params.end()) {
+            f(toByte(it->second));
         }
+    }
 
-        handleCommand(GlobalOnCommand(brightness));
+    inline void ifHasStringParam(const std::multimap<std::string, std::string> &params, const std::string &key, const std::function<void(std::string)> &f) {
+        auto it = params.find(key);
+        if (it != params.end()) {
+            f(it->second);
+        }
+    }
+
+    std::pair<int, json> handle_global_on(std::stringstream &path, const std::multimap<std::string, std::string> &params, json &command) {
+        GlobalOnCommand cmd;
+        ifHasByteParam(params, "brightness", [&cmd](int v) {
+            cmd.brightness = v;
+        });
+        handleCommand(cmd);
         return {200, getGlobalState()};
 
     }
 
     std::pair<int, json> handle_global_off(std::stringstream &path, const std::multimap<std::string, std::string> &params, json &command) {
         handleCommand(GlobalOffCommand());
-        return {200,  getGlobalState()};
+        return {200, getGlobalState()};
 
     }
+
+    void populateSectionGlobalCommand(SectionGlobalCommand &cmd, const std::multimap<std::string, std::string> &params, json &command) {
+        cmd.brightness = -1;
+        cmd.density = -1;
+        cmd.effectTouched = false;
+
+        ifHasByteParam(params, "brightness", [&cmd](int v) {
+            cmd.brightness = v;
+        });
+
+        ifHasByteParam(params, "density", [&cmd](int v) {
+            cmd.density = v;
+        });
+
+        ifHasStringParam(params, "effect", [&cmd](std::string v) {
+            cmd.effect = EFFECT_TYPE_ENUM_OF.at(v);
+            cmd.effectTouched = true;
+        });
+
+    }
+
     std::pair<int, json> handle_section_on(Section section, std::stringstream &path, const std::multimap<std::string, std::string> &params, json &command) {
-        json j = "Not Implemented: ";
-        return {404, j};
+        SectionOnCommand cmd = SectionOnCommand(section);
+        populateSectionGlobalCommand(cmd, params, command);
+        handleCommand(cmd);
+        return {200, getSectionState(section)};
 
     }
     std::pair<int, json> handle_section_off(Section section, std::stringstream &path, const std::multimap<std::string, std::string> &params, json &command) {
-        json j = "Not Implemented: ";
-        return {404, j};
-
+        SectionOffCommand cmd = SectionOffCommand(section);
+        handleCommand(cmd);
+        return {200, getSectionState(section)};
     }
     std::pair<int, json> handle_section_out(Section section, std::stringstream &path, const std::multimap<std::string, std::string> &params, json &command) {
-        json j = "Not Implemented: ";
-        return {404, j};
-
-    }
-    std::pair<int, json> handle_section_color(Section section, std::stringstream &path, const std::multimap<std::string, std::string> &params, json &command) {
-        json j = "Not Implemented: ";
-        return {404, j};
+        SectionOutCommand cmd = SectionOutCommand(section);
+        handleCommand(cmd);
+        return {200, getSectionState(section)};
 
     }
     std::pair<int, json> handle_section_set(Section section, std::stringstream &path, const std::multimap<std::string, std::string> &params, json &command) {
+        SectionSetCommand cmd = SectionSetCommand(section);
+        populateSectionGlobalCommand(cmd, params, command);
+        handleCommand(cmd);
+        return {200, getSectionState(section)};
+
+    }
+
+    std::pair<int, json> handle_section_color(Section section, std::stringstream &path, const std::multimap<std::string, std::string> &params, json &command) {
         json j = "Not Implemented: ";
         return {404, j};
-
     }
 
     std::pair<int, json> handle_section(Section section, std::stringstream &path, const std::multimap<std::string, std::string> &params, json &command) {

@@ -13,7 +13,6 @@
 #include <unordered_map>
 #include <map>
 
-
 /*
  * so:
  * #define STR(x) #x
@@ -36,13 +35,27 @@
     INTERPOLATION(QFADE)
 
 #define SECTION_LIST \
-    SECTION(Door) \
-    SECTION(Game) \
-    SECTION(Theatre) \
+    SECTION(Back) \
     SECTION(Deck) \
-    SECTION(Back)
+    SECTION(Theatre) \
+    SECTION(Game) \
+    SECTION(Door)
 
-static const int NSECTIONS = 5;
+static const int NSECTIONS = 0
+#define SECTION(name) +1
+        SECTION_LIST
+#undef SECTION
+;
+
+const int Back_LEN = 3;
+const int Deck_LEN = 3;
+const int Theatre_LEN = 3;
+const int Game_LEN = 3;
+const int Door_LEN = 3;
+
+extern const int SECTION_LEN[];
+extern int SECTION_START[]; // not const, b/c this is computed on startup.
+
 static const int NCOLORANGES = 2;
 
 enum class SectionEffectType {
@@ -111,7 +124,6 @@ inline RgbInterpolationType interpolationLookup(std::string name) {
     return INTERPOLATION_TYPE_ENUM_OF.at(name);
 }
 
-
 enum class SectionMode {
     on, off, out
 };
@@ -121,7 +133,5 @@ enum class SectionMode {
 struct RGB {
     uint8_t r { 0 }, g { 0 }, b { 0 };
 };
-
-
 
 #endif /* SRC_CORE_COMMON_HPP_ */

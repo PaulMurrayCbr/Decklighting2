@@ -9,7 +9,7 @@
 #include <string>    // for std::string
 #include <iomanip>   // for std::setw, std::setfill
 
-#import "common.hpp"
+#include "common.hpp"
 #include "state.hpp"
 
 GlobalState sharedState;
@@ -74,13 +74,10 @@ namespace {
 }
 
 json getGlobalState() {
-    std::lock_guard<std::mutex> lock(sharedStateMutex);
-    return toJson();
+    return inSharedStateMutex([]() { return toJson();});
 
 }
 
 json getSectionState(Section section) {
-    std::lock_guard<std::mutex> lock(sharedStateMutex);
-    return toJson(section);
+    return inSharedStateMutex([section]() {return toJson(section);});
 }
-

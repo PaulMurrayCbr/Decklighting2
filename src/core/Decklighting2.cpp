@@ -4,9 +4,10 @@
 #include <csignal>
 #include <iostream>
 
-#import "common.hpp"
+#include "common.hpp"
 
 #include "webserver.hpp"
+#include "state.hpp"
 #include "pixelloop.hpp"
 
 #ifdef __APPLE__
@@ -25,26 +26,17 @@ int main() {
 //    const int GPIO_PIN = 18;      // PWM0 (requires level shifter to 5V on data)
 //    const int LED_COUNT = 60;
 
-    for (auto const &pair : EFFECT_TYPE_NAME_OF) {
-        std::cout << static_cast<int>(pair.first) << " → " << pair.second << "\n";
-    }
-    for (auto const &pair : EFFECT_TYPE_ENUM_OF) {
-        std::cout << pair.first << " → " << static_cast<int>(pair.second) << "\n";
-    }
-    for (auto const &pair : INTERPOLATION_TYPE_NAME_OF) {
-        std::cout << static_cast<int>(pair.first) << " → " << pair.second << "\n";
-    }
-    for (auto const &pair : INTERPOLATION_TYPE_ENUM_OF) {
-        std::cout << pair.first << " → " << static_cast<int>(pair.second) << "\n";
-    }
-    for (auto const &pair : SECTION_NAME_OF) {
-        std::cout << static_cast<int>(pair.first) << " → " << pair.second << "\n";
-    }
-    for (auto const &pair : SECTION_ENUM_OF) {
-        std::cout << pair.first << " → " << static_cast<int>(pair.second) << "\n";
-    }
-
     std::cout << "Starting ...\n";
+
+    // initialise the sections
+
+    int at = 0;
+    for (int i = 0; i < NSECTIONS; i++) {
+        SECTION_START[i] = at;
+        at += SECTION_LEN[i];
+        sharedState.section[i].length = SECTION_LEN[i];
+        sharedState.section[i].mode = SectionMode::on;
+    }
 
     start_webserver();
     start_pixelloop();

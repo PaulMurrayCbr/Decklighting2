@@ -8,109 +8,114 @@
 #ifndef SRC_CORE_COMMANDS_HPP_
 #define SRC_CORE_COMMANDS_HPP_
 
-#import "common.hpp"
+#include "common.hpp"
 
-enum class SectionCommandType {
-    Off, On, Out, Set, Color
-};
-
-class SectionGlobalCommand {
+class SectionCommand {
 public:
-    int brightness;
-    int density;
-    SectionEffectType effect;
+    Section section;
 
-    SectionGlobalCommand(int b, int d, SectionEffectType e) :
-            brightness(b), density(d), effect(e) {
+    SectionCommand(Section section) :
+            section(section) {
+
     }
 };
 
-class SectionOnCommand: SectionGlobalCommand {
+class SectionGlobalCommand: public SectionCommand {
 public:
-    SectionOnCommand(int b, int d, SectionEffectType e) :
-            SectionGlobalCommand(b, d, e) {
+    int brightness = -1;
+    int density = -1;
+    bool effectTouched = false;
+    SectionEffectType effect = SectionEffectType::SOLID;
+
+    SectionGlobalCommand(Section section) :
+            SectionCommand(section) {
+
     }
 };
-class SectionOffCommand {
-};
-class SectionOutCommand {
+
+class SectionOnCommand: public SectionGlobalCommand {
+public:
+    SectionOnCommand(Section section) :
+            SectionGlobalCommand(section) {
+    }
 };
 
-class SectionColorRangeCommand {
+class SectionOffCommand: public SectionCommand {
+public:
+    SectionOffCommand(Section section) :
+            SectionCommand(section) {
+
+    }
+};
+
+class SectionOutCommand: public SectionCommand {
+public:
+    SectionOutCommand(Section section) :
+            SectionCommand(section) {
+
+    }
+};
+
+class SectionColorRangeCommand: public SectionCommand {
+public:
     int index;
+    SectionColorRangeCommand(Section section, int index) :
+            SectionCommand(section), index(index) {
+
+    }
 };
 
-class SectionColorCommand: SectionColorRangeCommand {
+class SectionColorCommand: public SectionColorRangeCommand {
+public:
     bool isFrom;
     RGB rgb;
+    int index;
+
+    SectionColorCommand(Section section, int index, bool isFrom) :
+            SectionColorRangeCommand(section, index), isFrom(isFrom) {
+
+    }
 };
-class SectionInterpolationCommand: SectionColorRangeCommand {
+
+class SectionInterpolationCommand: public SectionColorRangeCommand {
+public:
     RgbInterpolationType interpolation;
     double midpoint; // >0 to <1 default .5 Solve to get the quadratic coeficients
     bool seamless;
     bool animating;
     int frameDuration;
     int cycleSpeed;
-};
-class SectionSetCommand: SectionGlobalCommand {
-};
+    SectionInterpolationCommand(Section section, int index) :
+            SectionColorRangeCommand(section, index) {
 
-class SectionStateCommand {
-    SectionCommandType type;
-    Section section;
-    union {
-        SectionOnCommand on;
-        SectionOffCommand off;
-        SectionOutCommand out;
-        SectionColorCommand color;
-        SectionInterpolationCommand interpolation;
-        SectionSetCommand set;
-    } command;
-
+    }
 };
 
-enum class GlobalCommandType {
-    Off, On
+class SectionSetCommand: public SectionGlobalCommand {
+public:
+    SectionSetCommand(Section section) :
+            SectionGlobalCommand(section) {
+
+    }
 };
 
 class GlobalOnCommand {
 public:
-    int brightness;
-
-    GlobalOnCommand(int b) :
-            brightness(b) {
-    }
+    int brightness = -1;
 };
 
 class GlobalOffCommand {
 public:
 };
 
-struct GlobalStateCommand {
-public:
-    GlobalCommandType type;
-    union {
-        GlobalOnCommand on;
-        GlobalOffCommand off;
-    };
-};
-
-enum class CmdIsGlobal {
-    Global, Section
-};
-
-struct Command {
-public:
-    CmdIsGlobal type;
-    union {
-        GlobalStateCommand global;
-        SectionStateCommand section;
-    };
-};
-
-
 extern void handleCommand(const GlobalOnCommand &cmd);
 extern void handleCommand(const GlobalOffCommand &cmd);
-
+extern void handleCommand(const GlobalOffCommand &cmd);
+extern void handleCommand(const SectionOnCommand &cmd);
+extern void handleCommand(const SectionOutCommand &cmd);
+extern void handleCommand(const SectionOffCommand &cmd);
+extern void handleCommand(const SectionSetCommand &cmd);
+extern void handleCommand(const SectionColorCommand &cmd);
+extern void handleCommand(const SectionInterpolationCommand &cmd);
 
 #endif /* SRC_CORE_COMMANDS_HPP_ */

@@ -12,11 +12,12 @@
 #include <unordered_map>
 #include <map>
 #include <functional>
+#include <utility>
 
-#import "../lib/json.hpp"
+#include "../lib/json.hpp"
 using json = nlohmann::json;
 
-#import "common.hpp"
+#include "common.hpp"
 
 struct AnimationState {
     bool animating;
@@ -77,6 +78,7 @@ struct SectionState {
     int density;
     bool touched;
     bool needsRepaint;
+    int length; // this gets computed when a section is brought in or taken out. And at startup, obviously.
 
     SectionEffectType effect;
 
@@ -93,7 +95,7 @@ struct GlobalState {
     bool on;
     int brightness;
     bool touched;
-    bool needsRepaint;
+    bool needsRepaint = true;
 
     struct SectionState section[NSECTIONS];
 
@@ -104,9 +106,12 @@ extern std::mutex sharedStateMutex;
 extern json getGlobalState();
 extern json getSectionState(Section section);
 
-inline void inSharedStateMutex(std::function<void()> f) {
+// C++ weirdness, I have no idea what these ampersands do, or std:forward, or any of this stuff.
+
+template<typename F>
+inline auto inSharedStateMutex(F&& f) -> decltype(std::forward<F>(f)()) {
     std::lock_guard<std::mutex> lock(sharedStateMutex);
-    f();
+    return std::forward<F>(f)();
 }
 
 #endif
