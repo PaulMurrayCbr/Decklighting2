@@ -7,6 +7,7 @@
 
 #include <stdexcept>
 #include <iostream>
+#include <chrono>
 
 #include "common.hpp"
 #include "state.hpp"
@@ -136,11 +137,11 @@ void handleCommand(const SectionInterpolationCommand &cmd) {
             s.touched = true;
         }
         if (cmd.frameDuration.has_value()) {
-            r.animation.frameDuration = *cmd.frameDuration;
+            r.animation.frameDuration = std::chrono::milliseconds(static_cast<int64_t>(*cmd.frameDuration));
             s.touched = true;
         }
         if (cmd.cycleSpeed.has_value()) {
-            r.cycleSpeed = *cmd.cycleSpeed;
+            r.cycleSpeed = std::chrono::milliseconds(static_cast<int64_t>(*cmd.cycleSpeed));
             s.touched = true;
         }
     });
