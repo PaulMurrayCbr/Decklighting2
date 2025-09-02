@@ -12,6 +12,7 @@
 #include <unordered_map>
 #include <map>
 #include <functional>
+#include <utility>
 
 #include "../lib/json.hpp"
 using json = nlohmann::json;
@@ -105,9 +106,12 @@ extern std::mutex sharedStateMutex;
 extern json getGlobalState();
 extern json getSectionState(Section section);
 
-inline void inSharedStateMutex(std::function<void()> f) {
+// C++ weirdness, I have no idea what these ampersands do, or std:forward, or any of this stuff.
+
+template<typename F>
+inline auto inSharedStateMutex(F&& f) -> decltype(std::forward<F>(f)()) {
     std::lock_guard<std::mutex> lock(sharedStateMutex);
-    f();
+    return std::forward<F>(f)();
 }
 
 #endif

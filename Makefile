@@ -52,7 +52,7 @@ else
 maybe_save: 
 endif
 
-save: clean $(EXECUTABLE)
+save: $(EXECUTABLE)
 	@if [ -z "$(LABEL)" ]; then \
 	    echo "Error: LABEL cannot be blank"; \
 	    exit 1; \

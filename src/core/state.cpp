@@ -74,13 +74,11 @@ namespace {
 }
 
 json getGlobalState() {
-    std::lock_guard<std::mutex> lock(sharedStateMutex);
-    return toJson();
+    return inSharedStateMutex([]() { return toJson();});
 
 }
 
 json getSectionState(Section section) {
-    std::lock_guard<std::mutex> lock(sharedStateMutex);
-    return toJson(section);
+    return inSharedStateMutex([section]() {return toJson(section);});
 }
 
