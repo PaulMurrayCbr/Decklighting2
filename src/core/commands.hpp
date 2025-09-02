@@ -100,7 +100,7 @@ public:
 
 class GlobalOnCommand {
 public:
-    int brightness = -1;
+    Optional<int> brightness;
 };
 
 class GlobalOffCommand {

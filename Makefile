@@ -59,6 +59,9 @@ maybe_doc:
 endif
 
 save: $(EXECUTABLE)
+	$(MAKE) forcesave
+	
+forcesave:
 	@if [ -z "$(LABEL)" ]; then \
 	    echo "Error: LABEL cannot be blank"; \
 	    exit 1; \

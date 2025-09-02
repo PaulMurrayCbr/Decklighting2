@@ -67,6 +67,7 @@ struct ColorRangeState {
     AnimationState animation;
     RGB from;
     RGB to;
+    RgbInterpolationType interpolation = RgbInterpolationType::FADE;
     double midpoint; // >0 to <1 default .5 Solve toget the quadratic coeficients
     bool seamless;
     std::chrono::milliseconds cycleSpeed;

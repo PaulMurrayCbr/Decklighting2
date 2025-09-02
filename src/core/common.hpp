@@ -31,15 +31,16 @@
     EFFECT(THEATRE)
 
 #define INTERPOLATION_TYPE_LIST \
+    INTERPOLATION(NONE) \
     INTERPOLATION(FADE) \
     INTERPOLATION(QFADE)
 
 #define SECTION_LIST \
-    SECTION(Back) \
-    SECTION(Deck) \
-    SECTION(Theatre) \
+    SECTION(Door) \
     SECTION(Game) \
-    SECTION(Door)
+    SECTION(Theatre) \
+    SECTION(Deck) \
+    SECTION(Back)
 
 static const int NSECTIONS = 0
 #define SECTION(name) +1
