@@ -8,6 +8,7 @@
 #ifndef SRC_CORE_COMMANDS_HPP_
 #define SRC_CORE_COMMANDS_HPP_
 
+#include "../lib/optional.hpp"
 #include "common.hpp"
 
 class SectionCommand {
@@ -22,10 +23,9 @@ public:
 
 class SectionGlobalCommand: public SectionCommand {
 public:
-    int brightness = -1;
-    int density = -1;
-    bool effectTouched = false;
-    SectionEffectType effect = SectionEffectType::SOLID;
+    Optional<int> brightness;
+    Optional<int> density;
+    Optional<SectionEffectType> effect;
 
     SectionGlobalCommand(Section section) :
             SectionCommand(section) {
@@ -68,8 +68,7 @@ public:
 class SectionColorCommand: public SectionColorRangeCommand {
 public:
     bool isFrom;
-    RGB rgb;
-    int index;
+    Optional<RGB> rgb;
 
     SectionColorCommand(Section section, int index, bool isFrom) :
             SectionColorRangeCommand(section, index), isFrom(isFrom) {
@@ -79,12 +78,12 @@ public:
 
 class SectionInterpolationCommand: public SectionColorRangeCommand {
 public:
-    RgbInterpolationType interpolation;
-    double midpoint; // >0 to <1 default .5 Solve to get the quadratic coeficients
-    bool seamless;
-    bool animating;
-    int frameDuration;
-    int cycleSpeed;
+    Optional<RgbInterpolationType> interpolation;
+    Optional<double> midpoint; // >0 to <1 default .5 Solve to get the quadratic coeficients
+    Optional<bool> seamless;
+    Optional<bool> animating;
+    Optional<int> frameDuration;
+    Optional<int> cycleSpeed;
     SectionInterpolationCommand(Section section, int index) :
             SectionColorRangeCommand(section, index) {
 

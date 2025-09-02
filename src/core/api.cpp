@@ -23,6 +23,8 @@
 
 #include <iostream>
 #include <sstream>
+#include <stdexcept>
+#include <limits>
 
 #include "commands.hpp"
 #include "state.hpp"
@@ -30,19 +32,29 @@
 #include "api.hpp"
 
 namespace {
-
-    std::pair<int, json> sample(std::stringstream &path, const std::multimap<std::string, std::string> &params, json &command) {
-        json j = "Not Implemented: ";
-        return {404, j};
-
-    }
-
     int toInt(const std::string &s, int min, int max) {
         int v = std::stoi(s);
         if (v < min || v > max) {
             throw std::out_of_range(s + " must be " + std::to_string(min) + "-" + std::to_string(max));
         }
         return v;
+    }
+
+    int toDouble(const std::string &s, double min, double max) {
+        double v = std::stod(s);
+        if (v < min || v > max) {
+            throw std::out_of_range(s + " must be " + std::to_string(min) + "-" + std::to_string(max));
+        }
+        return v;
+    }
+
+    bool toBool(const std::string &s) {
+        if (s == "y" || s == "Y" || s == "on" || s == "true" || s == "yes")
+            return true;
+        if (s == "n" || s == "N" || s == "off" || s == "false" || s == "no")
+            return false;
+
+        throw std::out_of_range(s + " doesn't look like a yes/no to me");
     }
 
     int toByte(const std::string &s) {
@@ -80,10 +92,6 @@ namespace {
     }
 
     void populateSectionGlobalCommand(SectionGlobalCommand &cmd, const std::multimap<std::string, std::string> &params, json &command) {
-        cmd.brightness = -1;
-        cmd.density = -1;
-        cmd.effectTouched = false;
-
         ifHasByteParam(params, "brightness", [&cmd](int v) {
             cmd.brightness = v;
         });
@@ -94,7 +102,6 @@ namespace {
 
         ifHasStringParam(params, "effect", [&cmd](std::string v) {
             cmd.effect = EFFECT_TYPE_ENUM_OF.at(v);
-            cmd.effectTouched = true;
         });
 
     }
@@ -125,9 +132,94 @@ namespace {
 
     }
 
+    std::pair<int, json> handle_section_color_interpolation(Section section, int range, const std::multimap<std::string, std::string> &params, json &command) {
+        SectionInterpolationCommand cmd = SectionInterpolationCommand(section, range);
+
+        ifHasStringParam(params, "interpolation", [&cmd](std::string v) {
+            cmd.interpolation = INTERPOLATION_TYPE_ENUM_OF.at(v);
+        });
+
+        ifHasStringParam(params, "midpoint", [&cmd](std::string v) {
+            cmd.midpoint = toDouble(v, 0, 1);
+        });
+
+        ifHasStringParam(params, "seamless", [&cmd](std::string v) {
+            cmd.seamless = toBool(v);
+        });
+
+        ifHasStringParam(params, "animating", [&cmd](std::string v) {
+            cmd.animating = toBool(v);
+        });
+
+        ifHasStringParam(params, "frameDuration", [&cmd](std::string v) {
+            cmd.frameDuration = toInt(v, 0, std::numeric_limits<int>::max());
+        });
+        ifHasStringParam(params, "cycleSpeed", [&cmd](std::string v) {
+            cmd.cycleSpeed = toInt(v, 0, std::numeric_limits<int>::max());
+        });
+
+        handleCommand(cmd);
+
+        return {200, getSectionState(section)};
+    }
+
+    std::pair<int, json> handle_section_color_rgb(Section section, int rangeNo, std::string fromTo, const std::multimap<std::string, std::string> &params, json &command) {
+
+        bool isFrom;
+
+        if (fromTo == "from") {
+            isFrom = true;
+        } else if (fromTo == "to") {
+            isFrom = false;
+        } else {
+            throw std::logic_error("expected 'from' or 'to'");
+        }
+
+        SectionColorCommand cmd = SectionColorCommand(section, rangeNo, isFrom);
+
+        int r = -1;
+        int g = -1;
+        int b = -1;
+
+        ifHasByteParam(params, "r", [&r](int v) {
+            r = v;
+        });
+        ifHasByteParam(params, "g", [&g](int v) {
+            g = v;
+        });
+        ifHasByteParam(params, "b", [&b](int v) {
+            b = v;
+        });
+
+        if ((r == -1 || g == -1 || b == -1) && (r != -1 || g != -1 || b != -1)) {
+            throw std::logic_error("expected all of r, g, and b");
+        }
+
+        cmd.rgb = RGB(r, g, b);
+
+        handleCommand(cmd);
+
+        return {200, getSectionState(section)};
+    }
+
     std::pair<int, json> handle_section_color(Section section, std::stringstream &path, const std::multimap<std::string, std::string> &params, json &command) {
-        json j = "Not Implemented: ";
-        return {404, j};
+        std::string range;
+        std::getline(path, range, '/');
+
+        if (range.empty()) {
+            throw std::logic_error("expected section range");
+        }
+
+        int rangeNo = toInt(range, 0, NCOLORANGES);
+
+        std::string fromTo;
+        std::getline(path, fromTo, '/');
+
+        if (fromTo.empty()) {
+            return handle_section_color_interpolation(section, rangeNo, params, command);
+        } else {
+            return handle_section_color_rgb(section, rangeNo, fromTo, params, command);
+        }
     }
 
     std::pair<int, json> handle_section(Section section, std::stringstream &path, const std::multimap<std::string, std::string> &params, json &command) {
@@ -160,8 +252,6 @@ namespace {
         std::string frag;
         std::getline(path, frag, '/');
 
-        std::cout << "fragment at handle_api " << frag << "\n";
-
         if (!path || frag.empty() || frag == "status") {
             return {200, getGlobalState()};
         } else if (frag == "on") {
@@ -192,7 +282,6 @@ namespace {
         // ok, now it should be /api
 
         std::getline(path, frag, '/');
-        std::cout << "fragment at handle_root " << frag << "\n";
 
         if (!path || frag != "api") {
             json j = "Not Implemented: " + frag;
@@ -207,7 +296,6 @@ namespace {
 
 std::pair<int, json> api(const std::string &path, const std::multimap<std::string, std::string> &params, json &command) {
     try {
-        std::cout << "path is " << path << "\n";
         std::stringstream ss(path);
         return handle_root(ss, params, command);
     } catch (const std::out_of_range &e) {
