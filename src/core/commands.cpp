@@ -137,7 +137,7 @@ void handleCommand(const SectionInterpolationCommand &cmd) {
             s.touched = true;
         }
         if (cmd.frameDuration.has_value()) {
-            r.animation.frameDuration = std::chrono::milliseconds(static_cast<int64_t>(*cmd.frameDuration));
+            r.animation.frameDuration = std::chrono::milliseconds(*cmd.frameDuration);
             s.touched = true;
         }
         if (cmd.cycleSpeed.has_value()) {
