@@ -31,25 +31,25 @@ void handleCommand(const GlobalOffCommand &cmd) {
 }
 
 void handleCommand(const SectionOnCommand &cmd) {
-    throw std::runtime_error("Not implemented yet");
+    throw std::runtime_error("SectionOnCommand not implemented yet");
 }
 
 void handleCommand(const SectionOutCommand &cmd) {
-    throw std::runtime_error("Not implemented yet");
+    throw std::runtime_error("SectionOutCommand not implemented yet");
 }
 
 void handleCommand(const SectionOffCommand &cmd) {
-    throw std::runtime_error("Not implemented yet");
+    throw std::runtime_error("SectionOffCommand not implemented yet");
 }
 
 void handleCommand(const SectionSetCommand &cmd) {
-    throw std::runtime_error("Not implemented yet");
+    throw std::runtime_error("SectionSetCommand not implemented yet");
 }
 
 void handleCommand(const SectionColorCommand &cmd) {
-    throw std::runtime_error("Not implemented yet");
+    throw std::runtime_error("SectionColorCommand not implemented yet");
 }
 
 void handleCommand(const SectionInterpolationCommand &cmd) {
-    throw std::runtime_error("Not implemented yet");
+    throw std::runtime_error("SectionInterpolationCommand not implemented yet");
 }

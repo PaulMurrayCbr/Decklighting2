@@ -44,12 +44,18 @@ help:
 	@echo -e "\thelp:\tthis help"
 	@echo
 
-all: clear $(EXECUTABLE) doc # maybe_save
+all: clear $(EXECUTABLE) maybe_doc # maybe_save
 
 ifeq ($(UNAME_S),Darwin)
 maybe_save: save
 else
 maybe_save: 
+endif
+
+ifeq ($(UNAME_S),Darwin)
+maybe_doc: doc
+else
+maybe_doc: 
 endif
 
 save: $(EXECUTABLE)
