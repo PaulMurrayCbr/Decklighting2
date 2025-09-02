@@ -132,6 +132,13 @@ enum class SectionMode {
 
 struct RGB {
     uint8_t r { 0 }, g { 0 }, b { 0 };
+
+    RGB() {
+    }
+
+    RGB(int r, int g, int b) :
+            r(r), g(g), b(b) {
+    }
 };
 
 #endif /* SRC_CORE_COMMON_HPP_ */
