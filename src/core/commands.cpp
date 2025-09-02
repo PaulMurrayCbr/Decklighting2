@@ -5,6 +5,8 @@
  *      Author: pmurray
  */
 
+#include <stdexcept>
+
 #include "common.hpp"
 #include "state.hpp"
 #include "commands.hpp"
@@ -26,4 +28,28 @@ void handleCommand(const GlobalOffCommand &cmd) {
         sharedState.touched = true;
         sharedState.needsRepaint = true;
     });
+}
+
+void handleCommand(const SectionOnCommand &cmd) {
+    throw std::runtime_error("Not implemented yet");
+}
+
+void handleCommand(const SectionOutCommand &cmd) {
+    throw std::runtime_error("Not implemented yet");
+}
+
+void handleCommand(const SectionOffCommand &cmd) {
+    throw std::runtime_error("Not implemented yet");
+}
+
+void handleCommand(const SectionSetCommand &cmd) {
+    throw std::runtime_error("Not implemented yet");
+}
+
+void handleCommand(const SectionColorCommand &cmd) {
+    throw std::runtime_error("Not implemented yet");
+}
+
+void handleCommand(const SectionInterpolationCommand &cmd) {
+    throw std::runtime_error("Not implemented yet");
 }

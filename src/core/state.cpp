@@ -81,4 +81,3 @@ json getGlobalState() {
 json getSectionState(Section section) {
     return inSharedStateMutex([section]() {return toJson(section);});
 }
-

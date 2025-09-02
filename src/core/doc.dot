@@ -1,0 +1,35 @@
+digraph {
+
+Decklighting;
+common;
+state;
+
+subgraph  cluster_pix {
+label = "Pixels"
+pixelloop;
+effect;
+pixels;
+}
+
+subgraph  cluster_web {
+label = "Web"
+webserver;
+api;
+command;
+}
+
+Decklighting -> pixelloop [label="starts"];
+Decklighting -> webserver [label="starts"];
+Decklighting -> state [label="initializes"];
+
+
+state -> pixelloop [label="reads in mutex"];
+pixelloop -> effect [label="copied section state"];
+pixelloop -> pixels [label="writes"];
+effect -> pixels [label="writes"];
+
+webserver -> api [label="path, params, json"];
+api -> command [label="command objects"];
+command -> state [label="writes in mutex"];
+
+}

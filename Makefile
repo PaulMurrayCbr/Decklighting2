@@ -44,7 +44,7 @@ help:
 	@echo -e "\thelp:\tthis help"
 	@echo
 
-all: clear $(EXECUTABLE) # maybe_save
+all: clear $(EXECUTABLE) doc # maybe_save
 
 ifeq ($(UNAME_S),Darwin)
 maybe_save: save
@@ -95,5 +95,10 @@ $(EXECUTABLE): $(OBJECTS)
 
 clear:
 	clear && printf '\e[3J'
+
+doc: src/core/doc.png
+
+src/core/doc.png: src/core/doc.dot
+	dot -Tpng -o $@ $<
 
 
