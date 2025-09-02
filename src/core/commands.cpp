@@ -141,7 +141,7 @@ void handleCommand(const SectionInterpolationCommand &cmd) {
             s.touched = true;
         }
         if (cmd.cycleSpeed.has_value()) {
-            r.cycleSpeed = std::chrono::milliseconds(static_cast<int64_t>(*cmd.cycleSpeed));
+            r.cycleSpeed = std::chrono::milliseconds(*cmd.cycleSpeed);
             s.touched = true;
         }
     });
