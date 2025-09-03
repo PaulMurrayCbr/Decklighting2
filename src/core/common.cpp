@@ -70,4 +70,5 @@ const int SECTION_LEN[NSECTIONS] = {
         };
 
 int SECTION_START[NSECTIONS];
+int NPIXELS;
 
