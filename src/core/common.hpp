@@ -56,7 +56,7 @@ const int Door_LEN = 3;
 
 extern const int SECTION_LEN[];
 extern int SECTION_START[]; // not const, b/c this is computed on startup.
-extern int NPIXELS;
+extern int NPIXELS; // not const, b/c this is computed on startup.
 
 static const int NCOLORANGES = 2;
 

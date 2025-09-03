@@ -32,12 +32,13 @@ int main() {
 
     int at = 0;
     // we go backwards, because I prefer to think of the door as "first", but the pixels are injected into the other end
-    // this means all the effects wiull be mirrored, but meh.
+    // this means all the effects will be mirrored, but meh.
     for (int i = NSECTIONS-1; i >= 0; i--) {
         SECTION_START[i] = at;
-        at += SECTION_LEN[i];
+        sharedState.section[i].start = at = SECTION_LEN[i];
         sharedState.section[i].length = SECTION_LEN[i];
         sharedState.section[i].mode = SectionMode::on;
+        at += SECTION_LEN[i];
     }
 
     NPIXELS = at;

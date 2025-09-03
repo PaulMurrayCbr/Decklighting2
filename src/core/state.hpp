@@ -70,6 +70,8 @@ struct SectionState {
     int density;
     bool touched;
     bool needsRepaint;
+
+    int start; // this is redundant, but it's neater to have it here.
     int length; // this gets computed when a section is brought in or taken out. And at startup, obviously.
 
     SectionEffectType effect;
