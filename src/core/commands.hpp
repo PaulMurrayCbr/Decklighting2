@@ -21,11 +21,24 @@ public:
     }
 };
 
+class EffectSOLIDCommand {
+
+};
+
+class EffectTHEATRECommand {
+
+};
+
 class SectionGlobalCommand: public SectionCommand {
 public:
     Optional<int> brightness;
     Optional<int> density;
     Optional<SectionEffectType> effect;
+
+    union {
+        EffectSOLIDCommand solid;
+        EffectTHEATRECommand theatre;
+    } eff;
 
     SectionGlobalCommand(Section section) :
             SectionCommand(section) {

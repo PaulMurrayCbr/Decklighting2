@@ -48,15 +48,6 @@ struct AnimationState {
     }
 };
 
-// dont need this here
-//class Animator {
-//	virtual void animate() = 0;
-//};
-//
-//#define EFFECT(name) class Animate_##name : Animator;
-//    EFFECT_LIST
-//#undef EFFECT
-
 struct EffectSOLIDState {
 };
 
