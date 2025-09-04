@@ -77,6 +77,14 @@ struct SectionState {
 
     ColorRangeState colors[NCOLORANGES];
 
+    inline int npixels() {
+        return (length-1)/density +1;
+    }
+
+    inline int pixel(int i) {
+        return i * density + start;
+    }
+
     union {
 #define EFFECT(name) Effect##name##State name;
         EFFECT_TYPE_LIST
