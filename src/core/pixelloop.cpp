@@ -37,8 +37,10 @@ class PixelLoop {
 
             if (state.touched)
                 std::cout << "global state touched\n";
-            if (state.needsRepaint)
+
+            if (state.needsRepaint) {
                 std::cout << "global state needs repaint\n";
+            }
 
             for (int i = 0; i < NSECTIONS; i++) {
                 if (state.section[i].touched) {

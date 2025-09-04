@@ -11,9 +11,13 @@
 #include "effect.hpp"
 
 namespace {
-    void run(SectionState &s, bool repaint_required) {
+    void repaint(SectionState &s) {
     }
 
+    bool animate(SectionState &s) {
+        return false;
+    }
 }
 
-void (*effectRunner_THEATRE)(SectionState &s, bool repaint_required) = run;
+void (*effectRepaint_THEATRE)(SectionState &s) = repaint;
+bool (*effectAnimate_THEATRE)(SectionState &s) = animate;

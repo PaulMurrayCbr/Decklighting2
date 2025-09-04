@@ -13,6 +13,7 @@
 #include "common.hpp"
 #include "state.hpp"
 
-extern const std::unordered_map<SectionEffectType, void (*)(SectionState&, bool), EnumClassHash> EFFECT_RUNNERS;
+extern void (*const EFFECT_REPAINT[])(SectionState&);
+extern bool (*const EFFECT_ANIMATE[])(SectionState&);
 
 #endif /* SRC_CORE_EFFECT_HPP_ */
