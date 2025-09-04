@@ -103,10 +103,6 @@ json getSectionState(Section section) {
 
 // must be invoked inside a mutex
 void recompute_sections() {
-    std::cout << "Need to recompute sections" << '\n';
-    std::cout << "There are " << NSECTIONS << " sections" << '\n';
-    std::cout << "There are " << NPIXELS << " pixels" << '\n';
-
     if (sharedState.section[0].mode == SectionMode::out) {
         sharedState.section[0].mode = SectionMode::off;
         sharedState.section[0].touched = true;
@@ -119,19 +115,17 @@ void recompute_sections() {
     for (int i = NSECTIONS - 1; i >= 0; i--) {
         length += SECTION_LEN[i];
 
-        if (sharedState.section[i].mode == SectionMode::out) {
-            std::cout << "Section " << i << " is out. Adding " << SECTION_LEN[i] << " to the next section" << '\n';
+        SectionState &s = sharedState.section[i];
+
+        if (s.mode == SectionMode::out) {
             continue;
         }
 
-        std::cout << "Section " << i << " will start at " << start << " and have a length of " << length << '\n';
-
-        if (sharedState.section[i].length != length || sharedState.section[i].start != start) {
-            sharedState.section[0].touched = true;
-            sharedState.section[0].needsRepaint = true;
-
-            sharedState.section[i].length = length;
-            sharedState.section[i].start = start;
+        if (s.length != length || sharedState.section[i].start != start) {
+            s.touched = true;
+            s.needsRepaint = true;
+            s.length = length;
+            s.start = start;
         }
 
         start += length;

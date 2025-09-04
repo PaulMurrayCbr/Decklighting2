@@ -5,6 +5,8 @@
  *      Author: pmurray
  */
 
+#include <iostream>
+
 #include "common.hpp"
 #include "state.hpp"
 
@@ -12,6 +14,7 @@
 
 namespace {
     void repaint(SectionState &s) {
+        std::cout << "repainting SOLID from " << s.start << " length " << s.length;
     }
 
     bool animate(SectionState &s) {

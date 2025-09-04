@@ -28,15 +28,18 @@ int main() {
 
     std::cout << "Starting ...\n";
 
-    // initialise the sections
-    int at = 0;
-    // we go backwards, because I prefer to think of the door as "first", but the pixels are injected into the other end
-    // this means all the effects will be mirrored, but meh.
-    for (int i = NSECTIONS - 1; i >= 0; i--) {
-        sharedState.section[i].mode = SectionMode::on;
-        sharedState.section[i].touched = true;
-        sharedState.section[i].needsRepaint = true;
+    for (SectionState &s : sharedState.section) {
+        s.mode = SectionMode::on;
+        s.touched = true;
+        s.needsRepaint = true;
+        for (ColorRangeState &cr : s.colors) {
+            cr.animation.frameDuration = std::chrono::milliseconds(static_cast<int64_t>(100));
+            cr.from = RGB(255, 0, 0);
+            cr.to = RGB(0, 255, 0);
+            cr.interpolation = RgbInterpolationType::FADE;
+        }
     }
+
     sharedState.touched = true;
     sharedState.needsRepaint = true;
 

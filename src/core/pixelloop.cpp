@@ -12,6 +12,7 @@
 #include "common.hpp"
 #include "state.hpp"
 #include "effect.hpp"
+#include "pixels.hpp"
 #include "pixelloop.hpp"
 
 class PixelLoop {
@@ -49,6 +50,38 @@ class PixelLoop {
                 if (state.section[i].needsRepaint) {
                     std::cout << sectionName(i) << " needs repaint" << '\n';
                 }
+            }
+
+            if (state.needsRepaint) {
+                set_pixel_global_brightness(state.brightness);
+                clear_pixels(0, NPIXELS);
+
+                if (state.on) {
+                    for (SectionState *section = state.section; section < sharedState.section + NSECTIONS; section++) {
+                        if (section->mode == SectionMode::on) {
+                            EFFECT_REPAINT[static_cast<int>(section->effect)](*section);
+                        }
+                    }
+                }
+
+                send_pixels();
+            } else if (state.on) {
+                bool needs_send = false;
+
+                for (SectionState *section = state.section; section < sharedState.section + NSECTIONS; section++) {
+                    if (section->mode == SectionMode::on) {
+                        if (section->needsRepaint) {
+                            EFFECT_REPAINT[static_cast<int>(section->effect)](*section);
+                            needs_send = true;
+                        } else {
+                            needs_send = EFFECT_ANIMATE[static_cast<int>(section->effect)](*section) || needs_send;
+                        }
+
+                    }
+                }
+
+                if (needs_send)
+                    send_pixels();
             }
 
             std::this_thread::yield();
