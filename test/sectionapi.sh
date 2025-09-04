@@ -47,3 +47,25 @@ check_q '.result.mode' '"out"'
 
 curl -s -o $OUT 'http://localhost:8080/api/Door/on'
 check_q '.result.mode' '"on"'
+
+curl -s -o $OUT 'http://localhost:8080/api/Door/on?density=3'
+check_q '.result.density' '3'
+
+curl -s -o $OUT 'http://localhost:8080/api/Door/off?density=5'
+check_q '.result.density' '3'
+
+curl -s -o $OUT 'http://localhost:8080/api/Door/set?density=5'
+check_q '.result.density' '5'
+
+curl -s -o $OUT 'http://localhost:8080/api/Door/set?density=-1'
+check_q '.status' '400'
+
+curl -s -o $OUT 'http://localhost:8080/api/Door/set?density=999'
+check_q '.status' '400'
+
+
+curl -s -o $OUT 'http://localhost:8080/api/Door/set?effect=THEATRE'
+check_q '.result.effect' '"THEATRE"'
+
+curl -s -o $OUT 'http://localhost:8080/api/Door/set?effect=ZZZ'
+check_q '.status' '400'
