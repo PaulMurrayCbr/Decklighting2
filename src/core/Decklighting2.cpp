@@ -29,14 +29,18 @@ int main() {
     std::cout << "Starting ...\n";
 
     // initialise the sections
-
     int at = 0;
-    for (int i = 0; i < NSECTIONS; i++) {
-        SECTION_START[i] = at;
-        at += SECTION_LEN[i];
-        sharedState.section[i].length = SECTION_LEN[i];
+    // we go backwards, because I prefer to think of the door as "first", but the pixels are injected into the other end
+    // this means all the effects will be mirrored, but meh.
+    for (int i = NSECTIONS - 1; i >= 0; i--) {
         sharedState.section[i].mode = SectionMode::on;
+        sharedState.section[i].touched = true;
+        sharedState.section[i].needsRepaint = true;
     }
+    sharedState.touched = true;
+    sharedState.needsRepaint = true;
+
+    recompute_sections();
 
     start_webserver();
     start_pixelloop();
@@ -49,7 +53,7 @@ int main() {
 
     // Poll for stop signal
     while (!g_stop.load())
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
     std::cout << "Stopping ...\n";
 
     stop_pixelloop();

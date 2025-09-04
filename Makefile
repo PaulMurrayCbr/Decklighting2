@@ -26,6 +26,10 @@ SOURCES := $(foreach dir,$(SRCDIRS),$(wildcard $(dir)/*.cpp))
 OBJECTS := $(SOURCES:.cpp=.o)
 EXECUTABLE := decklighting2
 
+TESTS := $(wildcard test/*.sh)
+TESTRESULTS := $(TESTS:.sh=.test)
+
+
 # default git label
 LABEL=Makefile build succeeded
 
@@ -42,7 +46,8 @@ help:
 	@echo -e "\tall:\tbuild the decklighting2 executable (default)"
 	@echo -e "\tclean"
 	@echo -e "\thelp:\tthis help"
-	@echo
+	@echo -e "\ttest: run the tests $(TESTRESULTS)"
+	
 
 all: clear $(EXECUTABLE) maybe_doc # maybe_save
 
@@ -58,7 +63,16 @@ else
 maybe_doc: 
 endif
 
-save: $(EXECUTABLE)
+ifeq ($(UNAME_S),Darwin)
+maybe_test: test
+else
+maybe_test: 
+endif
+
+save: $(EXECUTABLE) maybe_test
+	$(MAKE) forcesave
+	
+forcesave:
 	@if [ -z "$(LABEL)" ]; then \
 	    echo "Error: LABEL cannot be blank"; \
 	    exit 1; \
@@ -107,4 +121,13 @@ doc: src/core/doc.png
 src/core/doc.png: src/core/doc.dot
 	dot -Tpng -o $@ $<
 
+test: clear $(TESTRESULTS) $(EXECUTABLE)
+
+test/%.test: $(EXECUTABLE)
+	@chmod +x $(@:.test=.sh)
+	@./decklighting2 > /dev/null 2>&1 & SERVER_PID=$$!; \
+		trap "kill $$SERVER_PID 2>/dev/null; wait $$SERVER_PID" EXIT; \
+		sleep 1 ; \
+		/bin/bash -c $(@:.test=.sh)
+		
 

@@ -91,19 +91,33 @@ namespace {
 
     }
 
-    void populateSectionGlobalCommand(SectionGlobalCommand &cmd, const std::multimap<std::string, std::string> &params, json &command) {
-        ifHasByteParam(params, "brightness", [&cmd](int v) {
-            cmd.brightness = v;
-        });
+    void populateSectionEffectCommand(EffectSOLIDCommand &cmd, const std::multimap<std::string, std::string> &params, json &command) {
 
+    }
+
+    void populateSectionEffectCommand(EffectTHEATRECommand &cmd, const std::multimap<std::string, std::string> &params, json &command) {
+
+    }
+
+    void populateSectionGlobalCommand(SectionGlobalCommand &cmd, const std::multimap<std::string, std::string> &params, json &command) {
         ifHasByteParam(params, "density", [&cmd](int v) {
             cmd.density = v;
         });
 
-        ifHasStringParam(params, "effect", [&cmd](std::string v) {
+        ifHasStringParam(params, "effect", [&cmd, &params, &command](std::string v) {
             cmd.effect = EFFECT_TYPE_ENUM_OF.at(v);
-        });
 
+            switch (*cmd.effect) {
+            case SectionEffectType::SOLID:
+                populateSectionEffectCommand(cmd.eff.solid, params, command);
+                break;
+
+            case SectionEffectType::THEATRE:
+                populateSectionEffectCommand(cmd.eff.theatre, params, command);
+                break;
+            }
+
+        });
     }
 
     std::pair<int, json> handle_section_on(Section section, std::stringstream &path, const std::multimap<std::string, std::string> &params, json &command) {

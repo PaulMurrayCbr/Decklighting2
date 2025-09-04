@@ -23,7 +23,6 @@ const std::string SECTION_NAME[] = {
 #define SECTION(name) #name,
         SECTION_LIST
 #undef SECTION
-
         };
 
 const std::unordered_map<SectionEffectType, std::string, EnumClassHash> EFFECT_TYPE_NAME_OF = {
@@ -68,6 +67,3 @@ const int SECTION_LEN[NSECTIONS] = {
 #undef SECTION
 
         };
-
-int SECTION_START[NSECTIONS];
-

@@ -48,15 +48,6 @@ struct AnimationState {
     }
 };
 
-// dont need this here
-//class Animator {
-//	virtual void animate() = 0;
-//};
-//
-//#define EFFECT(name) class Animate_##name : Animator;
-//    EFFECT_LIST
-//#undef EFFECT
-
 struct EffectSOLIDState {
 };
 
@@ -67,6 +58,7 @@ struct ColorRangeState {
     AnimationState animation;
     RGB from;
     RGB to;
+    RgbInterpolationType interpolation = RgbInterpolationType::FADE;
     double midpoint; // >0 to <1 default .5 Solve toget the quadratic coeficients
     bool seamless;
     std::chrono::milliseconds cycleSpeed;
@@ -74,10 +66,11 @@ struct ColorRangeState {
 
 struct SectionState {
     SectionMode mode;
-    int brightness;
     int density;
     bool touched;
     bool needsRepaint;
+
+    int start; // this is redundant, but it's neater to have it here.
     int length; // this gets computed when a section is brought in or taken out. And at startup, obviously.
 
     SectionEffectType effect;
@@ -113,5 +106,7 @@ inline auto inSharedStateMutex(F&& f) -> decltype(std::forward<F>(f)()) {
     std::lock_guard<std::mutex> lock(sharedStateMutex);
     return std::forward<F>(f)();
 }
+
+extern void recompute_sections();
 
 #endif

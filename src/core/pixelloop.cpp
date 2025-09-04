@@ -42,10 +42,10 @@ class PixelLoop {
 
             for (int i = 0; i < NSECTIONS; i++) {
                 if (state.section[i].touched) {
-                    std::cout << sectionName(i) << " touched";
+                    std::cout << sectionName(i) << " touched" << '\n';
                 }
                 if (state.section[i].needsRepaint) {
-                    std::cout << sectionName(i) << " needs repaint";
+                    std::cout << sectionName(i) << " needs repaint" << '\n';
                 }
             }
 
