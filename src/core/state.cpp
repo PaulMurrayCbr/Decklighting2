@@ -119,9 +119,12 @@ void recompute_sections() {
     for (int i = NSECTIONS - 1; i >= 0; i--) {
         length += SECTION_LEN[i];
 
-        if (sharedState.section[0].mode == SectionMode::out) {
+        if (sharedState.section[i].mode == SectionMode::out) {
+            std::cout << "Section " << i << " is out. Adding " << SECTION_LEN[i] << " to the next section" << '\n';
             continue;
         }
+
+        std::cout << "Section " << i << " will start at " << start << " and have a length of " << length << '\n';
 
         if (sharedState.section[i].length != length || sharedState.section[i].start != start) {
             sharedState.section[0].touched = true;
