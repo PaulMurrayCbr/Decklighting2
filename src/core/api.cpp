@@ -91,19 +91,15 @@ namespace {
 
     }
 
-    void populateSectionGlobalCommand(EffectSOLIDCommand &cmd, const std::multimap<std::string, std::string> &params, json &command) {
+    void populateSectionEffectCommand(EffectSOLIDCommand &cmd, const std::multimap<std::string, std::string> &params, json &command) {
 
     }
 
-    void populateSectionGlobalCommand(EffectTHEATRECommand &cmd, const std::multimap<std::string, std::string> &params, json &command) {
+    void populateSectionEffectCommand(EffectTHEATRECommand &cmd, const std::multimap<std::string, std::string> &params, json &command) {
 
     }
 
     void populateSectionGlobalCommand(SectionGlobalCommand &cmd, const std::multimap<std::string, std::string> &params, json &command) {
-        ifHasByteParam(params, "brightness", [&cmd](int v) {
-            cmd.brightness = v;
-        });
-
         ifHasByteParam(params, "density", [&cmd](int v) {
             cmd.density = v;
         });
@@ -113,11 +109,11 @@ namespace {
 
             switch (*cmd.effect) {
             case SectionEffectType::SOLID:
-                populateSectionGlobalCommand(cmd.eff.solid, params, command);
+                populateSectionEffectCommand(cmd.eff.solid, params, command);
                 break;
 
             case SectionEffectType::THEATRE:
-                populateSectionGlobalCommand(cmd.eff.theatre, params, command);
+                populateSectionEffectCommand(cmd.eff.theatre, params, command);
                 break;
             }
 

@@ -31,7 +31,6 @@ class EffectTHEATRECommand {
 
 class SectionGlobalCommand: public SectionCommand {
 public:
-    Optional<int> brightness;
     Optional<int> density;
     Optional<SectionEffectType> effect;
 

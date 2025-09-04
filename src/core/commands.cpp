@@ -21,11 +21,6 @@ namespace {
     void doSectionGlobal(const SectionGlobalCommand &cmd) {
         SectionState &s = sharedState.section[static_cast<int>(cmd.section)];
 
-        if (cmd.brightness.has_value()) {
-            s.brightness = *cmd.brightness;
-            s.touched = true;
-            s.needsRepaint = true;
-        }
         if (cmd.density.has_value()) {
             s.density = *cmd.density;
             s.touched = true;

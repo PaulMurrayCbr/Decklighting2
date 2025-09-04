@@ -115,7 +115,7 @@ doc: src/core/doc.png
 src/core/doc.png: src/core/doc.dot
 	dot -Tpng -o $@ $<
 
-test: $(TESTRESULTS)
+test: clear $(TESTRESULTS)
 
 test/%.test: $(EXECUTABLE)
 	@chmod +x $(@:.test=.sh)

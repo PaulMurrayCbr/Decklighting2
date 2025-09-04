@@ -66,7 +66,6 @@ struct ColorRangeState {
 
 struct SectionState {
     SectionMode mode;
-    int brightness;
     int density;
     bool touched;
     bool needsRepaint;
