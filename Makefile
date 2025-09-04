@@ -63,7 +63,13 @@ else
 maybe_doc: 
 endif
 
-save: $(EXECUTABLE)
+ifeq ($(UNAME_S),Darwin)
+maybe_test: test
+else
+maybe_test: 
+endif
+
+save: $(EXECUTABLE) maybe_test
 	$(MAKE) forcesave
 	
 forcesave:
@@ -115,7 +121,7 @@ doc: src/core/doc.png
 src/core/doc.png: src/core/doc.dot
 	dot -Tpng -o $@ $<
 
-test: clear $(TESTRESULTS)
+test: clear $(TESTRESULTS) $(EXECUTABLE)
 
 test/%.test: $(EXECUTABLE)
 	@chmod +x $(@:.test=.sh)
