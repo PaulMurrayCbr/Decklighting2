@@ -43,9 +43,18 @@ curl -s -o $OUT 'http://localhost:8080/api/Door/off'
 check_q '.result.mode' '"off"'
 
 curl -s -o $OUT 'http://localhost:8080/api/Door/out'
-check_q '.result.mode' '"out"'
+check_q '.result.mode' '"off"'
 
 curl -s -o $OUT 'http://localhost:8080/api/Door/on'
+check_q '.result.mode' '"on"'
+
+curl -s -o $OUT 'http://localhost:8080/api/Deck/off'
+check_q '.result.mode' '"off"'
+
+curl -s -o $OUT 'http://localhost:8080/api/Deck/out'
+check_q '.result.mode' '"out"'
+
+curl -s -o $OUT 'http://localhost:8080/api/Deck/on'
 check_q '.result.mode' '"on"'
 
 curl -s -o $OUT 'http://localhost:8080/api/Door/on?density=3'

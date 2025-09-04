@@ -107,4 +107,6 @@ inline auto inSharedStateMutex(F&& f) -> decltype(std::forward<F>(f)()) {
     return std::forward<F>(f)();
 }
 
+extern void recompute_sections();
+
 #endif

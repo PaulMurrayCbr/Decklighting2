@@ -100,3 +100,39 @@ json getSectionState(Section section) {
         return toJson(section);
     });
 }
+
+// must be invoked inside a mutex
+void recompute_sections() {
+    std::cout << "Need to recompute sections" << '\n';
+    std::cout << "There are " << NSECTIONS << " sections" << '\n';
+    std::cout << "There are " << NPIXELS << " pixels" << '\n';
+
+    if (sharedState.section[0].mode == SectionMode::out) {
+        sharedState.section[0].mode = SectionMode::off;
+        sharedState.section[0].touched = true;
+        sharedState.section[0].needsRepaint = true;
+    }
+
+    int start = 0;
+    int length = 0;
+
+    for (int i = NSECTIONS - 1; i >= 0; i--) {
+        length += SECTION_LEN[i];
+
+        if (sharedState.section[0].mode == SectionMode::out) {
+            continue;
+        }
+
+        if (sharedState.section[i].length != length || sharedState.section[i].start != start) {
+            sharedState.section[0].touched = true;
+            sharedState.section[0].needsRepaint = true;
+
+            sharedState.section[i].length = length;
+            sharedState.section[i].start = start;
+        }
+
+        start += length;
+        length = 0;
+    }
+}
+

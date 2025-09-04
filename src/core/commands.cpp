@@ -14,9 +14,6 @@
 #include "commands.hpp"
 
 namespace {
-    void recomputeSections() {
-        std::cout << "Need to recompute sections";
-    }
 
     void doSectionGlobal(const SectionGlobalCommand &cmd) {
         SectionState &s = sharedState.section[static_cast<int>(cmd.section)];
@@ -60,7 +57,7 @@ void handleCommand(const SectionOnCommand &cmd) {
         s.mode = SectionMode::on;
         s.touched = true;
         s.needsRepaint = true;
-        recomputeSections();
+        recompute_sections();
     });
 }
 
@@ -70,7 +67,7 @@ void handleCommand(const SectionOutCommand &cmd) {
         s.mode = SectionMode::out;
         s.touched = true;
         s.needsRepaint = true;
-        recomputeSections();
+        recompute_sections();
     });
 }
 
@@ -80,7 +77,7 @@ void handleCommand(const SectionOffCommand &cmd) {
         s.mode = SectionMode::off;
         s.touched = true;
         s.needsRepaint = true;
-        recomputeSections();
+        recompute_sections();
     });
 }
 

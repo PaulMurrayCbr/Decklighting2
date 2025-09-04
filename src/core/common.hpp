@@ -50,15 +50,19 @@ static const int NSECTIONS = 0
 
 const int Back_LEN = 3;
 const int Deck_LEN = 3;
-const int Theatre_LEN = 3;
+const int Theatre_LEN = 4;
 const int Game_LEN = 3;
 const int Door_LEN = 3;
 
-extern const int SECTION_LEN[];
-extern int SECTION_START[]; // not const, b/c this is computed on startup.
-extern int NPIXELS; // not const, b/c this is computed on startup.
+const int NPIXELS = 0
+#define SECTION(name) + name##_LEN
+        SECTION_LIST
+#undef SECTION
+        ;
 
-static const int NCOLORANGES = 2;
+extern const int SECTION_LEN[NSECTIONS];
+
+const int NCOLORANGES = 2;
 
 enum class SectionEffectType {
 #define EFFECT(name) name,
