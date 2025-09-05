@@ -10,12 +10,13 @@
 #include "webserver.hpp"
 #include "state.hpp"
 #include "pixelloop.hpp"
+#include "pixels.hpp"
 
-#ifdef __APPLE__
-namespace fs = std::__fs::filesystem;
-#else
-namespace fs = std::filesystem;
-#endif
+//#ifdef __APPLE__
+//namespace fs = std::__fs::filesystem;
+//#else
+//namespace fs = std::filesystem;
+//#endif
 
 static std::atomic<bool> g_stop { false };
 void handle_signal(int) {
@@ -117,6 +118,8 @@ int main() {
     sharedState.needsRepaint = true;
 
     recompute_sections();
+
+    init_pixels();
 
     start_webserver();
     start_pixelloop();
