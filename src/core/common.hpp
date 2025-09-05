@@ -28,6 +28,7 @@
 
 #define EFFECT_TYPE_LIST \
     EFFECT(SOLID) \
+    EFFECT(GRADIENT) \
     EFFECT(THEATRE)
 
 #define INTERPOLATION_TYPE_LIST \
@@ -142,9 +143,41 @@ struct RGB {
     RGB() {
     }
 
+    RGB(uint8_t r, uint8_t g, uint8_t b) :
+            r(r), g(g), b(b) {
+    }
+
     RGB(int r, int g, int b) :
             r(r), g(g), b(b) {
     }
 };
+
+
+struct HSV {
+    // hue goes from 0 to 256 * 6 (minus 1).
+    int h { 0 };
+    uint8_t s { 0 }, v { 0 };
+
+    HSV() {
+    }
+
+    HSV(int h, int s, int v) :
+            h(h), s(s), v(v) {
+    }
+
+    HSV(int h, uint8_t s, uint8_t v) :
+            h(h), s(s), v(v) {
+    }
+};
+
+extern RGB hsv2rgb(HSV c);
+extern HSV rgb2hsv(RGB c);
+
+
+// I'll use my fast hsb color model
+// Saturation is the gap between largest and smallest, brightness is the largest of r/g/b, hue is the position of the middle value
+// between smallest and largest, ranging from 0 to 256*6-1 (r->y, y->g, g->c, c->b, b->m, m->r)
+
+
 
 #endif /* SRC_CORE_COMMON_HPP_ */

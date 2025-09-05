@@ -51,6 +51,9 @@ struct AnimationState {
 struct EffectSOLIDState {
 };
 
+struct EffectGRADIENTState {
+};
+
 struct EffectTHEATREState {
 };
 
@@ -58,6 +61,8 @@ struct ColorRangeState {
     AnimationState animation;
     RGB from;
     RGB to;
+    HSV fromHsv;
+    HSV toHsv;
     RgbInterpolationType interpolation = RgbInterpolationType::FADE;
     double midpoint; // >0 to <1 default .5 Solve toget the quadratic coeficients
     bool seamless;
@@ -76,6 +81,14 @@ struct SectionState {
     SectionEffectType effect;
 
     ColorRangeState colors[NCOLORANGES];
+
+    inline int npixels() {
+        return (length - 1) / density + 1;
+    }
+
+    inline int pixel(int i) {
+        return i * density + start;
+    }
 
     union {
 #define EFFECT(name) Effect##name##State name;
@@ -102,7 +115,7 @@ extern json getSectionState(Section section);
 // C++ weirdness, I have no idea what these ampersands do, or std:forward, or any of this stuff.
 
 template<typename F>
-inline auto inSharedStateMutex(F&& f) -> decltype(std::forward<F>(f)()) {
+inline auto inSharedStateMutex(F &&f) -> decltype(std::forward<F>(f)()) {
     std::lock_guard<std::mutex> lock(sharedStateMutex);
     return std::forward<F>(f)();
 }

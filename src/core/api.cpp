@@ -95,6 +95,10 @@ namespace {
 
     }
 
+    void populateSectionEffectCommand(EffectGRADIENTCommand &cmd, const std::multimap<std::string, std::string> &params, json &command) {
+
+    }
+
     void populateSectionEffectCommand(EffectTHEATRECommand &cmd, const std::multimap<std::string, std::string> &params, json &command) {
 
     }
@@ -110,6 +114,10 @@ namespace {
             switch (*cmd.effect) {
             case SectionEffectType::SOLID:
                 populateSectionEffectCommand(cmd.eff.solid, params, command);
+                break;
+
+            case SectionEffectType::GRADIENT:
+                populateSectionEffectCommand(cmd.eff.gradient, params, command);
                 break;
 
             case SectionEffectType::THEATRE:

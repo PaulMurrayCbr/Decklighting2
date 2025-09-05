@@ -25,6 +25,10 @@ class EffectSOLIDCommand {
 
 };
 
+class EffectGRADIENTCommand {
+
+};
+
 class EffectTHEATRECommand {
 
 };
@@ -36,6 +40,7 @@ public:
 
     union {
         EffectSOLIDCommand solid;
+        EffectGRADIENTCommand gradient;
         EffectTHEATRECommand theatre;
     } eff;
 
