@@ -5,16 +5,21 @@
  *      Author: pmurray
  */
 
-#include <iostream>
-
 #include "common.hpp"
 #include "state.hpp"
+#include "pixels.hpp"
 
 #include "effect.hpp"
 
 namespace {
     void repaint(SectionState &s) {
-        std::cout << "repainting SOLID from " << s.start << " length " << s.length;
+        int npixels = s.npixels();
+
+        RGB rgb = s.colors[0].from;
+
+        for (int i = 0; i < npixels; i++) {
+            set_pixel(s.pixel(i), rgb.r, rgb.g, rgb.b);
+        }
     }
 
     bool animate(SectionState &s) {

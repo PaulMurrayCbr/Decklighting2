@@ -35,7 +35,7 @@ else
     exit 1
 fi
 
-check_q '.result.density' '0'
+check_q '.result.density' '1'
 check_q '.result.effect' '"SOLID"'
 check_q '.result.mode' '"on"'
 

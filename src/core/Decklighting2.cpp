@@ -102,6 +102,7 @@ int main() {
         s.mode = SectionMode::on;
         s.touched = true;
         s.needsRepaint = true;
+        s.density = 1;
         for (ColorRangeState &cr : s.colors) {
             cr.animation.frameDuration = std::chrono::milliseconds(static_cast<int64_t>(100));
             cr.from = RGB(255, 0, 0);

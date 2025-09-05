@@ -19,6 +19,9 @@ namespace {
         SectionState &s = sharedState.section[static_cast<int>(cmd.section)];
 
         if (cmd.density.has_value()) {
+            if (*cmd.density <= 0) {
+                throw new std::logic_error("density must be > 0");
+            }
             s.density = *cmd.density;
             s.touched = true;
             s.needsRepaint = true;
