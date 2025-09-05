@@ -36,30 +36,14 @@ class PixelLoop {
                 }
             });
 
-            if (state.touched)
-                std::cout << "global state touched\n";
-
-            if (state.needsRepaint) {
-                std::cout << "global state needs repaint\n";
-            }
-
-            for (int i = 0; i < NSECTIONS; i++) {
-                if (state.section[i].touched) {
-                    std::cout << sectionName(i) << " touched" << '\n';
-                }
-                if (state.section[i].needsRepaint) {
-                    std::cout << sectionName(i) << " needs repaint" << '\n';
-                }
-            }
-
             if (state.needsRepaint) {
                 set_pixel_global_brightness(state.brightness);
                 clear_pixels(0, NPIXELS);
 
                 if (state.on) {
-                    for (SectionState *section = state.section; section < sharedState.section + NSECTIONS; section++) {
-                        if (section->mode == SectionMode::on) {
-                            EFFECT_REPAINT[static_cast<int>(section->effect)](*section);
+                    for (SectionState &section : state.section) {
+                        if (section.mode == SectionMode::on) {
+                            EFFECT_REPAINT[static_cast<int>(section.effect)](section);
                         }
                     }
                 }
@@ -68,23 +52,24 @@ class PixelLoop {
             } else if (state.on) {
                 bool needs_send = false;
 
-                for (SectionState *section = state.section; section < sharedState.section + NSECTIONS; section++) {
-                    if (section->mode == SectionMode::on) {
-                        if (section->needsRepaint) {
-                            EFFECT_REPAINT[static_cast<int>(section->effect)](*section);
+                for (SectionState &section : state.section) {
+                    if (section.mode == SectionMode::on) {
+                        if (section.needsRepaint) {
+                            EFFECT_REPAINT[static_cast<int>(section.effect)](section);
                             needs_send = true;
                         } else {
-                            needs_send = EFFECT_ANIMATE[static_cast<int>(section->effect)](*section) || needs_send;
+                            needs_send = EFFECT_ANIMATE[static_cast<int>(section.effect)](section) || needs_send;
                         }
-
                     }
                 }
 
-                if (needs_send)
+                if (needs_send) {
                     send_pixels();
+                }
             }
 
             std::this_thread::yield();
+            std::this_thread::sleep_for(std::chrono::milliseconds(1000));
         }
         std::cerr << "Pixel loop stopped\n";
     }
