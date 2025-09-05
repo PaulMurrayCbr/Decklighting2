@@ -1,6 +1,6 @@
 /*
  * effect_SOLID.cpp
- *
+ * A single color that can be animated
  *  Created on: 1 Sept 2025
  *      Author: pmurray
  */

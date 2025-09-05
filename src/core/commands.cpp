@@ -94,8 +94,10 @@ void handleCommand(const SectionColorCommand &cmd) {
         if (cmd.rgb.has_value()) {
             if (cmd.isFrom) {
                 r.from = *cmd.rgb;
+                r.fromHsv = rgb2hsv(r.from);
             } else {
                 r.to = *cmd.rgb;
+                r.toHsv = rgb2hsv(r.to);
             }
 
             s.touched = true;

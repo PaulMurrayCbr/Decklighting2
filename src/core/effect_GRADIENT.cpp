@@ -1,5 +1,6 @@
 /*
- * effect_SOLID.cpp
+ * effect_GRADIENT.cpp
+ * A color gradient that can be animated
  *
  *  Created on: 1 Sept 2025
  *      Author: pmurray

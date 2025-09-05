@@ -1,5 +1,6 @@
 /*
  * effect_THEATRE.cpp
+ * Two interleaved solid colours, either of which might be gradiated.
  *
  *  Created on: 1 Sept 2025
  *      Author: pmurray
