@@ -10,15 +10,16 @@
 
 #include "interpolate.hpp"
 
-RGB getColorAt(ColorRangeState c, int pix, int of) {
-    if (c.seamless) {
-        // it's not obvious, but this works for odds and for evens
-        of = of / 2 + 1;
-        if (pix >= of) {
-            pix -= of;
-            pix = of - pix - 2;
-        }
-    }
+
+RGB getColorAt(ColorRangeState c) { //, int pix, int of) {
+//    if (c.seamless) {
+//        // it's not obvious, but this works for odds and for evens
+//        of = of / 2 + 1;
+//        if (pix >= of) {
+//            pix -= of;
+//            pix = of - pix - 2;
+//        }
+//    }
 
     // this will be different for animating and non-animating, as we want the animation
     // to be smooth, so floating point will be easiest.
@@ -30,3 +31,5 @@ RGB getColorAt(ColorRangeState c, int pix, int of) {
 
     return c.from;
 }
+
+void foo() {}

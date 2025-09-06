@@ -10,16 +10,30 @@
 
 #include "common.hpp"
 #include "state.hpp"
+#include "pixels.hpp"
+#include "interpolate.hpp"
 
 #include "effect.hpp"
 
 namespace {
 
     void repaint_evens(SectionState &s) {
+        int npixels = (s.npixels() + 1) / 2;
+
+        for (int i = 0; i < npixels; i++) {
+            RGB rgb = getColorAt(s.colors[0]); // , i, npixels);
+            set_pixel(s.pixel(i * 2), rgb);
+        }
 
     }
 
     void repaint_odds(SectionState &s) {
+        int npixels = s.npixels() / 2;
+
+        for (int i = 0; i < npixels; i++) {
+            RGB rgb = getColorAt(s.colors[1]); // , i, npixels);
+            set_pixel(s.pixel(i * 2 + 1), rgb);
+        }
 
     }
 

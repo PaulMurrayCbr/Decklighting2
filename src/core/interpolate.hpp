@@ -11,6 +11,8 @@
 #include "common.hpp"
 #include "state.hpp"
 
-extern RGB getColorAt(ColorRangeState &c, int pix, int of);
+extern RGB getColorAt(ColorRangeState &c); // , int pix, int of);
+
+extern void foo();
 
 #endif /* SRC_CORE_INTERPOLATE_HPP_ */
