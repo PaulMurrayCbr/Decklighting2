@@ -171,7 +171,7 @@ extern HSV rgb2hsv(RGB c);
 // do be sure to clamp your computed brightness values - it's an array access.
 
 const int APPARENT_BRIGHTNESS_SCALE = 480;
-extern const int APPARENT_BRIGHTNESS_OF_PIX_VALUE[];
+extern const int16_t APPARENT_BRIGHTNESS_OF_PIX_VALUE[];
 extern const uint8_t PIX_VALUE_FOR_APPARENT_BRIGHTNESS[];
 
 #endif /* SRC_CORE_COMMON_HPP_ */

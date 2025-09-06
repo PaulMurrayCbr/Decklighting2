@@ -23,7 +23,12 @@ namespace {
     }
 
     bool animate(SectionState &s) {
-        return false;
+        if (s.colors[0].animation.nextFrameReady()) {
+            repaint(s);
+            return true;
+        } else {
+            return false;
+        }
     }
 }
 

@@ -190,7 +190,7 @@ HSV rgb2hsv(RGB rgb) {
 // 'brightness' ranges 0 up to (but not including) 480, because this gives us enough
 // distinct values to map both directions.
 
-const int APPARENT_BRIGHTNESS_OF_PIX_VALUE[] = {
+const int16_t APPARENT_BRIGHTNESS_OF_PIX_VALUE[] = {
 0, 29, 42, 51, 59, 67, 73, 79, 84, 89, 94, 99, 103, 108, 112, 116,  //
 119, 123, 127, 130, 134, 137, 140, 143, 146, 149, 152, 155, 158, 161, 164, 167,  //
 169, 172, 174, 177, 179, 182, 184, 187, 189, 192, 194, 196, 198, 201, 203, 205,  //
