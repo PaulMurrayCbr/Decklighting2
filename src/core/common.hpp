@@ -10,7 +10,6 @@
 
 #include <string>
 #include <cstdint>
-#include <unordered_map>
 #include <map>
 
 /*
@@ -83,44 +82,34 @@ enum class Section {
 #undef SECTION
 };
 
-struct EnumClassHash {
-    template<typename T>
-    std::size_t operator()(T t) const {
-        return static_cast<std::size_t>(t);
-    }
-};
-
 extern const std::string EFFECT_TYPE_NAME[];
 extern const std::string INTERPOLATION_TYPE_NAME[];
 extern const std::string SECTION_NAME[];
 
-extern const std::unordered_map<SectionEffectType, std::string, EnumClassHash> EFFECT_TYPE_NAME_OF;
 extern const std::map<std::string, SectionEffectType> EFFECT_TYPE_ENUM_OF;
-extern const std::unordered_map<RgbInterpolationType, std::string, EnumClassHash> INTERPOLATION_TYPE_NAME_OF;
 extern const std::map<std::string, RgbInterpolationType> INTERPOLATION_TYPE_ENUM_OF;
-extern const std::unordered_map<Section, std::string, EnumClassHash> SECTION_NAME_OF;
 extern const std::map<std::string, Section> SECTION_ENUM_OF;
 
-// throw std::out_of_range("map::at");
-
 inline std::string sectionName(int section) {
-    return SECTION_NAME_OF.at(static_cast<Section>(section));
+    return SECTION_NAME[section];
 }
 inline std::string sectionName(Section section) {
-    return SECTION_NAME_OF.at(section);
+    return SECTION_NAME[static_cast<int>(section)];
 }
 inline std::string effectName(int effect) {
-    return EFFECT_TYPE_NAME_OF.at(static_cast<SectionEffectType>(effect));
+    return EFFECT_TYPE_NAME[effect];
 }
 inline std::string effectName(SectionEffectType effect) {
-    return EFFECT_TYPE_NAME_OF.at(effect);
+    return EFFECT_TYPE_NAME[static_cast<int>(effect)];
 }
 inline std::string interpolationName(int interpolation) {
-    return INTERPOLATION_TYPE_NAME_OF.at(static_cast<RgbInterpolationType>(interpolation));
+    return INTERPOLATION_TYPE_NAME[interpolation];
 }
 inline std::string interpolationName(RgbInterpolationType interpolation) {
-    return INTERPOLATION_TYPE_NAME_OF.at(interpolation);
+    return INTERPOLATION_TYPE_NAME[static_cast<int>(interpolation)];
 }
+
+
 inline Section sectionLookup(std::string name) {
     return SECTION_ENUM_OF.at(name);
 }
@@ -173,11 +162,16 @@ struct HSV {
 extern RGB hsv2rgb(HSV c);
 extern HSV rgb2hsv(RGB c);
 
+// 'brightness' ranges 0 up to (but not including) 480, because this gives us enough
+// distinct values to map from rgb and then back again.
+// x == PIX_VALUE_FOR_APPARENT_BRIGHTNESS[APPARENT_BRIGHTNESS_OF_PIX_VALUE[x]];
+// The converse is not true - there are
+// not enough pixel levels to distinguish all possible brighnesses from 0-479, but really, that's fine
 
-// I'll use my fast hsb color model
-// Saturation is the gap between largest and smallest, brightness is the largest of r/g/b, hue is the position of the middle value
-// between smallest and largest, ranging from 0 to 256*6-1 (r->y, y->g, g->c, c->b, b->m, m->r)
+// do be sure to clamp your computed brightness values - it's an array access.
 
-
+const int APPARENT_BRIGHTNESS_SCALE = 480;
+extern const int APPARENT_BRIGHTNESS_OF_PIX_VALUE[];
+extern const uint8_t PIX_VALUE_FOR_APPARENT_BRIGHTNESS[];
 
 #endif /* SRC_CORE_COMMON_HPP_ */

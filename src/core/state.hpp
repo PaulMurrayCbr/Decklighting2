@@ -9,7 +9,6 @@
 #include <cstdint>
 #include <chrono>
 #include <mutex>
-#include <unordered_map>
 #include <map>
 #include <functional>
 #include <utility>

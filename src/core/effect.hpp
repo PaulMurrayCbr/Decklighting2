@@ -8,8 +8,6 @@
 #ifndef SRC_CORE_EFFECT_HPP_
 #define SRC_CORE_EFFECT_HPP_
 
-#include <unordered_map>
-
 #include "common.hpp"
 #include "state.hpp"
 

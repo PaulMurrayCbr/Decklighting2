@@ -49,7 +49,7 @@ namespace {
             state["mode"] = s.mode == SectionMode::on ? "on" : s.mode == SectionMode::off ? "off" : "out";
             state["density"] = s.density;
 
-            state["effect"] = EFFECT_TYPE_NAME_OF.at(s.effect);
+            state["effect"] = effectName(s.effect);
 
             state["color"] = json::array();
 
@@ -74,8 +74,8 @@ namespace {
             state["on"] = sharedState.on;
             state["brightness"] = sharedState.brightness;
 
-            for (const auto &kv : SECTION_NAME_OF) {
-                state[kv.second] = toJson(kv.first);
+            for (int i = 0; i < NSECTIONS; i++) {
+                state[sectionName(i)] = toJson(static_cast<Section>(i));
             }
 
             return state;
