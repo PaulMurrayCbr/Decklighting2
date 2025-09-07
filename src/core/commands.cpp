@@ -119,8 +119,8 @@ void handleCommand(const SectionInterpolationCommand &cmd) {
             s.touched = true;
             s.needsRepaint = true;
         }
-        if (cmd.midpoint.has_value()) {
-            r.midpoint = *cmd.midpoint;
+        if (cmd.bias.has_value()) {
+            r.bias = *cmd.bias;
             s.touched = true;
             s.needsRepaint = true;
         }

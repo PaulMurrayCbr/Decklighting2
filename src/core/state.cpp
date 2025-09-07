@@ -35,7 +35,7 @@ namespace {
         state["frameDuration"] = s.animation.frameDuration.count();
         state["from"] = toJson(s.from);
         state["to"] = toJson(s.to);
-        state["midpoint"] = s.midpoint;
+        state["bias"] = s.bias;
         state["seamless"] = s.seamless;
         state["interpolation"] = interpolationName(s.interpolation);
         state["cycleSpeed"] = s.animation.cycleSpeed;

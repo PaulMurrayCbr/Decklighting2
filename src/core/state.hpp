@@ -90,7 +90,7 @@ struct ColorRangeState {
     HSV fromHsv;
     HSV toHsv;
     RgbInterpolationType interpolation = RgbInterpolationType::FADE;
-    double midpoint; // >0 to <1 default .5 Solve toget the quadratic coeficients
+    double bias = 0.5; // range >0 <1 , makes the values "bunch up"
     bool seamless;
 };
 

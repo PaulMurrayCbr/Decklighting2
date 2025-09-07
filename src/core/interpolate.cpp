@@ -5,6 +5,8 @@
  *      Author: pmurray
  */
 
+#include <cmath>
+
 #include "common.hpp"
 #include "state.hpp"
 
@@ -45,6 +47,10 @@ namespace INTERP_QFADE {
     }
 }
 
+inline double bias(double x, double a) {
+    return x / ((1.0 / a - 2.0) * (1.0 - x) + 1.0);
+}
+
 RGB interpolate_color(ColorRangeState &c, int pix, int of) {
     // lets just do this using floating point for now
 
@@ -57,12 +63,17 @@ RGB interpolate_color(ColorRangeState &c, int pix, int of) {
 
     }
 
+    relative = relative / ((1 / c.bias - 2) * (1 - relative) + 1);
+
+
     if (c.seamless) {
         relative *= 2;
         if (relative >= 1) {
             relative = 1 - (relative - 1);
         }
     }
+
+    relative = std::fmod(relative, 1);
 
     switch (c.interpolation) {
 #define INTERPOLATION(name) case RgbInterpolationType::name : return INTERP_##name::compute(c, relative);

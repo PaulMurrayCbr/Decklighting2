@@ -161,8 +161,8 @@ namespace {
             cmd.interpolation = INTERPOLATION_TYPE_ENUM_OF.at(v);
         });
 
-        ifHasStringParam(params, "midpoint", [&cmd](std::string v) {
-            cmd.midpoint = toDouble(v, 0, 1);
+        ifHasStringParam(params, "bias", [&cmd](std::string v) {
+            cmd.bias = toDouble(v, 0.001, 0.999);
         });
 
         ifHasStringParam(params, "seamless", [&cmd](std::string v) {
