@@ -37,6 +37,7 @@ namespace {
         state["to"] = toJson(s.to);
         state["midpoint"] = s.midpoint;
         state["seamless"] = s.seamless;
+        state["interpolation"] = interpolationName(s.interpolation);
         state["cycleSpeed"] = s.animation.cycleSpeed;
         return state;
     }

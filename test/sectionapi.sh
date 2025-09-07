@@ -36,7 +36,7 @@ else
 fi
 
 check_q '.result.density' '1'
-check_q '.result.effect' '"SOLID"'
+check_q '.result.effect' '"GRADIENT"'
 check_q '.result.mode' '"on"'
 
 curl -s -o $OUT 'http://localhost:8080/api/Door/off'

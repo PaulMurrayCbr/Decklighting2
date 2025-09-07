@@ -12,19 +12,6 @@
 #include <cstdint>
 #include <map>
 
-/*
- * so:
- * #define STR(x) #x
- * #define SECTION(S) \
- *   if(foo == Section::S) { \
- *     cout << "the name of the section is " << STR(s) << "\n"; \
- *   }
- * SECTION_LIST
- * #undef SECTION
- *
- * I think
- */
-
 #define EFFECT_TYPE_LIST \
     EFFECT(SOLID) \
     EFFECT(GRADIENT) \
@@ -58,7 +45,7 @@ const int NPIXELS = 0
 #define SECTION(name) + name##_LEN
         SECTION_LIST
 #undef SECTION
-        ;
+;
 
 extern const int SECTION_LEN[NSECTIONS];
 
@@ -109,7 +96,6 @@ inline std::string interpolationName(RgbInterpolationType interpolation) {
     return INTERPOLATION_TYPE_NAME[static_cast<int>(interpolation)];
 }
 
-
 inline Section sectionLookup(std::string name) {
     return SECTION_ENUM_OF.at(name);
 }
@@ -140,7 +126,6 @@ struct RGB {
             r(r), g(g), b(b) {
     }
 };
-
 
 struct HSV {
     // hue goes from 0 to 256 * 6 (minus 1).

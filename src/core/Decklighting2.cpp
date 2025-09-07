@@ -136,6 +136,15 @@ int main() {
         }
     }
 
+    for (SectionState &s : sharedState.section) {
+        s.mode = SectionMode::out;
+    }
+    sharedState.on = true;
+    sharedState.brightness = 16;
+    sharedState.section[0].mode = SectionMode::on;
+    sharedState.section[0].effect = SectionEffectType::GRADIENT;
+    sharedState.section[0].colors[0].animation.animating = true;
+
     sharedState.touched = true;
     sharedState.needsRepaint = true;
 

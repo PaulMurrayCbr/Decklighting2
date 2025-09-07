@@ -18,10 +18,12 @@
 namespace {
 
     void repaint_evens(SectionState &s) {
+        interpolate_color(s.colors[0], 0, 1);
+
         int npixels = (s.npixels() + 1) / 2;
 
         for (int i = 0; i < npixels; i++) {
-            RGB rgb = getColorAt(s.colors[0]); // , i, npixels);
+            RGB rgb = interpolate_color(s.colors[0], i, npixels);
             set_pixel(s.pixel(i * 2), rgb);
         }
 
@@ -31,14 +33,13 @@ namespace {
         int npixels = s.npixels() / 2;
 
         for (int i = 0; i < npixels; i++) {
-            RGB rgb = getColorAt(s.colors[1]); // , i, npixels);
+            RGB rgb = interpolate_color(s.colors[1], i, npixels);
             set_pixel(s.pixel(i * 2 + 1), rgb);
         }
 
     }
 
     void repaint(SectionState &s) {
-        std::cout << "repainting THEATRE from " << s.start << " length " << s.length;
         repaint_evens(s);
         repaint_odds(s);
     }
