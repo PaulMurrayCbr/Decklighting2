@@ -8,6 +8,7 @@
 #include "common.hpp"
 #include "state.hpp"
 #include "pixels.hpp"
+#include "interpolate.hpp"
 
 #include "effect.hpp"
 
@@ -15,15 +16,20 @@ namespace {
     void repaint(SectionState &s) {
         int npixels = s.npixels();
 
-        RGB rgb = s.colors[0].from;
+        RGB rgb = interpolate_color(s.colors[0], 0, 1);
 
         for (int i = 0; i < npixels; i++) {
-            set_pixel(s.pixel(i), rgb.r, rgb.g, rgb.b);
+            set_pixel(s.pixel(i), rgb);
         }
     }
 
     bool animate(SectionState &s) {
-        return false;
+        if (s.colors[0].animation.nextFrameReady()) {
+            repaint(s);
+            return true;
+        } else {
+            return false;
+        }
     }
 }
 

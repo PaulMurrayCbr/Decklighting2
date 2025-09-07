@@ -13,6 +13,10 @@ namespace {
     RGB out[NPIXELS];
 }
 
+void init_pixels() {
+
+}
+
 void clear_pixels(int start, int length) {
     for (int i = start; i < start + length; i++) {
         out[i].r = 0;

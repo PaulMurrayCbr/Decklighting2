@@ -130,15 +130,15 @@ void handleCommand(const SectionInterpolationCommand &cmd) {
             s.needsRepaint = true;
         }
         if (cmd.animating.has_value()) {
-            r.animation.animating = *cmd.animating;
+            r.animation.setAnimating(*cmd.animating);
             s.touched = true;
         }
         if (cmd.frameDuration.has_value()) {
-            r.animation.frameDuration = std::chrono::milliseconds(*cmd.frameDuration);
+            r.animation.setFrameDuration(*cmd.frameDuration);
             s.touched = true;
         }
         if (cmd.cycleSpeed.has_value()) {
-            r.cycleSpeed = std::chrono::milliseconds(*cmd.cycleSpeed);
+            r.animation.setCycleSpeed(*cmd.cycleSpeed);
             s.touched = true;
         }
     });

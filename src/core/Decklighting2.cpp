@@ -10,16 +10,39 @@
 #include "webserver.hpp"
 #include "state.hpp"
 #include "pixelloop.hpp"
+#include "pixels.hpp"
 
-#ifdef __APPLE__
-namespace fs = std::__fs::filesystem;
-#else
-namespace fs = std::filesystem;
-#endif
+//#ifdef __APPLE__
+//namespace fs = std::__fs::filesystem;
+//#else
+//namespace fs = std::filesystem;
+//#endif
 
 static std::atomic<bool> g_stop { false };
 void handle_signal(int) {
     g_stop.store(true);
+}
+
+int zzz(int pix, int of) {
+    // it's not obvious, but this works for odds and for evens
+    of = of / 2 + 1;
+    if (pix >= of) {
+        pix -= of;
+        pix = of - pix - 2;
+    }
+
+    return pix;
+}
+
+int main_test_pixel_bookfolding() {
+    for (int pix = 0; pix < 8; pix++) {
+        std::cout << pix << ' ' << zzz(pix, 8) << '\n';
+    }
+    std::cout << '\n';
+    for (int pix = 0; pix < 9; pix++) {
+        std::cout << pix << ' ' << zzz(pix, 9) << '\n';
+    }
+    return 0;
 }
 
 int main_test_color_wheel() {
@@ -113,10 +136,21 @@ int main() {
         }
     }
 
+    for (SectionState &s : sharedState.section) {
+        s.mode = SectionMode::out;
+    }
+    sharedState.on = true;
+    sharedState.brightness = 16;
+    sharedState.section[0].mode = SectionMode::on;
+    sharedState.section[0].effect = SectionEffectType::GRADIENT;
+    sharedState.section[0].colors[0].animation.animating = true;
+
     sharedState.touched = true;
     sharedState.needsRepaint = true;
 
     recompute_sections();
+
+    init_pixels();
 
     start_webserver();
     start_pixelloop();

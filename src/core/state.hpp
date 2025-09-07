@@ -9,7 +9,6 @@
 #include <cstdint>
 #include <chrono>
 #include <mutex>
-#include <unordered_map>
 #include <map>
 #include <functional>
 #include <utility>
@@ -21,15 +20,31 @@ using json = nlohmann::json;
 
 struct AnimationState {
     bool animating;
-    std::chrono::milliseconds frameDuration;
+    std::chrono::milliseconds frameDuration = std::chrono::milliseconds(100);
     std::chrono::time_point<std::chrono::steady_clock> previousFrameTime;
+    int cycleSpeed = 1000;
+    int currentCyclePos;
 
-    void setFrameDuration(double ms) {
-        frameDuration = std::chrono::milliseconds(static_cast<int64_t>(ms));
+    void setAnimating(bool a) {
+        animating = a;
+        restart();
+    }
+
+    void setFrameDuration(int ms) {
+        frameDuration = std::chrono::milliseconds(static_cast<int64_t>(ms < 50 ? 50 : ms));
+        restart();
+    }
+
+    // cycle speed can be less than the fram duration, which kinda randomises
+    // where the cycle is each frame
+    void setCycleSpeed(int ms) {
+        cycleSpeed = ms < 1 ? 1 : ms;
+        restart();
     }
 
     void restart() {
         previousFrameTime = std::chrono::steady_clock::now() - frameDuration;
+        currentCyclePos = 0;
     }
 
     /** note that this method sets the current frame time if it returns true
@@ -37,10 +52,21 @@ struct AnimationState {
      */
 
     bool nextFrameReady() {
-        auto now = std::chrono::steady_clock::now();
+        if (!animating) {
+            return false;
+        }
 
-        if (now - previousFrameTime >= frameDuration) {
+        auto now = std::chrono::steady_clock::now();
+        auto elapsed = now - previousFrameTime;
+
+        if (elapsed >= frameDuration) {
             previousFrameTime = now;
+
+            int ms = (int) std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
+            currentCyclePos += ms;
+            while (currentCyclePos > cycleSpeed)
+                currentCyclePos -= cycleSpeed;
+
             return true;
         } else {
             return false;
@@ -66,7 +92,6 @@ struct ColorRangeState {
     RgbInterpolationType interpolation = RgbInterpolationType::FADE;
     double midpoint; // >0 to <1 default .5 Solve toget the quadratic coeficients
     bool seamless;
-    std::chrono::milliseconds cycleSpeed;
 };
 
 struct SectionState {

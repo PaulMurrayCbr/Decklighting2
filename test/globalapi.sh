@@ -35,8 +35,8 @@ else
     exit 1
 fi
 
-check_q '.result.brightness' '0'
-check_q '.result.on' 'false'
+check_q '.result.brightness' '16'
+check_q '.result.on' 'true'
 curl -s -o $OUT 'http://localhost:8080/api/on?brightness=3'
 check_q '.result.brightness' '3'
 check_q '.result.on' 'true'
