@@ -55,6 +55,7 @@ class PixelLoop {
                 for (SectionState &section : state.section) {
                     if (section.mode == SectionMode::on) {
                         if (section.needsRepaint) {
+                            clear_pixels(section.start, section.length);
                             EFFECT_REPAINT[static_cast<int>(section.effect)](section);
                             needs_send = true;
                         } else {

@@ -12,11 +12,11 @@
 #include "webserver.hpp"
 #include "api.hpp"
 
-#ifdef __APPLE__
-namespace fs = std::__fs::filesystem;
-#else
-namespace fs = std::filesystem;
-#endif
+//#ifdef __APPLE__
+//namespace fs = std::__fs::filesystem;
+//#else
+//namespace fs = std::filesystem;
+//#endif
 
 using json = nlohmann::json;
 
@@ -50,20 +50,20 @@ public:
 		const uint16_t PORT = 8080;
 		const std::string static_dir = "web";
 
-		std::cerr << "Using web files at " << fs::canonical(static_dir) << "\n";
+//		std::cerr << "Using web files at " << fs::canonical(static_dir) << "\n";
 
 		// Serve your React build
-		if (fs::exists(static_dir)) {
+//		if (fs::exists(static_dir)) {
 			svr.set_mount_point("/", static_dir.c_str());
 			// SPA fallback: serve index.html for unknown routes (but not under /api)
 			svr.set_file_extension_and_mimetype_mapping("js",
 					"text/javascript");
 			svr.set_file_extension_and_mimetype_mapping("css", "text/css");
 
-		} else {
-			std::cerr << "Warning: static dir '" << static_dir
-					<< "' not found; only /api/* will work.\n";
-		}
+//		} else {
+//			std::cerr << "Warning: static dir '" << static_dir
+//					<< "' not found; only /api/* will work.\n";
+//		}
 
 		svr.set_error_handler([](const httplib::Request& req, httplib::Response& res) {
 		    // Check if the path starts with the static mount point
