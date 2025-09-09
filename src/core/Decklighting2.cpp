@@ -65,7 +65,7 @@ int main_test_color_wheel() {
 }
 
 int main_test_color_wheel_2() {
-    int x;
+    int x = 0;
 
     for (int r = 0; r < 256; r++) {
         for (int g = 0; g < 256; g++) {
@@ -114,6 +114,56 @@ int main_test_color_wheel_2() {
     return 0;
 }
 
+int main_test_color_wheel_3() {
+    int x = 0;
+
+    for (int r = 0; r < 256; r++) {
+        for (int g = 0; g < 256; g++) {
+            for (int b = 0; b < 256; b++) {
+                RGB c = RGB(r, g, b);
+                HSQ h = rgb2hsq(c);
+                RGB c2 = hsq2rgb(h);
+
+                try {
+                    if (std::abs(((int) c2.r) - ((int) c.r)) > 1) {
+                        throw std::logic_error("red");
+                    }
+                    if (std::abs(((int) c2.g) - ((int) c.g)) > 1) {
+                        throw std::logic_error("green");
+                    }
+                    if (std::abs(((int) c2.b) - ((int) c.b)) > 1) {
+                        throw std::logic_error("blue");
+                    }
+
+                    if (h.h < 0 || h.h > APPARENT_BRIGHTNESS_SCALE * 6) {
+                        throw std::logic_error("hue");
+                    }
+                    if (h.v < 0 || h.v > APPARENT_BRIGHTNESS_SCALE) {
+                        throw std::logic_error("brite");
+                    }
+                    if (h.s < 0 || h.s > h.v) {
+                        throw std::logic_error("sat");
+                    }
+                } catch (std::logic_error ex) {
+                    std::cout << //
+                            "init " << ((int) c.r) << ' ' << ((int) c.g) << ' ' << ((int) c.b) << "\t| " << //
+                            "hsq " << ((int) h.h) / APPARENT_BRIGHTNESS_SCALE << '/' << ((int) h.h) % APPARENT_BRIGHTNESS_SCALE << ' ' << ((int) h.s) << ' ' << ((int) h.v) << "\t| " << //
+                            "roundtrip " << ((int) c2.r) << ' ' << ((int) c2.g) << ' ' << ((int) c2.b) << "\t| " << //
+                            "diff " << ((int) c2.r) - ((int) c.r) << ' ' << ((int) c2.g) - ((int) c.g) << ' ' << ((int) c2.b) - ((int) c.b) << "\t| " << //
+                            '\n';
+
+                    throw ex;
+                }
+
+                x++;
+            }
+        }
+    }
+    std::cout << x << " values checked \n";
+
+    return 0;
+}
+
 int main() {
 // === Config ===
 //    const int GPIO_PIN = 18;      // PWM0 (requires level shifter to 5V on data)
@@ -130,8 +180,8 @@ int main() {
             cr.animation.frameDuration = std::chrono::milliseconds(static_cast<int64_t>(100));
             cr.from = RGB(255, 0, 0);
             cr.to = RGB(0, 255, 0);
-            cr.fromHsv = rgb2hsv(cr.from);
-            cr.toHsv = rgb2hsv(cr.to);
+            cr.fromHsq = rgb2hsq(cr.from);
+            cr.toHsq = rgb2hsq(cr.to);
             cr.interpolation = RgbInterpolationType::FADE;
         }
     }

@@ -20,7 +20,9 @@
 #define INTERPOLATION_TYPE_LIST \
     INTERPOLATION(NONE) \
     INTERPOLATION(FADE) \
-    INTERPOLATION(QFADE)
+    INTERPOLATION(QFADE) \
+    INTERPOLATION(ROYGBV) \
+    INTERPOLATION(VBGYOB)
 
 #define SECTION_LIST \
     SECTION(Door) \
@@ -134,7 +136,7 @@ struct RGB {
 };
 
 struct HSV {
-    // hue goes from 0 to 256 * 6 (minus 1).
+    // hue goes from 0 to 256 (minus 1) * 6 .
     int h { 0 };
     uint8_t s { 0 }, v { 0 };
 
@@ -164,5 +166,26 @@ extern HSV rgb2hsv(RGB c);
 const int APPARENT_BRIGHTNESS_SCALE = 480;
 extern const int16_t APPARENT_BRIGHTNESS_OF_PIX_VALUE[];
 extern const uint8_t PIX_VALUE_FOR_APPARENT_BRIGHTNESS[];
+
+struct HSQ {
+    // hue goes from 0 to APPARENT_BRIGHTNESS_SCALE * 6 (minus 1).
+    int16_t h { 0 };
+    // brghtness and saturation likewise go from 0 APPARENT_BRIGHTNESS_SCALE  (minus 1).
+    int16_t s { 0 }, v { 0 };
+
+    HSQ() {
+    }
+
+    HSQ(int h, int s, int v) :
+            h(h), s(s), v(v) {
+    }
+
+    HSQ(int16_t h, int16_t s, int16_t v) :
+            h(h), s(s), v(v) {
+    }
+};
+
+extern RGB hsq2rgb(HSQ c);
+extern HSQ rgb2hsq(RGB c);
 
 #endif /* SRC_CORE_COMMON_HPP_ */
