@@ -1,76 +1,81 @@
 // App.js
 
 
-const { useState, useEffect } = React;
+const { useState, useEffect, useRef } = React;
 
 function App() {
-	// Dynamic sections array
-	const [sections, setSections] = useState(["Door", "Game", "Theatre"]);
 	const [activeTab, setActiveTab] = useState("Global Commands");
 	const [pixelState, setPixelState] = useState({});
 	const [loading, setLoading] = useState(false);
+	const loadingCount = useRef(0);
 	const [error, setError] = useState(false);
+	const [info, setInfo] = useState({
+		effects: [],
+		interpolations: [],
+		ncolorranges: 0,
+		sections: []
+	});
 
-	useEffect(() => {
-		console.log("App " + name + " loading", loading);
+	const apiFetch = async (url) => {
+		if (++loadingCount.current) {
+			setLoading(true);
+		}
+		try {
+			const response = await fetch(`/api/${url}`);
+			const json = await response.json();
 
-	}, [loading]);
+			if (!response.ok || !json?.status || json?.status !== 200) {
+				throw new Error(json?.result || response.statusText || `HTTP error ${response.status}`);
+			}
 
-	useEffect(() => {
-		console.log("fetch pixelState");
-		setLoading(true);
-
-		fetch("/api")
-			.then((response) => {
-				if (!response.ok) {
-					throw new Error("Network response was not ok");
-				}
-				return response.json();
-			})
-			.then((json) => {
-				if (json.status != 200) {
-					throw new Error("Json response was not ok");
-				}
-				console.log("got pixelState", json);
-				setPixelState(json.result);
-
-				const loadOff = async () => {
-					await new Promise((resolve) => setTimeout(resolve, 3000));
-					setLoading(false);
-				};
-				loadOff();
-			})
-			.catch((err) => {
-				setError(err);
+			return json.result;
+		}
+		catch (err) {
+			setError(err);
+			//			throw err;
+		}
+		finally {
+			if (!--loadingCount.current) {
 				setLoading(false);
-			});
+			}
+		}
+	};
+
+
+	useEffect(() => {
+		apiFetch("status").then(setPixelState);
+		apiFetch("info").then(setInfo);
 	}, []); // empty deps = run once after first render
 
 	return (
-		<div>
+		<div> <div>LOADING: {JSON.stringify(loading)}</div>
 			<Navbar
-				sections={sections}
+				info={info}
 				activeTab={activeTab}
 				onTabChange={setActiveTab}
 				loading={loading}
 			/>
 			<div className="container mt-3">
 				{activeTab === "Global Commands" ? (
-					<GlobalCommands loading={loading} pixelState={pixelState} />
+					<GlobalCommands
+						loading={loading}
+						pixelState={pixelState}
+						apiFetch={apiFetch}
+						setPixelState={setPixelState} />
 				) : (
-					<Section name={activeTab} loading={loading} pixelState={pixelState} />
+					<Section
+						name={activeTab}
+						loading={loading}
+						pixelState={pixelState}
+						apiFetch={apiFetch}
+						setPixelState={setPixelState} />
 				)}
 			</div>
 		</div>
 	);
 }
 
-function Navbar({ sections, activeTab, onTabChange, loading, pixelState }) {
-	useEffect(() => {
-		console.log("Navbar loading", loading);
-
-	}, [loading]);
-
+function Navbar({ info, activeTab, onTabChange, loading, pixelState }) {
 	return (
 		<nav className="navbar navbar-expand-lg bg-body-tertiary">
 			<div className="container-fluid">
@@ -90,7 +95,7 @@ function Navbar({ sections, activeTab, onTabChange, loading, pixelState }) {
 								Overview
 							</button>
 						</li>
-						{sections.map((section) => (
+						{info?.sections?.map((section) => (
 							<li className="nav-item" key={section}>
 								<button
 									className={`nav-link btn ${activeTab === section ? "active" : ""}`}
@@ -110,16 +115,15 @@ function Navbar({ sections, activeTab, onTabChange, loading, pixelState }) {
 	);
 }
 
-function GlobalCommands({ loading, pixelState }) {
-	useEffect(() => {
-		console.log("GlobalCommands loading", loading);
+function GlobalCommands({ loading, pixelState, info, apiFetch, setPixelState }) {
 
-	}, [loading]);
+	const reload = () => apiFetch("status").then(setPixelState);
+
 	return (
 		<div>
 			<h3 className="d-flex justify-content-between align-items-center">
 				Overview
-				<button className="btn btn-sm btn-outline-secondary" disabled={loading}>
+				<button className="btn btn-sm btn-outline-secondary" disabled={loading} onClick={reload}>
 					<i className="bi bi-arrow-clockwise"></i>
 					{loading}
 				</button>
@@ -128,38 +132,91 @@ function GlobalCommands({ loading, pixelState }) {
 			<p>Commands that affect everything.</p>
 			<pre>{JSON.stringify(pixelState, (k, v) => k.length > 0 && k[0] === k[0].toLocaleUpperCase() ? undefined : v, 2)}</pre>
 
+			{/* Overlay while loading is true */}
+			{loading && (
+				<div
+					className="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
+					style={{
+						backgroundColor: 'rgba(0,0,0,0.3)',
+						transition: "opacity 0.3s ease-in-out",
+						zIndex: 1050,   // above most Bootstrap elements
+					}}
+				>
+					<div className="spinner-border text-light" role="status">
+						<span className="visually-hidden">Loading...</span>
+					</div>
+				</div>
+			)}
+
 		</div>
 	);
 }
 
-function Section({ name, loading, pixelState }) {
+function Section({ name, loading, pixelState, info, apiFetch, setPixelState }) {
 	const [section, setSection] = useState({});
 
+	const reload = () => {
+		apiFetch(name)
+			.then((json) => {
+				console.log(`refetched state for ${name}`, json);
+				setPixelState({
+					...pixelState,
+					[name]: json
+				})
+			});
+	};
 
 	useEffect(() => {
-		console.log("Section " + name + " changed", name);
 		setSection(pixelState[name]);
+	}, [name, pixelState]);
 
-	}, [name]);
-	useEffect(() => {
-		console.log("Section " + name + " loading", loading);
-		setSection(pixelState[name]);
-
-	}, [loading]);
 	return (
 		<div>
 			<h3 className="d-flex justify-content-between align-items-center">
 				{name}
-				<button className="btn btn-sm btn-outline-secondary" disabled={loading}>
+				<button className="btn btn-sm btn-outline-secondary" disabled={loading} onClick={reload}>
 					<i className="bi bi-arrow-clockwise"></i>
 				</button>
 			</h3>
 			<p>Controls for {name}.</p>
 			<pre>{JSON.stringify(section, null, 2)}</pre>
+
+			{/* Overlay while loading is true */}
+			{loading && (
+				<div
+					className="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
+					style={{
+						backgroundColor: 'rgba(0,0,0,0.3)',
+						transition: "opacity 0.3s ease-in-out",
+						zIndex: 1050,   // above most Bootstrap elements
+					}}
+				>
+					<div className="spinner-border text-light" role="status">
+						<span className="visually-hidden">Loading...</span>
+					</div>
+				</div>
+			)}
 		</div>
 	);
 }
 
+
+function LoadingOverlay({ loading }) {
+  return (
+    <div
+      className="loading-overlay"
+      style={{
+        opacity: loading ? 1 : 0,
+        pointerEvents: loading ? "auto" : "none", // blocks interaction only when visible
+        transition: "opacity 0.3s ease-in-out", // smooth fade
+      }}
+    >
+      <div className="spinner-border text-light" role="status">
+        <span className="visually-hidden">Loading...</span>
+      </div>
+    </div>
+  );
+}
 
 // Important: expose App to the global scope
 window.App = App;

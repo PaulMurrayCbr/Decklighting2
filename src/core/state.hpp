@@ -136,6 +136,7 @@ extern GlobalState sharedState;
 extern std::mutex sharedStateMutex;
 extern json getGlobalState();
 extern json getSectionState(Section section);
+extern json getGlobalInfo();
 
 // C++ weirdness, I have no idea what these ampersands do, or std:forward, or any of this stuff.
 
