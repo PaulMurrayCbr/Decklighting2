@@ -1,20 +1,50 @@
 // App.js
-//function App() {
-//  return (
-//    <div className="container text-center mt-5">
-//      <h1 className="text-primary">Paul's Funky Lighting 2.0</h1>
-//      <button className="btn btn-success">Click Me</button>
-//    </div>
-//  );
-//}
 
 
-const { useState } = React;
+const { useState, useEffect } = React;
 
 function App() {
 	// Dynamic sections array
-	const [sections, setSections] = useState(["Section 1", "Section 2", "Section 3"]);
+	const [sections, setSections] = useState(["Door", "Game", "Theatre"]);
 	const [activeTab, setActiveTab] = useState("Global Commands");
+	const [pixelState, setPixelState] = useState({});
+	const [loading, setLoading] = useState(false);
+	const [error, setError] = useState(false);
+
+	useEffect(() => {
+		console.log("App " + name + " loading", loading);
+
+	}, [loading]);
+
+	useEffect(() => {
+		console.log("fetch pixelState");
+		setLoading(true);
+
+		fetch("/api")
+			.then((response) => {
+				if (!response.ok) {
+					throw new Error("Network response was not ok");
+				}
+				return response.json();
+			})
+			.then((json) => {
+				if (json.status != 200) {
+					throw new Error("Json response was not ok");
+				}
+				console.log("got pixelState", json);
+				setPixelState(json.result);
+
+				const loadOff = async () => {
+					await new Promise((resolve) => setTimeout(resolve, 3000));
+					setLoading(false);
+				};
+				loadOff();
+			})
+			.catch((err) => {
+				setError(err);
+				setLoading(false);
+			});
+	}, []); // empty deps = run once after first render
 
 	return (
 		<div>
@@ -22,28 +52,34 @@ function App() {
 				sections={sections}
 				activeTab={activeTab}
 				onTabChange={setActiveTab}
+				loading={loading}
 			/>
 			<div className="container mt-3">
 				{activeTab === "Global Commands" ? (
-					<GlobalCommands />
+					<GlobalCommands loading={loading} pixelState={pixelState} />
 				) : (
-					<Section name={activeTab} />
+					<Section name={activeTab} loading={loading} pixelState={pixelState} />
 				)}
 			</div>
 		</div>
 	);
 }
 
-function Navbar({ sections, activeTab, onTabChange }) {
+function Navbar({ sections, activeTab, onTabChange, loading, pixelState }) {
+	useEffect(() => {
+		console.log("Navbar loading", loading);
+
+	}, [loading]);
+
 	return (
-		<nav class="navbar navbar-expand-lg bg-body-tertiary">
-			<div class="container-fluid">
-				<a class="navbar-brand" href="#">Paul's Funky Lighting 2.0</a>
-				<button class="navbar-toggler" type="button"
+		<nav className="navbar navbar-expand-lg bg-body-tertiary">
+			<div className="container-fluid">
+				<a className="navbar-brand" href="#">Paul's Funky Lighting 2.0</a>
+				<button className="navbar-toggler" type="button"
 					data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup">
-					<span class="navbar-toggler-icon"></span>
+					<span className="navbar-toggler-icon"></span>
 				</button>
-				<div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+				<div className="collapse navbar-collapse" id="navbarNavAltMarkup">
 					<ul className="navbar-nav me-auto mb-2 mb-lg-0">
 						<li className="nav-item">
 							<button
@@ -74,31 +110,52 @@ function Navbar({ sections, activeTab, onTabChange }) {
 	);
 }
 
-function GlobalCommands() {
+function GlobalCommands({ loading, pixelState }) {
+	useEffect(() => {
+		console.log("GlobalCommands loading", loading);
+
+	}, [loading]);
 	return (
 		<div>
-		<h3 class="d-flex justify-content-between align-items-center">
-		  Overview
-		  <button class="btn btn-sm btn-outline-secondary">
-		    <i class="bi bi-arrow-clockwise"></i>
-		  </button>
-		</h3>			
+			<h3 className="d-flex justify-content-between align-items-center">
+				Overview
+				<button className="btn btn-sm btn-outline-secondary" disabled={loading}>
+					<i className="bi bi-arrow-clockwise"></i>
+					{loading}
+				</button>
+			</h3>
 
 			<p>Commands that affect everything.</p>
+			<pre>{JSON.stringify(pixelState, (k, v) => k.length > 0 && k[0] === k[0].toLocaleUpperCase() ? undefined : v, 2)}</pre>
+
 		</div>
 	);
 }
 
-function Section({ name }) {
+function Section({ name, loading, pixelState }) {
+	const [section, setSection] = useState({});
+
+
+	useEffect(() => {
+		console.log("Section " + name + " changed", name);
+		setSection(pixelState[name]);
+
+	}, [name]);
+	useEffect(() => {
+		console.log("Section " + name + " loading", loading);
+		setSection(pixelState[name]);
+
+	}, [loading]);
 	return (
 		<div>
-		<h3 class="d-flex justify-content-between align-items-center">
-		  {name}
-		  <button class="btn btn-sm btn-outline-secondary">
-		    <i class="bi bi-arrow-clockwise"></i>
-		  </button>
-		</h3>			
+			<h3 className="d-flex justify-content-between align-items-center">
+				{name}
+				<button className="btn btn-sm btn-outline-secondary" disabled={loading}>
+					<i className="bi bi-arrow-clockwise"></i>
+				</button>
+			</h3>
 			<p>Controls for {name}.</p>
+			<pre>{JSON.stringify(section, null, 2)}</pre>
 		</div>
 	);
 }
