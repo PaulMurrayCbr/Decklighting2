@@ -24,9 +24,13 @@ function App() {
 			const response = await fetch(`/api/${url}`);
 			const json = await response.json();
 
+
+
 			if (!response.ok || !json?.status || json?.status !== 200) {
 				throw new Error(json?.result || response.statusText || `HTTP error ${response.status}`);
 			}
+
+			// await new Promise((resolve) => setTimeout(resolve, 1000));
 
 			return json.result;
 		}
@@ -48,7 +52,7 @@ function App() {
 	}, []); // empty deps = run once after first render
 
 	return (
-		<div> <div>LOADING: {JSON.stringify(loading)}</div>
+		<div>
 			<Navbar
 				info={info}
 				activeTab={activeTab}
@@ -70,6 +74,22 @@ function App() {
 						apiFetch={apiFetch}
 						setPixelState={setPixelState} />
 				)}
+
+				<div
+					className="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
+					style={{
+						opacity: loading ? 1 : 0,
+						pointerEvents: loading ? "auto" : "none", // blocks interaction only when visible
+						transition: "opacity 0.3s ease-in-out", // smooth fade
+						backgroundColor: 'rgba(0,0,0,0.3)',
+						zIndex: 1050,   // above most Bootstrap elements
+					}}
+				>
+					<div className="spinner-border text-light" role="status">
+						<span className="visually-hidden">Loading...</span>
+					</div>
+				</div>
+
 			</div>
 		</div>
 	);
@@ -131,23 +151,6 @@ function GlobalCommands({ loading, pixelState, info, apiFetch, setPixelState }) 
 
 			<p>Commands that affect everything.</p>
 			<pre>{JSON.stringify(pixelState, (k, v) => k.length > 0 && k[0] === k[0].toLocaleUpperCase() ? undefined : v, 2)}</pre>
-
-			{/* Overlay while loading is true */}
-			{loading && (
-				<div
-					className="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
-					style={{
-						backgroundColor: 'rgba(0,0,0,0.3)',
-						transition: "opacity 0.3s ease-in-out",
-						zIndex: 1050,   // above most Bootstrap elements
-					}}
-				>
-					<div className="spinner-border text-light" role="status">
-						<span className="visually-hidden">Loading...</span>
-					</div>
-				</div>
-			)}
-
 		</div>
 	);
 }
@@ -180,42 +183,26 @@ function Section({ name, loading, pixelState, info, apiFetch, setPixelState }) {
 			</h3>
 			<p>Controls for {name}.</p>
 			<pre>{JSON.stringify(section, null, 2)}</pre>
-
-			{/* Overlay while loading is true */}
-			{loading && (
-				<div
-					className="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
-					style={{
-						backgroundColor: 'rgba(0,0,0,0.3)',
-						transition: "opacity 0.3s ease-in-out",
-						zIndex: 1050,   // above most Bootstrap elements
-					}}
-				>
-					<div className="spinner-border text-light" role="status">
-						<span className="visually-hidden">Loading...</span>
-					</div>
-				</div>
-			)}
 		</div>
 	);
 }
 
 
 function LoadingOverlay({ loading }) {
-  return (
-    <div
-      className="loading-overlay"
-      style={{
-        opacity: loading ? 1 : 0,
-        pointerEvents: loading ? "auto" : "none", // blocks interaction only when visible
-        transition: "opacity 0.3s ease-in-out", // smooth fade
-      }}
-    >
-      <div className="spinner-border text-light" role="status">
-        <span className="visually-hidden">Loading...</span>
-      </div>
-    </div>
-  );
+	return (
+		<div
+			className="loading-overlay"
+			style={{
+				opacity: loading ? 1 : 0,
+				pointerEvents: loading ? "auto" : "none", // blocks interaction only when visible
+				transition: "opacity 0.3s ease-in-out", // smooth fade
+			}}
+		>
+			<div className="spinner-border text-light" role="status">
+				<span className="visually-hidden">Loading...</span>
+			</div>
+		</div>
+	);
 }
 
 // Important: expose App to the global scope
