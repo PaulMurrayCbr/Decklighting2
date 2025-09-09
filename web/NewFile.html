@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+<!-- Load React and ReactDOM from CDN -->
+<script src="https://unpkg.com/react@18/umd/react.development.js"
+	crossorigin></script>
+<script
+	src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
+	crossorigin></script>
+<!-- Load Babel so we can write JSX directly -->
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+
+<!-- Bootstrap -->
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+	rel="stylesheet"
+	integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
+	crossorigin="anonymous">
+
+<link rel="stylesheet" href="Decklighting2.css" />
+</head>
+<body>
+
+
+	<div id="App">
+		<div>
+			<nav class="navbar navbar-expand-lg navbar-light bg-light">
+				<div class="container-fluid">
+					<a class="navbar-brand" href="#">Paul's Funky Lighting 2.0</a>
+					<button class="navbar-toggler" type="button"
+						data-bs-toggle="dropdown" data-bs-target="#navbarMenu"
+						aria-controls="navbarMenu" aria-expanded="false"
+						aria-label="Toggle navigation">
+						<span class="navbar-toggler-icon"></span>
+					</button>
+					<div class="collapse navbar-collapse" id="navbarMenu">
+						<ul class="navbar-nav me-auto mb-2 mb-lg-0">
+							<li class="nav-item"><button class="nav-link btn active"
+									style="border: medium; background: none;">Global
+									Commands</button></li>
+							<li class="nav-item"><button class="nav-link btn "
+									style="border: medium; background: none;">Section 1</button></li>
+							<li class="nav-item"><button class="nav-link btn "
+									style="border: medium; background: none;">Section 2</button></li>
+							<li class="nav-item"><button class="nav-link btn "
+									style="border: medium; background: none;">Section 3</button></li>
+						</ul>
+					</div>
+				</div>
+			</nav>
+			<div class="container mt-3">
+				<div>
+					<h3>Global Commands</h3>
+					<p>Commands that affect everything.</p>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+
+
+	<nav class="navbar navbar-expand-lg bg-body-tertiary">
+		<div class="container-fluid">
+			<a class="navbar-brand" href="#">Navbar</a>
+			<button class="navbar-toggler" type="button"
+				data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
+				aria-controls="navbarNavAltMarkup" aria-expanded="false"
+				aria-label="Toggle navigation">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+				<div class="navbar-nav">
+					<a class="nav-link active" aria-current="page" href="#">Home</a> <a
+						class="nav-link" href="#">Features</a> <a class="nav-link"
+						href="#">Pricing</a> <a class="nav-link disabled"
+						aria-disabled="true">Disabled</a>
+				</div>
+			</div>
+		</div>
+	</nav>
+
+
+
+	<script
+		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+		integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+		crossorigin="anonymous"></script>
+
+</body>
+</html>

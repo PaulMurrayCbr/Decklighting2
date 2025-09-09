@@ -31,6 +31,9 @@
 * different effects
 * global functions sensibly named
 
+### interpolate
+* deals with colour comuutation
+
 ### webserver
 * http server
 * handles static content
