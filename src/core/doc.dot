@@ -9,6 +9,7 @@ label = "Pixels"
 pixelloop;
 effect;
 pixels;
+interpolate;
 }
 
 subgraph  cluster_web {
@@ -26,7 +27,10 @@ Decklighting -> state [label="initializes"];
 state -> pixelloop [label="reads in mutex"];
 pixelloop -> effect [label="copied section state"];
 pixelloop -> pixels [label="writes"];
-effect -> pixels [label="writes"];
+effect -> pixels 
+
+interpolate -> effect [label="calculates colours"];
+state -> interpolate [label="specifies method\nanimation state"];
 
 webserver -> api [label="path, params, json"];
 api -> command [label="command objects"];

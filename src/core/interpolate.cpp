@@ -5,6 +5,8 @@
  *      Author: pmurray
  */
 
+#include <cmath>
+
 #include "common.hpp"
 #include "state.hpp"
 
@@ -33,24 +35,23 @@ namespace INTERP_QFADE {
     RGB compute(ColorRangeState &c, double relative) {
         // this won't be correct because the 'to' end gets clipped
 
-        int apparentr = APPARENT_BRIGHTNESS_OF_PIX_VALUE[c.from.r] + (APPARENT_BRIGHTNESS_OF_PIX_VALUE[c.to.r] - APPARENT_BRIGHTNESS_OF_PIX_VALUE[c.from.r]) * relative;
-        int apparentg = APPARENT_BRIGHTNESS_OF_PIX_VALUE[c.from.g] + (APPARENT_BRIGHTNESS_OF_PIX_VALUE[c.to.g] - APPARENT_BRIGHTNESS_OF_PIX_VALUE[c.from.g]) * relative;
-        int apparentb = APPARENT_BRIGHTNESS_OF_PIX_VALUE[c.from.b] + (APPARENT_BRIGHTNESS_OF_PIX_VALUE[c.to.b] - APPARENT_BRIGHTNESS_OF_PIX_VALUE[c.from.b]) * relative;
+        int apparentr = APPARENT_BRIGHTNESS_OF_PIX_VALUE[c.from.r] + ((int) APPARENT_BRIGHTNESS_OF_PIX_VALUE[c.to.r] - (int) APPARENT_BRIGHTNESS_OF_PIX_VALUE[c.from.r]) * relative;
+        int apparentg = APPARENT_BRIGHTNESS_OF_PIX_VALUE[c.from.g] + ((int) APPARENT_BRIGHTNESS_OF_PIX_VALUE[c.to.g] - (int) APPARENT_BRIGHTNESS_OF_PIX_VALUE[c.from.g]) * relative;
+        int apparentb = APPARENT_BRIGHTNESS_OF_PIX_VALUE[c.from.b] + ((int) APPARENT_BRIGHTNESS_OF_PIX_VALUE[c.to.b] - (int) APPARENT_BRIGHTNESS_OF_PIX_VALUE[c.from.b]) * relative;
 
-        return RGB(PIX_VALUE_FOR_APPARENT_BRIGHTNESS[apparentr], PIX_VALUE_FOR_APPARENT_BRIGHTNESS[apparentb], PIX_VALUE_FOR_APPARENT_BRIGHTNESS[apparentb]);
+        apparentr = apparentr >= 0 ? apparentr < APPARENT_BRIGHTNESS_SCALE ? apparentr : APPARENT_BRIGHTNESS_SCALE : 0;
+        apparentg = apparentg >= 0 ? apparentg < APPARENT_BRIGHTNESS_SCALE ? apparentg : APPARENT_BRIGHTNESS_SCALE : 0;
+        apparentb = apparentb >= 0 ? apparentb < APPARENT_BRIGHTNESS_SCALE ? apparentb : APPARENT_BRIGHTNESS_SCALE : 0;
+
+        return RGB(PIX_VALUE_FOR_APPARENT_BRIGHTNESS[apparentr], PIX_VALUE_FOR_APPARENT_BRIGHTNESS[apparentg], PIX_VALUE_FOR_APPARENT_BRIGHTNESS[apparentb]);
     }
 }
 
-RGB interpolate_color(ColorRangeState &c, int pix, int of) {
-    if (c.seamless) {
-// it's not obvious, but this works for odds and for evens
-        of = of / 2 + 1;
-        if (pix >= of) {
-            pix -= of;
-            pix = of - pix - 2;
-        }
-    }
+inline double bias(double x, double a) {
+    return x / ((1.0 / a - 2.0) * (1.0 - x) + 1.0);
+}
 
+RGB interpolate_color(ColorRangeState &c, int pix, int of) {
     // lets just do this using floating point for now
 
     double relative = (double) pix / (double) of;
@@ -61,6 +62,18 @@ RGB interpolate_color(ColorRangeState &c, int pix, int of) {
             relative -= 1;
 
     }
+
+    relative = relative / ((1 / c.bias - 2) * (1 - relative) + 1);
+
+
+    if (c.seamless) {
+        relative *= 2;
+        if (relative >= 1) {
+            relative = 1 - (relative - 1);
+        }
+    }
+
+    relative = std::fmod(relative, 1);
 
     switch (c.interpolation) {
 #define INTERPOLATION(name) case RgbInterpolationType::name : return INTERP_##name::compute(c, relative);

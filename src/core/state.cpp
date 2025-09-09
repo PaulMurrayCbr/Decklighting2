@@ -10,6 +10,7 @@
 #include <sstream>   // for std::stringstream
 #include <string>    // for std::string
 #include <iomanip>   // for std::setw, std::setfill
+#include <iterator> // for std::begin, std::end
 
 #include "common.hpp"
 #include "state.hpp"
@@ -35,7 +36,7 @@ namespace {
         state["frameDuration"] = s.animation.frameDuration.count();
         state["from"] = toJson(s.from);
         state["to"] = toJson(s.to);
-        state["midpoint"] = s.midpoint;
+        state["bias"] = s.bias;
         state["seamless"] = s.seamless;
         state["interpolation"] = interpolationName(s.interpolation);
         state["cycleSpeed"] = s.animation.cycleSpeed;
@@ -87,6 +88,32 @@ namespace {
         }
     }
 
+    json globalInfo() {
+        json info = { };
+
+        info["effects"] = json::array( {
+#define EFFECT(name) #name,
+                EFFECT_TYPE_LIST
+#undef EFFECT
+                });
+
+        info["interpolations"] = json::array( {
+#define INTERPOLATION(name) #name,
+                INTERPOLATION_TYPE_LIST
+#undef INTERPOLATION
+                });
+
+        info["sections"] = json::array( {
+#define SECTION(name) #name,
+                SECTION_LIST
+#undef SECTION
+                });
+
+        info["ncolorranges"] = NCOLORANGES;
+
+        return info;
+    }
+
 }
 
 json getGlobalState() {
@@ -100,6 +127,10 @@ json getSectionState(Section section) {
     return inSharedStateMutex([section]() {
         return toJson(section);
     });
+}
+
+json getGlobalInfo() {
+    return globalInfo();
 }
 
 // must be invoked inside a mutex

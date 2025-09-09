@@ -96,7 +96,7 @@ public:
 class SectionInterpolationCommand: public SectionColorRangeCommand {
 public:
     Optional<RgbInterpolationType> interpolation;
-    Optional<double> midpoint; // >0 to <1 default .5 Solve to get the quadratic coeficients
+    Optional<double> bias; // >0 to <1 default .5
     Optional<bool> seamless;
     Optional<bool> animating;
     Optional<int> frameDuration;
