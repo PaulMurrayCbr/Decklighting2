@@ -87,8 +87,8 @@ struct ColorRangeState {
     AnimationState animation;
     RGB from;
     RGB to;
-    HSV fromHsv;
-    HSV toHsv;
+    HSQ fromHsq;
+    HSQ toHsq;
     RgbInterpolationType interpolation = RgbInterpolationType::FADE;
     double bias = 0.5; // range >0 <1 , makes the values "bunch up"
     bool seamless;

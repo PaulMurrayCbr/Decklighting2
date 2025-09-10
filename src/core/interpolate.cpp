@@ -12,6 +12,21 @@
 
 #include "interpolate.hpp"
 
+namespace {
+    inline HSQ interpolate_hsq(HSQ a, HSQ b, double relative) {
+        int16_t h = a.h + (b.h - a.h) * relative;
+        while (h < 0)
+            h += APPARENT_BRIGHTNESS_SCALE;
+        while (h >= APPARENT_BRIGHTNESS_SCALE * 6)
+            h -= APPARENT_BRIGHTNESS_SCALE;
+        int16_t v = a.v + (b.v - a.v) * relative;
+        int16_t s = a.s + (b.s - a.s) * relative;
+        v = v < 0 ? 0 : v >= APPARENT_BRIGHTNESS_SCALE ? APPARENT_BRIGHTNESS_SCALE - 1 : v;
+        s = s < 0 ? 0 : s > v ? v : s;
+        return HSQ(h, s, v);
+    }
+}
+
 namespace INTERP_NONE {
     RGB compute(ColorRangeState &c, double relative) {
         return c.from;
@@ -27,8 +42,49 @@ namespace INTERP_FADE {
                 (int) ((double) c.from.g + (double) ((int) c.to.g - (int) c.from.g) * relative), //
                 (int) ((double) c.from.b + (double) ((int) c.to.b - (int) c.from.b) * relative));
     }
-
 }
+
+namespace INTERP_ROYGBV {
+    RGB compute(ColorRangeState &c, double relative) {
+        if (c.fromHsq.v <= c.toHsq.v)
+            return hsq2rgb(interpolate_hsq(c.fromHsq, c.toHsq, relative));
+        else
+            return hsq2rgb(interpolate_hsq(c.toHsq, c.fromHsq, relative));
+    }
+}
+
+namespace INTERP_VBGYOB {
+    RGB compute(ColorRangeState &c, double relative) {
+        if (c.fromHsq.v >= c.toHsq.v)
+            return hsq2rgb(interpolate_hsq(c.fromHsq, c.toHsq, relative));
+        else
+            return hsq2rgb(interpolate_hsq(c.toHsq, c.fromHsq, relative));
+    }
+}
+
+namespace INTERP_NEAREST {
+    // no, this is tricky. I'll get some sleep try tomorrow
+
+    RGB compute(ColorRangeState &c, double relative) {
+        int16_t dist = c.toHsq.v - c.fromHsq.v;
+        if(dist < 0) dist += APPARENT_BRIGHTNESS_SCALE * 6;
+        if (c.toHsq.v - c.fromHsq.v < APPARENT_BRIGHTNESS_SCALE * 3)
+            return hsq2rgb(interpolate_hsq(c.fromHsq, c.toHsq, relative));
+        else
+            return hsq2rgb(interpolate_hsq(c.toHsq, c.fromHsq, relative));
+    }
+}
+
+namespace INTERP_FURTHEST {
+    RGB compute(ColorRangeState &c, double relative) {
+        if (c.toHsq.v - c.fromHsq.v < APPARENT_BRIGHTNESS_SCALE * 3)
+            return hsq2rgb(interpolate_hsq(c.fromHsq, c.toHsq, relative));
+        else
+            return hsq2rgb(interpolate_hsq(c.toHsq, c.fromHsq, relative));
+    }
+}
+
+
 
 namespace INTERP_QFADE {
     // this won't be correct because the 'to' end gets clipped
@@ -64,7 +120,6 @@ RGB interpolate_color(ColorRangeState &c, int pix, int of) {
     }
 
     relative = relative / ((1 / c.bias - 2) * (1 - relative) + 1);
-
 
     if (c.seamless) {
         relative *= 2;

@@ -16,6 +16,7 @@ function App() {
 		sections: []
 	});
 
+
 	const apiFetch = async (url) => {
 		if (++loadingCount.current) {
 			setLoading(true);
@@ -45,6 +46,21 @@ function App() {
 		}
 	};
 
+	const apiGlobal = async (url) => {
+		const json = await apiFetch(url);
+		if (json)
+			setPixelState(json);
+	};
+
+	const apiSection = async (section, url) => {
+		const json = await apiFetch(`${section}/${url}`);
+		if (json)
+			setPixelState({
+				...pixelState,
+				[section]: json
+			});
+
+	};
 
 	useEffect(() => {
 		apiFetch("status").then(setPixelState);
@@ -58,21 +74,27 @@ function App() {
 				activeTab={activeTab}
 				onTabChange={setActiveTab}
 				loading={loading}
+				pixelState={pixelState}
 			/>
 			<div className="container mt-3">
 				{activeTab === "Global Commands" ? (
 					<GlobalCommands
 						loading={loading}
 						pixelState={pixelState}
-						apiFetch={apiFetch}
-						setPixelState={setPixelState} />
+						info={info}
+						apiGlobal={apiGlobal}
+						apiSection={apiSection}
+						setActiveTab={setActiveTab}
+					/>
 				) : (
 					<Section
 						name={activeTab}
 						loading={loading}
 						pixelState={pixelState}
-						apiFetch={apiFetch}
-						setPixelState={setPixelState} />
+						info={info}
+						apiSection={apiSection}
+						home={() => setActiveTab('Global Commands')}
+					/>
 				)}
 
 				<div
@@ -115,17 +137,20 @@ function Navbar({ info, activeTab, onTabChange, loading, pixelState }) {
 								Overview
 							</button>
 						</li>
-						{info?.sections?.map((section) => (
-							<li className="nav-item" key={section}>
-								<button
-									className={`nav-link btn ${activeTab === section ? "active" : ""}`}
-									style={{ border: "none", background: "none" }}
-									onClick={() => onTabChange(section)}
-								>
-									{section}
-								</button>
-							</li>
-						))}
+						{info?.sections
+							?.filter((section) => pixelState[section]?.mode !== 'out')
+							?.map((section) => (
+								<li className="nav-item" key={section}>
+									<button
+										className={`nav-link btn ${activeTab === section ? "active" : ""}`}
+										style={{ border: "none", background: "none" }}
+										onClick={() => onTabChange(section)}
+									>
+										{section}
+									</button>
+								</li>
+							)
+							)}
 					</ul>
 				</div>
 
@@ -135,12 +160,17 @@ function Navbar({ info, activeTab, onTabChange, loading, pixelState }) {
 	);
 }
 
-function GlobalCommands({ loading, pixelState, info, apiFetch, setPixelState }) {
+function GlobalCommands({ loading, pixelState, info, apiGlobal, apiSection, setActiveTab }) {
 
-	const reload = () => apiFetch("status").then(setPixelState);
+	const reload = () => apiGlobal("status");
 
 	return (
 		<div>
+			<nav aria-label="breadcrumb">
+				<ol className="breadcrumb">
+					<li className="breadcrumb-item active" aria-current="page"><i className="fa-solid fa-house"></i> Overview</li>
+				</ol>
+			</nav>
 			<h3 className="d-flex justify-content-between align-items-center">
 				Overview
 				<button className="btn btn-sm btn-outline-secondary" disabled={loading} onClick={reload}>
@@ -149,24 +179,107 @@ function GlobalCommands({ loading, pixelState, info, apiFetch, setPixelState }) 
 				</button>
 			</h3>
 
-			<p>Commands that affect everything.</p>
+			<GlobalLinkingButtons
+				loading={loading}
+				pixelState={pixelState}
+				info={info}
+				apiSection={apiSection}
+				setActiveTab={setActiveTab}
+			/>
+
+
+			<p>Brightness/on</p>
 			<pre>{JSON.stringify(pixelState, (k, v) => k.length > 0 && k[0] === k[0].toLocaleUpperCase() ? undefined : v, 2)}</pre>
 		</div>
 	);
 }
 
-function Section({ name, loading, pixelState, info, apiFetch, setPixelState }) {
+function GlobalLinkingButtons({ loading, pixelState, info, apiSection, setActiveTab }) {
+	const setOn = (sname) => apiSection(sname, 'on');
+	const setOff = (sname) => apiSection(sname, 'off');
+	const setOut = (sname) => apiSection(sname, 'out');
+
+	let groups = [];
+	let g = undefined;
+
+	for (var sname of info?.sections ?? []) {
+		const smode = pixelState[sname]?.mode ?? 'off';
+		if (!g || smode === 'on' || smode === 'off') {
+			const link = !!g;
+			if (g) {
+				g.needsLinkRight = link;
+				g.rightSname = sname;
+			}
+			g = {
+				needsLinkLeft: link,
+				needsLinkRight: false,
+				sections: [sname],
+				state: smode,
+				name: sname
+			};
+			groups.push(g);
+		}
+		else {
+			g.sections.push(sname);
+		}
+	}
+
+	return (
+		<div className=" d-flex flex-wrap" >
+
+			{
+				groups.map((g) => {
+					const on = g.state === 'on';
+					const sectionStyle = `btn btn-primary flex-fill`;
+					const subStyle = `btn btn-outline-primary flex-fill`;
+					const linkStyle = `btn btn-outline-secondary`;
+
+					const x = (
+						<span key={`group-${g.name}`} className="btn-group d-flex flex-wrap me-2 mb-2" role="group">
+							{
+								g.needsLinkLeft ? (
+									<button type="button" className={linkStyle} disabled={loading}
+										onClick={() => setOut(g.name)}
+									>
+										<i className="fa-solid fa-link"></i>
+									</button>
+								) : null
+							}
+
+							{
+								g.sections.map((s, sindex) => (
+									<button key={`section-${s}`} type="button"
+										className={sindex === 0 ? sectionStyle : subStyle} disabled={loading}
+										onClick={() => sindex === 0 ? setActiveTab(s) : setOn(s)}
+									>{s}</button>
+								))
+							}
+
+							{
+								g.needsLinkRight ? (
+									<button type="button" className={linkStyle} disabled={loading}
+										onClick={() => setOut(g.rightSname)}
+									>
+										<i className="fa-solid fa-link"></i>
+									</button>
+								) : null
+							}
+						</span>
+					);
+					return x;
+				})
+			}
+
+		</div>
+	);
+
+}
+
+function Section({ name, loading, pixelState, info, apiSection, home }) {
 	const [section, setSection] = useState({});
 
 	const reload = () => {
-		apiFetch(name)
-			.then((json) => {
-				console.log(`refetched state for ${name}`, json);
-				setPixelState({
-					...pixelState,
-					[name]: json
-				})
-			});
+		apiSection(name, '');
 	};
 
 	useEffect(() => {
@@ -175,6 +288,14 @@ function Section({ name, loading, pixelState, info, apiFetch, setPixelState }) {
 
 	return (
 		<div>
+			<nav aria-label="breadcrumb">
+				<ol className="breadcrumb">
+					<li className="breadcrumb-item">
+						<a href="#" onClick={home}><i className="fa-solid fa-house"></i> Overview</a>
+					</li>
+					<li className="breadcrumb-item active" aria-current="page">{name}</li>
+				</ol>
+			</nav>
 			<h3 className="d-flex justify-content-between align-items-center">
 				{name}
 				<button className="btn btn-sm btn-outline-secondary" disabled={loading} onClick={reload}>
