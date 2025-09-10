@@ -162,22 +162,70 @@ function Navbar({ info, activeTab, onTabChange, loading, pixelState }) {
 
 function GlobalCommands({ loading, pixelState, info, apiGlobal, apiSection, setActiveTab }) {
 
+	const debounceRef = useRef(null);
+	const [brightnessState, setBrightnessState] = useState(0);
+
 	const reload = () => apiGlobal("status");
+
+	const togglePower = () => {
+		if (pixelState?.on) {
+			apiGlobal("off");
+		}
+		else {
+			apiGlobal("on");
+		}
+	}
+
+	const setBrightness = (value) => {
+		setBrightnessState(value);
+		if (debounceRef.current) clearTimeout(debounceRef.current);
+		debounceRef.current = setTimeout(() => {
+			apiGlobal(`on?brightness=${value}`);
+			debounceRef.current = null;
+		}, 300);
+	};
+
+	useEffect(() => {
+		setBrightnessState(pixelState?.brightness ?? 0);
+	}, [pixelState]);
+
 
 	return (
 		<div>
-			<nav aria-label="breadcrumb">
-				<ol className="breadcrumb">
-					<li className="breadcrumb-item active" aria-current="page"><i className="fa-solid fa-house"></i> Overview</li>
-				</ol>
-			</nav>
-			<h3 className="d-flex justify-content-between align-items-center">
-				Overview
-				<button className="btn btn-sm btn-outline-secondary" disabled={loading} onClick={reload}>
-					<i className="bi bi-arrow-clockwise"></i>
-					{loading}
+			<div className="d-flex justify-content-between align-items-center flex-wrap mb-3">
+				<nav aria-label="breadcrumb">
+					<ol className="breadcrumb">
+						<li className="breadcrumb-item active" aria-current="page"><i className="fa-solid fa-house"></i> Overview</li>
+					</ol>
+				</nav>
+				<button className="btn btn-outline-secondary btn-sm" disabled={loading} onClick={reload}>
+					<i className="fa-solid fa-rotate"></i>
 				</button>
-			</h3>
+			</div>
+
+			<div className="d-flex justify-content-around align-items-center flex-wrap mb-3">
+				<button
+					className={`btn btn-outline-${pixelState?.on ? "success" : "danger"} btn-md`}
+					onClick={togglePower}
+					style={{ width: "100px", height: "100px", borderRadius: "50%" }}
+				>
+					<i className="fa-solid fa-power-off fa-2x"></i>
+				</button>
+			</div>
+
+
+			<div className="d-flex align-items-center gap-3 mb-4">
+				<i className="fa-solid fa-lightbulb  text-warning"></i>
+				<input
+					type="range"
+					className="form-range"
+					min="0"
+					max="255"
+					value={brightnessState}
+					onChange={(e) => setBrightness(Number(e.target.value))}
+				/>
+				<span>{brightnessState}</span>
+			</div>
 
 			<GlobalLinkingButtons
 				loading={loading}
@@ -186,10 +234,6 @@ function GlobalCommands({ loading, pixelState, info, apiGlobal, apiSection, setA
 				apiSection={apiSection}
 				setActiveTab={setActiveTab}
 			/>
-
-
-			<p>Brightness/on</p>
-			<pre>{JSON.stringify(pixelState, (k, v) => k.length > 0 && k[0] === k[0].toLocaleUpperCase() ? undefined : v, 2)}</pre>
 		</div>
 	);
 }
@@ -288,21 +332,20 @@ function Section({ name, loading, pixelState, info, apiSection, home }) {
 
 	return (
 		<div>
-			<nav aria-label="breadcrumb">
-				<ol className="breadcrumb">
-					<li className="breadcrumb-item">
-						<a href="#" onClick={home}><i className="fa-solid fa-house"></i> Overview</a>
-					</li>
-					<li className="breadcrumb-item active" aria-current="page">{name}</li>
-				</ol>
-			</nav>
-			<h3 className="d-flex justify-content-between align-items-center">
-				{name}
-				<button className="btn btn-sm btn-outline-secondary" disabled={loading} onClick={reload}>
-					<i className="bi bi-arrow-clockwise"></i>
+			<div className="d-flex justify-content-between align-items-center flex-wrap mb-3">
+				<nav aria-label="breadcrumb">
+					<ol className="breadcrumb">
+						<li className="breadcrumb-item">
+							<a href="#" onClick={home}><i className="fa-solid fa-house"></i> Overview</a>
+						</li>
+						<li className="breadcrumb-item active" aria-current="page">{name}</li>
+					</ol>
+				</nav>
+				<button className="btn btn-outline-secondary btn-sm" disabled={loading} onClick={reload}>
+					<i className="fa-solid fa-rotate"></i>
 				</button>
-			</h3>
-			<p>Controls for {name}.</p>
+			</div>
+
 			<pre>{JSON.stringify(section, null, 2)}</pre>
 		</div>
 	);
