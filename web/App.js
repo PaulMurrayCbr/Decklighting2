@@ -16,6 +16,7 @@ function App() {
 		sections: []
 	});
 
+
 	const apiFetch = async (url) => {
 		if (++loadingCount.current) {
 			setLoading(true);
@@ -45,6 +46,21 @@ function App() {
 		}
 	};
 
+	const apiSection = async (section, url) => {
+		const json = await apiFetch(`${section}/${url}`);
+		if (json)
+			setPixelState({
+				...pixelState,
+				[section]: json
+			});
+
+	};
+
+	const apiGlobal = async (url) => {
+		const json = await apiFetch(url);
+		if (json)
+			setPixelState(json);
+	};
 
 	useEffect(() => {
 		apiFetch("status").then(setPixelState);
@@ -64,15 +80,20 @@ function App() {
 					<GlobalCommands
 						loading={loading}
 						pixelState={pixelState}
+						info={info}
 						apiFetch={apiFetch}
-						setPixelState={setPixelState} />
+						setPixelState={setPixelState}
+						apiSection={apiSection}
+					/>
 				) : (
 					<Section
 						name={activeTab}
 						loading={loading}
 						pixelState={pixelState}
+						info={info}
 						apiFetch={apiFetch}
-						setPixelState={setPixelState} />
+						setPixelState={setPixelState}
+					/>
 				)}
 
 				<div
@@ -135,7 +156,7 @@ function Navbar({ info, activeTab, onTabChange, loading, pixelState }) {
 	);
 }
 
-function GlobalCommands({ loading, pixelState, info, apiFetch, setPixelState }) {
+function GlobalCommands({ loading, pixelState, info, apiFetch, setPixelState, apiSection }) {
 
 	const reload = () => apiFetch("status").then(setPixelState);
 
@@ -149,19 +170,108 @@ function GlobalCommands({ loading, pixelState, info, apiFetch, setPixelState }) 
 				</button>
 			</h3>
 
-			<p>Commands that affect everything.</p>
+			<GlobalLinkingButtons
+				loading={loading}
+				pixelState={pixelState}
+				info={info}
+				apiFetch={apiFetch}
+				setPixelState={setPixelState}
+				apiSection={apiSection}
+			/>
+
+
+			<p>Brightness/on</p>
 			<pre>{JSON.stringify(pixelState, (k, v) => k.length > 0 && k[0] === k[0].toLocaleUpperCase() ? undefined : v, 2)}</pre>
 		</div>
 	);
+}
+
+function GlobalLinkingButtons({ loading, pixelState, info, apiFetch, setPixelState, apiSection }) {
+	const setOn = (sname) => apiSection(sname, 'on');
+	const setOff = (sname) => apiSection(sname, 'off');
+	const setOut = (sname) => apiSection(sname, 'out');
+
+	let groups = [];
+	let g = undefined;
+
+	for (var sname of info?.sections ?? []) {
+		const smode = pixelState[sname]?.mode ?? 'off';
+		if (!g || smode === 'on' || smode === 'off') {
+			const link = !!g;
+			if (g) {
+				g.needsLinkRight = link;
+				g.rightSname = sname;
+			}
+			g = {
+				needsLinkLeft: link,
+				needsLinkRight: false,
+				sections: [sname],
+				state: smode,
+				name: sname
+			};
+			groups.push(g);
+		}
+		else {
+			g.sections.push(sname);
+		}
+	}
+
+	return (
+		<div className=" d-flex flex-wrap" >
+
+			{
+				groups.map((g) => {
+					const on = g.state === 'on';
+					const sectionStyle = `btn btn${on ? '' : '-outline'}-primary flex-fill`;
+					const linkStyle = `btn btn${on ? '' : '-outline'}-secondary`;
+
+					const x = (
+						<span key={`group-${g.name}`} className="btn-group d-flex flex-wrap me-2 mb-2" role="group">
+							{
+								g.needsLinkLeft ? (
+									<button type="button" className={linkStyle}
+										onClick={() => setOut(g.name)}
+									>
+										<i className="fa-solid fa-link"></i>
+									</button>
+								) : null
+							}
+
+							{
+								g.sections.map((s, sindex) => (
+									<button key={`section-${s}`} type="button" className={sectionStyle}
+										onClick={() => on ? setOff(s) : setOn(s)}
+									>{s}</button>
+								))
+							}
+
+							{
+								g.needsLinkRight ? (
+									<button type="button" className={linkStyle}
+										onClick={() => setOut(g.rightSname)}
+									>
+										<i className="fa-solid fa-link"></i>
+									</button>
+								) : null
+							}
+						</span>
+					);
+					return x;
+				})
+			}
+
+		</div>
+	);
+
 }
 
 function Section({ name, loading, pixelState, info, apiFetch, setPixelState }) {
 	const [section, setSection] = useState({});
 
 	const reload = () => {
+		
 		apiFetch(name)
 			.then((json) => {
-				console.log(`refetched state for ${name}`, json);
 				setPixelState({
 					...pixelState,
 					[name]: json
