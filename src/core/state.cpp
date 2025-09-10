@@ -111,6 +111,19 @@ namespace {
 
         info["ncolorranges"] = NCOLORANGES;
 
+        info["effectInfo"] = { //
+                { "SOLID", //
+                        {  {"ncolorranges",  1 } } //
+                }, //
+                { "GRADIENT", //
+                        {  {"ncolorranges",  1 } } //
+                }, //
+                { "THEATRE", //
+                        {  {"ncolorranges",  2 } } //
+                }, //
+
+                };
+
         return info;
     }
 
