@@ -115,6 +115,8 @@ function SectionMain({ section, info, apiSection }) {
 
 	const debounceRef = useRef(null);
 	const [densityState, setDensityState] = useState(0);
+	const activeEffectPill = useRef(null);
+
 
 
 	const setDensity = (value) => {
@@ -128,8 +130,19 @@ function SectionMain({ section, info, apiSection }) {
 
 	useEffect(() => {
 		setDensityState(section?.density ?? 1);
+		if (activeEffectPill.current) {
+			activeEffectPill.current.scrollIntoView({ behavior: "smooth", inline: "center" });
+		}
 	}, [section]);
 
+	function effectPillActive(name) {
+		return section?.effect === name ? 'active' : '';
+	}
+
+
+	function setEffect(value) {
+		apiSection(`set?effect=${value}`);
+	}
 
 	return (
 		<div>
@@ -156,8 +169,6 @@ function SectionMain({ section, info, apiSection }) {
 				/>
 			</div>
 
-
-
 			<div className="d-flex justify-content-between w-100 mb-4">
 
 				{Array.from({ length: 11 }).map((_, i) => (
@@ -169,9 +180,20 @@ function SectionMain({ section, info, apiSection }) {
 
 			</div>
 
-			<pre>
-				{JSON.stringify(section, null, 2)}
-			</pre>
+			<div className="overflow-auto scrollable-pills">
+				<ul className="nav nav-pills flex-nowrap">
+
+					{info?.effects?.map((ename) => (
+						<li key={`effect-pill-${ename}`}
+							className="nav-item">
+							<button className={`nav-link ${effectPillActive(ename)}`}
+								onClick={() => setEffect(ename)}
+								ref={section?.effect === ename ? activeEffectPill : null}
+							>{ename}</button>
+						</li>
+					))}
+				</ul>
+			</div>
 		</div>
 
 	);
