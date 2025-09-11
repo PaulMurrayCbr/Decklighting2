@@ -25,8 +25,6 @@ function App() {
 			const response = await fetch(`/api/${url}`);
 			const json = await response.json();
 
-
-
 			if (!response.ok || !json?.status || json?.status !== 200) {
 				throw new Error(json?.result || response.statusText || `HTTP error ${response.status}`);
 			}
@@ -36,6 +34,9 @@ function App() {
 			return json.result;
 		}
 		catch (err) {
+			
+			
+			console.log(error);
 			setError(err);
 			//			throw err;
 		}
@@ -97,6 +98,7 @@ function App() {
 					/>
 				)}
 
+				{/* 'talking to server' overlay */}
 				<div
 					className="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
 					style={{
@@ -110,6 +112,30 @@ function App() {
 					<div className="spinner-border text-light" role="status">
 						<span className="visually-hidden">Loading...</span>
 					</div>
+				</div>
+
+				{/* Toast container fixed at bottom center */}
+				<div
+					className="toast-container position-fixed bottom-0 start-50 translate-middle-x p-3"
+					style={{ zIndex: 1055 }}
+				>
+					{error && (
+						<div
+							className="toast align-items-center text-bg-danger border-0 show"
+							role="alert"
+							aria-live="assertive"
+							aria-atomic="true"
+						>
+							<div className="d-flex">
+								<div className="toast-body">{error?.message || JSON.stringify(error)}</div>
+								<button
+									type="button"
+									className="btn-close btn-close-white me-2 m-auto"
+									onClick={() => setError(null)}
+								></button>
+							</div>
+						</div>
+					)}
 				</div>
 
 			</div>
