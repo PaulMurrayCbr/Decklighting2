@@ -1,4 +1,7 @@
 
+const { useState, useEffect, useRef } = React;
+
+
 function HomePage({ loading, pixelState, info, apiGlobal, apiSection, setActiveTab }) {
 
 	const debounceRef = useRef(null);
