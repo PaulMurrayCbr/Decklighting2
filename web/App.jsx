@@ -18,6 +18,7 @@ function App() {
 
 
 	const apiFetch = async (url) => {
+		setError(null);
 		if (++loadingCount.current) {
 			setLoading(true);
 		}
@@ -29,13 +30,9 @@ function App() {
 				throw new Error(json?.result || response.statusText || `HTTP error ${response.status}`);
 			}
 
-			// await new Promise((resolve) => setTimeout(resolve, 1000));
-
 			return json.result;
 		}
 		catch (err) {
-
-
 			console.log(error);
 			setError(err);
 			//			throw err;
@@ -100,7 +97,7 @@ function App() {
 				)}
 			</div>
 
-			<ErrorToast error={error} />
+			<ErrorToast error={error} setError={setError} />
 
 			<LoadingOverlay loading={loading} />
 		</div>
@@ -176,7 +173,7 @@ function LoadingOverlay({ loading }) {
 }
 
 /* Toast container fixed at bottom center */
-function ErrorToast({ error }) {
+function ErrorToast({ error, setError }) {
 	return (
 		< div
 			className="toast-container position-fixed bottom-0 start-50 translate-middle-x p-3"
