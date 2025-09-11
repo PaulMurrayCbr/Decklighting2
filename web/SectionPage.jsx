@@ -87,14 +87,14 @@ function SectionPage({ name, loading, pixelState, info, apiSection, home }) {
 				<SectionMain
 					section={section}
 					info={info}
-					apiSection={apiSection}
+					apiSection={(url) => apiSection(name, url)}
 				/>
 			)}
 			{!selected.main && (
 				<SectionColor
 					color={section.color[selected.color]}
 					info={info}
-					apiSection={apiSection}
+					apiSection={(url) => apiSection(name, url)}
 				/>
 			)}
 
@@ -103,9 +103,72 @@ function SectionPage({ name, loading, pixelState, info, apiSection, home }) {
 }
 
 function SectionMain({ section, info, apiSection }) {
+
+	const togglePower = () => {
+		if (section?.mode === "on") {
+			apiSection("off");
+		}
+		else {
+			apiSection("on");
+		}
+	}
+
+	const debounceRef = useRef(null);
+	const [densityState, setDensityState] = useState(0);
+
+
+	const setDensity = (value) => {
+		setDensityState(value);
+		if (debounceRef.current) clearTimeout(debounceRef.current);
+		debounceRef.current = setTimeout(() => {
+			apiSection(`set?density=${value}`);
+			debounceRef.current = null;
+		}, 300);
+	};
+
+	useEffect(() => {
+		setDensityState(section?.density ?? 1);
+	}, [section]);
+
+
 	return (
 		<div>
-			main
+			<div className="d-flex justify-content-around align-items-center flex-wrap mb-3">
+				<button
+					className={`btn btn-outline-${section?.mode === "on" ? "success" : "danger"} btn-md`}
+					onClick={togglePower}
+					style={{ width: "100px", height: "100px", borderRadius: "50%" }}
+				>
+					<i className="fa-solid fa-power-off fa-2x"></i>
+				</button>
+			</div>
+
+
+
+			<div className="d-flex align-items-center ">
+				<input
+					type="range"
+					className="form-range"
+					min="1"
+					max="10"
+					value={densityState}
+					onChange={(e) => setDensity(Number(e.target.value))}
+				/>
+			</div>
+
+
+
+			<div className="d-flex justify-content-between w-100 mb-4">
+
+				{Array.from({ length: 11 }).map((_, i) => (
+					<i
+						key={`bulb-${i}`}
+						className="fa-solid fa-lightbulb"
+						style={{ color: i % densityState == 0 ? 'gold' : 'darkgray' }}></i>
+				))}
+
+			</div>
+
 			<pre>
 				{JSON.stringify(section, null, 2)}
 			</pre>
