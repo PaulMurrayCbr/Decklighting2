@@ -98,10 +98,10 @@ function App() {
 					/>
 				)}
 			</div>
-			
+
 			<ErrorToast error={error} />
-			
-			<LoadingOverlay loading={loading}/>
+
+			<LoadingOverlay loading={loading} />
 		</div>
 	);
 }
@@ -153,19 +153,19 @@ function Navbar({ info, activeTab, onTabChange, loading, pixelState }) {
 function LoadingOverlay({ loading }) {
 	return (
 		< div
-			className = "position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
-	style = {{
-		opacity: loading ? 1 : 0,
-			pointerEvents: loading ? "auto" : "none", // blocks interaction only when visible
+			className="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
+			style={{
+				opacity: loading ? 1 : 0,
+				pointerEvents: loading ? "auto" : "none", // blocks interaction only when visible
 				transition: "opacity 0.3s ease-in-out", // smooth fade
-					backgroundColor: 'rgba(0,0,0,0.3)',
-						zIndex: 1050,   // above most Bootstrap elements
+				backgroundColor: 'rgba(0,0,0,0.3)',
+				zIndex: 1050,   // above most Bootstrap elements
 			}
-}
+			}
 		>
-	<div className="spinner-border text-light" role="status">
-		<span className="visually-hidden">Loading...</span>
-	</div>
+			<div className="spinner-border text-light" role="status">
+				<span className="visually-hidden">Loading...</span>
+			</div>
 		</div >
 
 	);
@@ -175,28 +175,28 @@ function LoadingOverlay({ loading }) {
 function ErrorToast({ error }) {
 	return (
 		< div
-		className = "toast-container position-fixed bottom-0 start-50 translate-middle-x p-3"
-	style = {{ zIndex: 1055 }
-}
-	>
-	{ error && (
-		<div
-			className="toast align-items-center text-bg-danger border-0 show"
-			role="alert"
-			aria-live="assertive"
-			aria-atomic="true"
+			className="toast-container position-fixed bottom-0 start-50 translate-middle-x p-3"
+			style={{ zIndex: 1055 }
+			}
 		>
-			<div className="d-flex">
-				<div className="toast-body">{error?.message || e?.toString() || JSON.stringify(error)}</div>
-				<button
-					type="button"
-					className="btn-close btn-close-white me-2 m-auto"
-					onClick={() => setError(null)}
-				></button>
-			</div>
-		</div>
-	)}
-	</div >
+			{error && (
+				<div
+					className="toast align-items-center text-bg-danger border-0 show"
+					role="alert"
+					aria-live="assertive"
+					aria-atomic="true"
+				>
+					<div className="d-flex">
+						<div className="toast-body">{error?.message || e?.toString() || JSON.stringify(error)}</div>
+						<button
+							type="button"
+							className="btn-close btn-close-white me-2 m-auto"
+							onClick={() => setError(null)}
+						></button>
+					</div>
+				</div>
+			)}
+		</div >
 	);
 }
 
@@ -255,7 +255,7 @@ function GlobalCommands({ loading, pixelState, info, apiGlobal, apiSection, setA
 
 
 			<div className="d-flex align-items-center gap-3 mb-4">
-				<i className="fa-solid fa-lightbulb  text-warning"></i>
+				<i className="fa-solid fa-lightbulb" style={{color: 'gold'}}></i>
 				<input
 					type="range"
 					className="form-range"
@@ -387,24 +387,6 @@ function Section({ name, loading, pixelState, info, apiSection, home }) {
 			</div>
 
 			<pre>{JSON.stringify(section, null, 2)}</pre>
-		</div>
-	);
-}
-
-
-function LoadingOverlay({ loading }) {
-	return (
-		<div
-			className="loading-overlay"
-			style={{
-				opacity: loading ? 1 : 0,
-				pointerEvents: loading ? "auto" : "none", // blocks interaction only when visible
-				transition: "opacity 0.3s ease-in-out", // smooth fade
-			}}
-		>
-			<div className="spinner-border text-light" role="status">
-				<span className="visually-hidden">Loading...</span>
-			</div>
 		</div>
 	);
 }
