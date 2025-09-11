@@ -40,11 +40,13 @@ namespace {
         return v;
     }
 
-    int toDouble(const std::string &s, double min, double max) {
+    double toDouble(const std::string &s, double min, double max) {
+
         double v = std::stod(s);
         if (v < min || v > max) {
             throw std::out_of_range(s + " must be " + std::to_string(min) + "-" + std::to_string(max));
         }
+
         return v;
     }
 
@@ -186,7 +188,6 @@ namespace {
     }
 
     std::pair<int, json> handle_section_color_rgb(Section section, int rangeNo, std::string fromTo, const std::multimap<std::string, std::string> &params, json &command) {
-
         bool isFrom;
 
         if (fromTo == "from") {
@@ -270,7 +271,6 @@ namespace {
     }
 
     std::pair<int, json> handle_api(std::stringstream &path, const std::multimap<std::string, std::string> &params, json &command) {
-
         std::string frag;
         std::getline(path, frag, '/');
 
