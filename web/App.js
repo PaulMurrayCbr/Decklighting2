@@ -34,8 +34,8 @@ function App() {
 			return json.result;
 		}
 		catch (err) {
-			
-			
+
+
 			console.log(error);
 			setError(err);
 			//			throw err;
@@ -97,48 +97,11 @@ function App() {
 						home={() => setActiveTab('Global Commands')}
 					/>
 				)}
-
-				{/* 'talking to server' overlay */}
-				<div
-					className="position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
-					style={{
-						opacity: loading ? 1 : 0,
-						pointerEvents: loading ? "auto" : "none", // blocks interaction only when visible
-						transition: "opacity 0.3s ease-in-out", // smooth fade
-						backgroundColor: 'rgba(0,0,0,0.3)',
-						zIndex: 1050,   // above most Bootstrap elements
-					}}
-				>
-					<div className="spinner-border text-light" role="status">
-						<span className="visually-hidden">Loading...</span>
-					</div>
-				</div>
-
-				{/* Toast container fixed at bottom center */}
-				<div
-					className="toast-container position-fixed bottom-0 start-50 translate-middle-x p-3"
-					style={{ zIndex: 1055 }}
-				>
-					{error && (
-						<div
-							className="toast align-items-center text-bg-danger border-0 show"
-							role="alert"
-							aria-live="assertive"
-							aria-atomic="true"
-						>
-							<div className="d-flex">
-								<div className="toast-body">{error?.message || JSON.stringify(error)}</div>
-								<button
-									type="button"
-									className="btn-close btn-close-white me-2 m-auto"
-									onClick={() => setError(null)}
-								></button>
-							</div>
-						</div>
-					)}
-				</div>
-
 			</div>
+			
+			<ErrorToast error={error} />
+			
+			<LoadingOverlay loading={loading}/>
 		</div>
 	);
 }
@@ -183,6 +146,57 @@ function Navbar({ info, activeTab, onTabChange, loading, pixelState }) {
 			</div>
 		</nav>
 
+	);
+}
+
+/* 'talking to server' overlay */
+function LoadingOverlay({ loading }) {
+	return (
+		< div
+			className = "position-fixed top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center"
+	style = {{
+		opacity: loading ? 1 : 0,
+			pointerEvents: loading ? "auto" : "none", // blocks interaction only when visible
+				transition: "opacity 0.3s ease-in-out", // smooth fade
+					backgroundColor: 'rgba(0,0,0,0.3)',
+						zIndex: 1050,   // above most Bootstrap elements
+			}
+}
+		>
+	<div className="spinner-border text-light" role="status">
+		<span className="visually-hidden">Loading...</span>
+	</div>
+		</div >
+
+	);
+}
+
+/* Toast container fixed at bottom center */
+function ErrorToast({ error }) {
+	return (
+		< div
+		className = "toast-container position-fixed bottom-0 start-50 translate-middle-x p-3"
+	style = {{ zIndex: 1055 }
+}
+	>
+	{ error && (
+		<div
+			className="toast align-items-center text-bg-danger border-0 show"
+			role="alert"
+			aria-live="assertive"
+			aria-atomic="true"
+		>
+			<div className="d-flex">
+				<div className="toast-body">{error?.message || e?.toString() || JSON.stringify(error)}</div>
+				<button
+					type="button"
+					className="btn-close btn-close-white me-2 m-auto"
+					onClick={() => setError(null)}
+				></button>
+			</div>
+		</div>
+	)}
+	</div >
 	);
 }
 
