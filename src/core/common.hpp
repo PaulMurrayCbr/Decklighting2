@@ -43,11 +43,11 @@ static const int NSECTIONS = 0
 //const int Game_LEN = 3;
 //const int Door_LEN = 3;
 
-const int Back_LEN = 253;
-const int Deck_LEN = 192;
+const int Door_LEN = 253;
+const int Game_LEN = 192;
 const int Theatre_LEN = 205;
-const int Game_LEN = 249;
-const int Door_LEN = 247;
+const int Deck_LEN = 249;
+const int Back_LEN = 247;
 
 const int NPIXELS = 0
 #define SECTION(name) + name##_LEN

@@ -317,6 +317,9 @@ namespace {
 }
 
 std::pair<int, json> api(const std::string &path, const std::multimap<std::string, std::string> &params, json &command) {
+
+    std::cout << "\ngot command " << path << "\n";
+
     try {
         std::stringstream ss(path);
         return handle_root(ss, params, command);

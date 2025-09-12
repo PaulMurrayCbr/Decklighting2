@@ -52,16 +52,25 @@ class PixelLoop {
             } else if (state.on) {
                 bool needs_send = false;
 
+                int i = 0;
                 for (SectionState &section : state.section) {
+                    if (section.needsRepaint) {
+                        std::cout << "section " << i << " needs repaint\n";
+                        clear_pixels(section.start, section.length);
+                        needs_send = true;
+                        std::cout << "mode for section " << i << " is " << static_cast<int>(section.mode) << "\n";
+                        std::cout << "should repaint section " << i << " is " << (section.mode == SectionMode::on) << "\n";
+                    }
+
                     if (section.mode == SectionMode::on) {
                         if (section.needsRepaint) {
-                            clear_pixels(section.start, section.length);
+                            std::cout << "calling effect repaint for section  " << i << "\n";
                             EFFECT_REPAINT[static_cast<int>(section.effect)](section);
-                            needs_send = true;
                         } else {
                             needs_send = EFFECT_ANIMATE[static_cast<int>(section.effect)](section) || needs_send;
                         }
                     }
+                    i++;
                 }
 
                 if (needs_send) {

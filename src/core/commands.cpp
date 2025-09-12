@@ -70,14 +70,33 @@ void handleCommand(const SectionOutCommand &cmd) {
         s.mode = SectionMode::out;
         s.touched = true;
         s.needsRepaint = true;
+
+        std::cout << "we will repaint " << static_cast<int>(cmd.section) << "\n";
+
+        // we also need a repaint of the section before this one now that we are linked
+
+        for (int i = static_cast<int>(cmd.section) - 1; i >= 0; i++) {
+            std::cout << "might need to repaint " << i << "\n";
+            if (sharedState.section[i].mode != SectionMode::out) {
+                std::cout << "yep, marking  " << i << " for repaint\n";
+                sharedState.section[i].touched = true;
+                sharedState.section[i].needsRepaint = true;
+                break;
+            }
+        }
+
         recompute_sections();
     });
 }
 
 void handleCommand(const SectionOffCommand &cmd) {
+
+    std::cout << "handle command section off";
+
     inSharedStateMutex([cmd] {
         SectionState &s = sharedState.section[static_cast<int>(cmd.section)];
         s.mode = SectionMode::off;
+        std::cout << "section" << static_cast<int>(cmd.section) << " is now marked as needing a repaint";
         s.touched = true;
         s.needsRepaint = true;
         recompute_sections();
