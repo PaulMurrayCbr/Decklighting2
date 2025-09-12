@@ -22,8 +22,16 @@ function SectionPage({ name, loading, pixelState, info, apiSection, home }) {
 	}, [section, info])
 
 
+	function pageApiSection(url) {
+		apiSection(name, url);
+	}
+
+	function pageColorSection(url) {
+		apiSection(name, `color/${selected.color}${url}`);
+	}
+
 	function reload() {
-		apiSection(name, '');
+		pageApiSection('');
 	};
 
 	function selectMainPage() {
@@ -87,14 +95,14 @@ function SectionPage({ name, loading, pixelState, info, apiSection, home }) {
 				<SectionMain
 					section={section}
 					info={info}
-					apiSection={(url) => apiSection(name, url)}
+					apiSection={pageApiSection}
 				/>
 			)}
 			{!selected.main && (
 				<SectionColor
 					color={section.color[selected.color]}
 					info={info}
-					apiColor={(url) => apiSection(name, `color/${selected.color}${url}`)}
+					apiColor={pageColorSection}
 				/>
 			)}
 
