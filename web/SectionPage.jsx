@@ -71,7 +71,7 @@ function SectionPage({ name, loading, pixelState, info, apiSection, home }) {
 
 			<ul className="nav nav-pills mb-3">
 				<li className="nav-item">
-					<button className={`nav-link ${mainPillActive()}`} onClick={selectMainPage} >{name}</button>
+					<button className={`nav-link ${mainPillActive()}`} onClick={selectMainPage} >Main</button>
 				</li>
 
 				{Array.from({ length: nColors }).map((_, i) => (
@@ -241,7 +241,7 @@ function SectionColor({ color, info, apiColor }) {
 	));
 
 	const [toColorState, setToColorState] = useState(0);
-	const toColorDebouncer = useRef(new Debouncer(300, setFromColorState,
+	const toColorDebouncer = useRef(new Debouncer(300, setToColorState,
 		(value) => apiColor(`/to?${toRgb(value)}`)
 	));
 
@@ -270,8 +270,8 @@ function SectionColor({ color, info, apiColor }) {
 
 	return (
 		<div>
-			<div className="row">
-				<label className="col-sm-3 col-form-label">From</label>
+			<div className="row mb-3">
+				<label className="col-sm-3 col-form-label">From/To</label>
 				<div className="col-sm-9">
 					<input
 						type="color"
@@ -279,12 +279,6 @@ function SectionColor({ color, info, apiColor }) {
 						value={fromColorState}
 						onChange={e => fromColorDebouncer.current.set(e.target.value)}
 					/>
-				</div>
-			</div>
-
-			<div className="row mb-3">
-				<label className="col-sm-3 col-form-label">To</label>
-				<div className="col-sm-9">
 					<input
 						type="color"
 						className="form-control-color"
