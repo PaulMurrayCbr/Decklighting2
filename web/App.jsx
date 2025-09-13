@@ -1,7 +1,7 @@
 // App.js
 
 
-const { useState, useEffect, useRef } = React;
+const { useState, useEffect, useRef, useCallback } = React;
 
 function App() {
 	const [activeTab, setActiveTab] = useState(SelectedPage.ofHome());
@@ -9,6 +9,7 @@ function App() {
 	const [loading, setLoading] = useState(false);
 	const loadingCount = useRef(0);
 	const [error, setError] = useState(false);
+	const [recentFetch, setRecentFetch] = useState(false);
 	const [info, setInfo] = useState({
 		effects: [],
 		interpolations: [],
@@ -23,6 +24,8 @@ function App() {
 			setLoading(true);
 		}
 		try {
+			setRecentFetch(`/api/${url}`)
+
 			const response = await fetch(`/api/${url}`);
 			const json = await response.json();
 
@@ -35,7 +38,6 @@ function App() {
 		catch (err) {
 			console.log(error);
 			setError(err);
-			//			throw err;
 		}
 		finally {
 			if (!--loadingCount.current) {
@@ -57,7 +59,6 @@ function App() {
 				...pixelState,
 				[section]: json
 			});
-
 	};
 
 	useEffect(() => {
@@ -97,7 +98,10 @@ function App() {
 				)}
 			</div>
 
-			<ErrorToast error={error} setError={setError} />
+			<Notifications
+				error={error} setError={setError}
+				recentFetch={recentFetch} setRecentFetch={setRecentFetch}
+			/>
 
 			<LoadingOverlay loading={loading} />
 		</div>
@@ -173,13 +177,30 @@ function LoadingOverlay({ loading }) {
 }
 
 /* Toast container fixed at bottom center */
-function ErrorToast({ error, setError }) {
+function Notifications({ error, setError, recentFetch, setRecentFetch }) {
 	return (
 		< div
 			className="toast-container position-fixed bottom-0 start-50 translate-middle-x p-3"
 			style={{ zIndex: 1055 }
 			}
 		>
+			{recentFetch && (
+				<div
+					className="toast align-items-center text-bg-light border-0 show"
+					role="alert"
+					aria-live="assertive"
+					aria-atomic="true"
+				>
+					<div className="d-flex">
+						<div className="toast-body">{recentFetch}</div>
+						<button
+							type="button"
+							className="btn-close me-2 m-auto"
+							onClick={() => setRecentFetch(null)}
+						></button>
+					</div>
+				</div>
+			)}
 			{error && (
 				<div
 					className="toast align-items-center text-bg-danger border-0 show"

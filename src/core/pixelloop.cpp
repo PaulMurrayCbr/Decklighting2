@@ -52,16 +52,21 @@ class PixelLoop {
             } else if (state.on) {
                 bool needs_send = false;
 
+                int i = 0;
                 for (SectionState &section : state.section) {
+                    if (section.needsRepaint) {
+                        clear_pixels(section.start, section.length);
+                        needs_send = true;
+                    }
+
                     if (section.mode == SectionMode::on) {
                         if (section.needsRepaint) {
-                            clear_pixels(section.start, section.length);
                             EFFECT_REPAINT[static_cast<int>(section.effect)](section);
-                            needs_send = true;
                         } else {
                             needs_send = EFFECT_ANIMATE[static_cast<int>(section.effect)](section) || needs_send;
                         }
                     }
+                    i++;
                 }
 
                 if (needs_send) {

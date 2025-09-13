@@ -70,11 +70,23 @@ void handleCommand(const SectionOutCommand &cmd) {
         s.mode = SectionMode::out;
         s.touched = true;
         s.needsRepaint = true;
+
+        // we also need a repaint of the section before this one now that we are linked
+
+        for (int i = static_cast<int>(cmd.section) - 1; i >= 0; i++) {
+            if (sharedState.section[i].mode != SectionMode::out) {
+                sharedState.section[i].touched = true;
+                sharedState.section[i].needsRepaint = true;
+                break;
+            }
+        }
+
         recompute_sections();
     });
 }
 
 void handleCommand(const SectionOffCommand &cmd) {
+
     inSharedStateMutex([cmd] {
         SectionState &s = sharedState.section[static_cast<int>(cmd.section)];
         s.mode = SectionMode::off;

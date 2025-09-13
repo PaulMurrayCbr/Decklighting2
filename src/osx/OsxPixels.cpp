@@ -35,10 +35,10 @@ void set_pixel(int at, uint8_t r, uint8_t g, uint8_t b) {
 }
 
 void send_pixels() {
-    std::cout << '|';
-    for (int i = 0; i < NPIXELS; i++) {
-        std::cout << (int) out[i].r << '/' << (int) out[i].g << '/' << (int) out[i].b << '/' << '|';
-    }
-    std::cout << '\n';
+//    std::cout << '|';
+//    for (int i = 0; i < NPIXELS; i++) {
+//        std::cout << (int) out[i].r << '/' << (int) out[i].g << '/' << (int) out[i].b << '/' << '|';
+//    }
+//    std::cout << '\n';
 }
 

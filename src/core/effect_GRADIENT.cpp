@@ -18,7 +18,6 @@
 namespace {
     void repaint(SectionState &s) {
         int npixels = s.npixels();
-
         for (int i = 0; i < npixels; i++) {
             RGB rgb = interpolate_color(s.colors[0], i, npixels);
             set_pixel(s.pixel(i), rgb);
