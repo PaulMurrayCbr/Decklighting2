@@ -413,12 +413,14 @@ function SectionColor({ color, info, apiColor }) {
 						className="form-control-color"
 						value={fromColorState}
 						onChange={e => fromColorDebouncer.current.set(e.target.value)}
+						onInput={e => fromColorDebouncer.current.set(e.target.value)}
 					/>
 					<input
 						type="color"
 						className="form-control-color"
 						value={toColorState}
 						onChange={e => toColorDebouncer.current.set(e.target.value)}
+						onInput={e => toColorDebouncer.current.set(e.target.value)}
 					/>
 				</div>
 			</div>
