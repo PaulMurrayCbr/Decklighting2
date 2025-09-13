@@ -155,7 +155,7 @@ function SectionMain({ section, info, apiSection }) {
 
 	const densityDebouncer = useRef(new Debouncer(100,
 		setDensityState,
-		(value) => apiSectapiSectionStableion(`set?density=${value}`)
+		(value) => apiSectionRef.current(`set?density=${value}`)
 	));
 
 	const activeEffectPill = useRef(null);
