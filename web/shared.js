@@ -41,3 +41,28 @@ class SelectedPage {
 		return new SelectedPage({ pageLevel: SelectedPage.PageLevel.SECTION, section });
 	}
 }
+
+
+class Debouncer {
+	debounce = undefined;
+	ms = 300;
+	setMethod = () => { }
+	apiCall = () => { }
+
+	constructor(ms, setMethod, apiCall) {
+		this.ms = ms;
+		this.setMethod = setMethod;
+		this.apiCall = apiCall;
+	}
+
+	set(value) {
+		this.setMethod(value);
+		if (this.debounce) clearTimeout(this.debounce);
+		this.debounce = setTimeout(() => {
+			this.apiCall(value);
+			this.debounce = undefined;
+		}, this.ms);
+	}
+}
+
+

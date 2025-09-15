@@ -64,6 +64,7 @@ function App() {
 	}, []); // empty deps = run once after first render
 
 	return (
+
 		<div>
 			<Navbar
 				info={info}
@@ -180,7 +181,7 @@ function Notifications({ error, setError }) {
 			style={{ zIndex: 1055 }
 			}
 		>
-			
+
 			{error && (
 				<div
 					className="toast align-items-center text-bg-danger border-0 show"
