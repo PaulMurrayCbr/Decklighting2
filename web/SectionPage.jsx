@@ -109,28 +109,6 @@ function SectionPage({ name, loading, pixelState, info, apiSection, home }) {
 	);
 }
 
-class Debouncer {
-	debounce = undefined;
-	ms = 300;
-	setMethod = () => { }
-	apiCall = () => { }
-
-	constructor(ms, setMethod, apiCall) {
-		this.ms = ms;
-		this.setMethod = setMethod;
-		this.apiCall = apiCall;
-	}
-
-	set(value) {
-		this.setMethod(value);
-		if (this.debounce) clearTimeout(this.debounce);
-		this.debounce = setTimeout(() => {
-			this.apiCall(value);
-			this.debounce = undefined;
-		}, this.ms);
-	}
-}
-
 function SectionMain({ section, info, apiSection }) {
 
 	const togglePower = () => {
@@ -155,7 +133,7 @@ function SectionMain({ section, info, apiSection }) {
 
 	const densityDebouncer = useRef(new Debouncer(100,
 		setDensityState,
-		(value) => apiSectapiSectionStableion(`set?density=${value}`)
+		(value) => apiSectionRef.current(`set?density=${value}`)
 	));
 
 	const activeEffectPill = useRef(null);
@@ -250,16 +228,6 @@ function toRgb(value) {
 }
 
 function SectionColor({ color, info, apiColor }) {
-
-	const apiColorRef = useRef(apiColor);
-	useEffect(() => {
-		apiColorRef.current = apiColor;
-	}, [apiColor]);
-
-	function apiColorStable(url) {
-		apiColorRef.current(url);
-	}
-
 	const [fromColorState, setFromColorState] = useState(0);
 	const fromColorDebouncer = useRef(new Debouncer(100, setFromColorState,
 		(value) => apiColorStable(`/from?${toRgb(value)}`)
@@ -275,75 +243,14 @@ function SectionColor({ color, info, apiColor }) {
 		(value) => apiColorStable(`?bias=${value / 10000}`)
 	));
 
-	const SLIDER_RESOLUTION = 10000;
-
 	const CYCLE_SPEED_MIN = 10;
-	const CYCLE_SPEED_MAX = 1000 * 60 * 60 * 24;
-
+	const CYCLE_SPEED_MAX = 1000 * 60 * 10;
+	
 	const FRAME_RATE_MIN = 50;
 	const FRAME_RATE_MAX = 1000 * 60;
 
-	const CYCLE_SPEED_MIN_LOG = Math.log(CYCLE_SPEED_MIN);
-	const CYCLE_SPEED_MAX_LOG = Math.log(CYCLE_SPEED_MAX);
-	const CYCLE_SPEED_S2V_SCALE = (CYCLE_SPEED_MAX_LOG - CYCLE_SPEED_MIN_LOG) / SLIDER_RESOLUTION;
-	const CYCLE_SPEED_V2S_SCALE = SLIDER_RESOLUTION / (CYCLE_SPEED_MAX_LOG - CYCLE_SPEED_MIN_LOG);
-
-
-	const FRAME_RATE_MIN_LOG = Math.log(FRAME_RATE_MIN);
-	const FRAME_RATE_MAX_LOG = Math.log(FRAME_RATE_MAX);
-	const FRAME_RATE_S2V_SCALE = (FRAME_RATE_MAX_LOG - FRAME_RATE_MIN_LOG) / SLIDER_RESOLUTION;
-	const FRAME_RATE_V2S_SCALE = SLIDER_RESOLUTION / (FRAME_RATE_MAX_LOG - FRAME_RATE_MIN_LOG);
-
-	function clamp(value, min, max) {
-		return Math.min(Math.max(value, min), max);
-	}
-
-	function cs_sliderToValue(pos) {
-		return clamp(
-			Math.exp(CYCLE_SPEED_MIN_LOG + CYCLE_SPEED_S2V_SCALE * pos),
-			CYCLE_SPEED_MIN, CYCLE_SPEED_MAX);
-	}
-
-	function cs_valueToSlider(val) {
-		return clamp((Math.log(val) - CYCLE_SPEED_MIN_LOG) * CYCLE_SPEED_V2S_SCALE,
-			0, SLIDER_RESOLUTION);
-	}
-
-	function fr_sliderToValue(pos) {
-		return clamp(
-			Math.exp(FRAME_RATE_MIN_LOG + FRAME_RATE_S2V_SCALE * pos),
-			FRAME_RATE_MIN, FRAME_RATE_MAX);
-	}
-
-	function fr_valueToSlider(val) {
-		return clamp((Math.log(val) - FRAME_RATE_MIN_LOG) * FRAME_RATE_V2S_SCALE,
-			0, SLIDER_RESOLUTION);
-	}
-
-	const CYCLE_SPEED_1s_SLIDER = cs_valueToSlider(1000);
-	const FRAME_RATE_1s_SLIDER = fr_valueToSlider(1000);
-
-
-	function threeDigits(n) {
-		if (Math.abs(n) > 100)
-			return "" + Math.round(n);
-		else if (Math.abs(n) > 10)
-			return "" + (Math.round(n * 10) / 10);
-		else if (Math.abs(n) > 1)
-			return "" + (Math.round(n * 100) / 100);
-		else
-			return "" + (Math.round(n * 1000) / 1000);
-	}
-
-	const [cycleSpeedState, setCycleSpeedState] = useState(500);
-	const cycleSpeedDebouncer = useRef(new Debouncer(100, setCycleSpeedState,
-		(value) => apiColorStable(`?cycleSpeed=${cs_sliderToValue(value)}`)
-	));
-
-	const [frameRateState, setFrameRateState] = useState(500);
-	const frameRateDebouncer = useRef(new Debouncer(100, setFrameRateState,
-		(value) => apiColorStable(`?frameDuration=${fr_sliderToValue(value)}`)
-	));
+	const [cycleSpeedState, setCycleSpeedState] = useState(color?.cycleSpeed ?? 500);
+	const [frameRateState, setFrameRateState] = useState(color?.frameRate ?? 500);
 
 	const activeInterpolationPill = useRef(null);
 
@@ -351,52 +258,12 @@ function SectionColor({ color, info, apiColor }) {
 		return color?.interpolation === name ? 'active' : '';
 	}
 
-
-	const timeUnits = [
-		{ u: 'd', t: 24 * 60 * 60 * 1000 },
-		{ u: 'h', t: 60 * 60 * 1000 },
-		{ u: 'm', t: 60 * 1000 }
-	];
-
-	function timeString(t) {
-		if (Math.abs(t) < 1000)
-			return threeDigits(1000 / t) + ' fps'
-
-		let s = '';
-
-		let used = 0;
-		let remaining = t;
-		for (const tu of timeUnits) {
-			if (tu.t > t) continue;
-			if (used > 0) {
-				s += ' ';
-			}
-			const amt = Math.floor(remaining / tu.t);
-
-			s += amt + tu.u;
-			remaining -= amt * tu.t;
-			if (++used >= 2) break;
-
-		}
-		if (used == 0) {
-			// don't need ms, because we will get fps instead.
-			s += threeDigits(remaining / 1000) + 's'
-		}
-		else if (used == 1) {
-			s += ' ';
-			s += Math.floor(remaining / 1000) + 's'
-		}
-
-		return s;
-	}
-
-
 	useEffect(() => {
 		setFromColorState(color?.from ?? '#000000');
 		setToColorState(color?.to ?? '#000000');
 		setBiasState(color?.bias * 10000 ?? 500);
-		setCycleSpeedState(cs_valueToSlider(color?.cycleSpeed) ?? 0);
-		setFrameRateState(fr_valueToSlider(color?.frameDuration) ?? 0);
+		setCycleSpeedState(color?.cycleSpeed ?? CYCLE_SPEED_MIN);
+		setFrameRateState(color?.frameDuration ?? FRAME_RATE_MIN);
 		if (activeInterpolationPill.current) {
 			activeInterpolationPill.current.scrollIntoView({ behavior: "smooth", inline: "center" });
 		}
@@ -413,12 +280,14 @@ function SectionColor({ color, info, apiColor }) {
 						className="form-control-color"
 						value={fromColorState}
 						onChange={e => fromColorDebouncer.current.set(e.target.value)}
+						onInput={e => fromColorDebouncer.current.set(e.target.value)}
 					/>
 					<input
 						type="color"
 						className="form-control-color"
 						value={toColorState}
 						onChange={e => toColorDebouncer.current.set(e.target.value)}
+						onInput={e => toColorDebouncer.current.set(e.target.value)}
 					/>
 				</div>
 			</div>
@@ -493,41 +362,28 @@ function SectionColor({ color, info, apiColor }) {
 				</div>
 			</div>
 
-			<div className="row mb-3">
-				<label className="col-sm-3 col-form-label">Cycle speed</label>
-				<div className="col-sm-9 d-flex align-items-center">
-					<input
-						type="range"
-						className="form-range"
-						min="0"
-						max={SLIDER_RESOLUTION}
-						value={cycleSpeedState}
-						onChange={e => cycleSpeedDebouncer.current.set(parseFloat(e.target.value))}
-						style={{ flexGrow: 1 }}  // slider fills available space
-					/>
-					<span className="ms-3" style={{ whiteSpace: 'nowrap' }}>
-						{timeString(cs_sliderToValue(cycleSpeedState))}
-					</span>
-				</div>
-			</div>
+			<DurationSlider
+				label={'Cycle speed'}
+				value={cycleSpeedState}
+				setValue={setCycleSpeedState}
+				min={CYCLE_SPEED_MIN}
+				max={CYCLE_SPEED_MAX}
+				api={
+					(value) => apiColor(`?cycleSpeed=${value}`)
 
-			<div className="row mb-3">
-				<label className="col-sm-3 col-form-label">Frame rate</label>
-				<div className="col-sm-9 d-flex align-items-center">
-					<input
-						type="range"
-						className="form-range"
-						min="0"
-						max={SLIDER_RESOLUTION}
-						value={frameRateState}
-						onChange={e => frameRateDebouncer.current.set(parseFloat(e.target.value))}
-						style={{ flexGrow: 1 }}  // slider fills available space
-					/>
-					<span className="ms-3" style={{ whiteSpace: 'nowrap' }}>
-						{timeString(fr_sliderToValue(frameRateState))}
-					</span>
-				</div>
-			</div>
+				}
+			/>
+
+			<DurationSlider
+				label={'Frame rate'}
+				value={frameRateState}
+				setValue={setFrameRateState}
+				min={FRAME_RATE_MIN}
+				max={FRAME_RATE_MAX}
+				api={
+					(value) => apiColor(`?frameRate=${value}`)
+				}
+			/>
 		</div>
 
 	);
