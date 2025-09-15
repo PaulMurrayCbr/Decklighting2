@@ -11,6 +11,8 @@
 #include <string>
 #include <cstdint>
 #include <map>
+#include <iostream>
+#include <string>
 
 #define EFFECT_TYPE_LIST \
     EFFECT(SOLID) \
@@ -22,7 +24,7 @@
     INTERPOLATION(FADE) \
     INTERPOLATION(QFADE) \
     INTERPOLATION(ROYGBV) \
-    INTERPOLATION(VBGYOB)
+    INTERPOLATION(VBGYOR)
 
 #define SECTION_LIST \
     SECTION(Door) \
@@ -133,6 +135,10 @@ struct RGB {
     RGB(int r, int g, int b) :
             r(r), g(g), b(b) {
     }
+
+    std::string toString() const {
+        return "RGB[" + std::to_string(r) + "," + std::to_string(g) + "," + std::to_string(b) + "]";
+    }
 };
 
 struct HSV {
@@ -149,6 +155,10 @@ struct HSV {
 
     HSV(int h, uint8_t s, uint8_t v) :
             h(h), s(s), v(v) {
+    }
+
+    std::string toString() const {
+        return "HSV[" + std::to_string(h) + "," + std::to_string(s) + "," + std::to_string(v) + "]";
     }
 };
 
@@ -183,9 +193,22 @@ struct HSQ {
     HSQ(int16_t h, int16_t s, int16_t v) :
             h(h), s(s), v(v) {
     }
+
+    std::string toString() const {
+        return "HSQ[" + std::to_string(h) + "," + std::to_string(s) + "," + std::to_string(v) + "]";
+    }
+
 };
 
 extern RGB hsq2rgb(HSQ c);
 extern HSQ rgb2hsq(RGB c);
+
+
+
+extern std::ostream& operator<<(std::ostream& os, const HSV& v);
+extern std::ostream& operator<<(std::ostream& os, const RGB& v);
+extern std::ostream& operator<<(std::ostream& os, const HSQ& v);
+
+
 
 #endif /* SRC_CORE_COMMON_HPP_ */

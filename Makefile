@@ -14,13 +14,13 @@ UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Darwin)
     SRCDIRS := src/core src/lib src/osx
     CXX := clang++
-    CXXFLAGS := -std=c++11
+    CXXFLAGS := -std=c++11 -DHTTP_HOST=\"Sally.local\" -DHTTP_PORT=8080
     CXXLIBS :=
 else ifeq ($(UNAME_S),Linux)
     SRCDIRS := src/core src/lib src/pi
     
 #    CXXFLAGS := -std=c++11 -I../rpi_ws281x -L../rpi_ws281x -lws2811 -lm -pthread
-    CXXFLAGS := -std=c++11  -lm -pthread 
+    CXXFLAGS := -std=c++11  -lm -pthread  -DHTTP_HOST=\"neopixel.local\" -DHTTP_PORT=80
     CXXLIBS := /home/p/rpi_ws281x/libws2811.a
 else
     $(error Unsupported platform: $(UNAME_S))

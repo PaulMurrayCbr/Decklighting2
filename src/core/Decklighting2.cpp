@@ -164,6 +164,21 @@ int main_test_color_wheel_3() {
     return 0;
 }
 
+extern HSQ TEST_INTERP(HSQ a, HSQ b, double relative);
+
+int main_TEST_INTERP() {
+
+    HSQ a = HSQ(APPARENT_BRIGHTNESS_SCALE, APPARENT_BRIGHTNESS_SCALE * 5, APPARENT_BRIGHTNESS_SCALE * 5);
+    HSQ b = HSQ(APPARENT_BRIGHTNESS_SCALE * 4, APPARENT_BRIGHTNESS_SCALE * 5, APPARENT_BRIGHTNESS_SCALE * 5);
+
+    for (double relative = .66; relative <= .67; relative += .001) {
+        HSQ z = TEST_INTERP(b, a, relative);
+        std::cout << relative << "\t" << z << "\t" << hsq2rgb(z) << "\n";
+    }
+
+    return 0;
+}
+
 int main() {
 // === Config ===
 //    const int GPIO_PIN = 18;      // PWM0 (requires level shifter to 5V on data)
