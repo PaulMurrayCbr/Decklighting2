@@ -358,3 +358,17 @@ const uint8_t PIX_VALUE_FOR_APPARENT_BRIGHTNESS[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0,
         224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239,  //
         240, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 252, 253, 254, 255,  //
         };
+
+
+std::ostream& operator<<(std::ostream& os, const HSV& v) {
+    return os << v.toString();
+}
+
+std::ostream& operator<<(std::ostream& os, const HSQ& v) {
+    return os << v.toString();
+}
+
+std::ostream& operator<<(std::ostream& os, const RGB& v) {
+    return os << v.toString();
+}
+

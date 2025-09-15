@@ -228,6 +228,11 @@ function toRgb(value) {
 }
 
 function SectionColor({ color, info, apiColor }) {
+	const apiColorStableRef = useRef(apiColor);
+	useEffect(() => apiColorStableRef.current = apiColor, [apiColor])
+
+	const apiColorStable = (url) => apiColorStableRef.current(url);
+
 	const [fromColorState, setFromColorState] = useState(0);
 	const fromColorDebouncer = useRef(new Debouncer(100, setFromColorState,
 		(value) => apiColorStable(`/from?${toRgb(value)}`)
@@ -245,7 +250,7 @@ function SectionColor({ color, info, apiColor }) {
 
 	const CYCLE_SPEED_MIN = 10;
 	const CYCLE_SPEED_MAX = 1000 * 60 * 10;
-	
+
 	const FRAME_RATE_MIN = 50;
 	const FRAME_RATE_MAX = 1000 * 60;
 
@@ -257,6 +262,7 @@ function SectionColor({ color, info, apiColor }) {
 	function interpolationPillActive(name) {
 		return color?.interpolation === name ? 'active' : '';
 	}
+
 
 	useEffect(() => {
 		setFromColorState(color?.from ?? '#000000');
@@ -304,7 +310,7 @@ function SectionColor({ color, info, apiColor }) {
 								<li key={`interpolation-pill-${iname}`}
 									className="nav-item">
 									<button className={`nav-link ${interpolationPillActive(iname)}`}
-										onClick={() => apiColor(`?interpolation=${iname}`)}
+										onClick={() => apiColorStable(`?interpolation=${iname}`)}
 										ref={color?.interpolation === iname ? activeInterpolationPill : null}
 									>{iname}</button>
 								</li>
@@ -325,7 +331,7 @@ function SectionColor({ color, info, apiColor }) {
 						checked={color.seamless}
 						onChange={e => {
 							const value = e.target.checked;
-							apiColor(`?seamless=${value}`)
+							apiColorStable(`?seamless=${value}`)
 						}}
 					/>
 				</div>
@@ -356,7 +362,7 @@ function SectionColor({ color, info, apiColor }) {
 						checked={color.animating}
 						onChange={e => {
 							const value = e.target.checked;
-							apiColor(`?animating=${value}`)
+							apiColorStable(`?animating=${value}`)
 						}}
 					/>
 				</div>
@@ -368,10 +374,7 @@ function SectionColor({ color, info, apiColor }) {
 				setValue={setCycleSpeedState}
 				min={CYCLE_SPEED_MIN}
 				max={CYCLE_SPEED_MAX}
-				api={
-					(value) => apiColor(`?cycleSpeed=${value}`)
-
-				}
+				api={(value) => apiColorStable(`?cycleSpeed=${value}`)}
 			/>
 
 			<DurationSlider
@@ -380,9 +383,7 @@ function SectionColor({ color, info, apiColor }) {
 				setValue={setFrameRateState}
 				min={FRAME_RATE_MIN}
 				max={FRAME_RATE_MAX}
-				api={
-					(value) => apiColor(`?frameRate=${value}`)
-				}
+				api={(value) => apiColorStable(`?frameRate=${value}`)}
 			/>
 		</div>
 
