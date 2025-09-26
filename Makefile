@@ -109,7 +109,7 @@ forcesave:
 		echo "Error: you must be on branch 'main' to save." >&2; \
 		exit 1; \
 	fi
-		@if [ -z "$(LABEL)" ]; then \
+	@if [ -z "$(LABEL)" ]; then \
 	    echo "Error: LABEL cannot be blank"; \
 	    exit 1; \
 	fi
@@ -150,7 +150,13 @@ release: VERSION.mk save
 	@$(MAKE) do-release NEW_TAG=$(NEXT_MINOR)
 
 do-release:
+	@CURRENT_BRANCH=$$(git symbolic-ref --short HEAD); \
+	if [ "$$CURRENT_BRANCH" != "main" ]; then \
+		echo "Error: you must be on branch 'main' to release." >&2; \
+		exit 1; \
+	fi
 	git diff-index --quiet HEAD -- && git diff-files --quiet || (echo "Working directory has changes/untracked files, aborting release." >&2; exit 1)
+	git branch $(VER)-DEV
 	@echo "will release as tag $(NEW_TAG)"
 	git checkout release
 	git merge --squash main
