@@ -41,8 +41,11 @@ LABEL=Makefile build succeeded
 # The main clean target
 clean:
 	rm -f $(OBJECTS) $(EXECUTABLE)
+	
+.PHONY: FORCE
+FORCE:	
 
-VERSION.mk:
+VERSION.mk: FORCE
 	@VER=$$(git describe --tags --abbrev=0 release 2>/dev/null || echo "0.0.0"); \
 	VER=$$(echo $$VER | sed 's/^v//'); \
 	MAJOR=$$(echo $$VER | cut -d. -f1); \
