@@ -185,6 +185,4 @@ test/%.test: $(EXECUTABLE)
 		/bin/bash -c $(@:.test=.sh)
 		
 test-change:
-
-		
-
+	a change
