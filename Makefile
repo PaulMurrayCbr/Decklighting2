@@ -42,10 +42,33 @@ LABEL=Makefile build succeeded
 clean:
 	rm -f $(OBJECTS) $(EXECUTABLE)
 
+VERSION.mk:
+	@VER=$$(git describe --tags --abbrev=0 release 2>/dev/null || echo "0.0.0"); \
+	VER=$$(echo $$VER | sed 's/^v//'); \
+	MAJOR=$$(echo $$VER | cut -d. -f1); \
+	MINOR=$$(echo $$VER | cut -d. -f2); \
+	PATCH=$$(echo $$VER | cut -d. -f3); \
+	NEXT_PATCH="$${MAJOR}.$${MINOR}.$$((PATCH+1))"; \
+	NEXT_MINOR="$${MAJOR}.$$((MINOR+1)).0"; \
+	NEXT_MAJOR="$$((MAJOR+1)).0.0"; \
+	echo "VER=$$VER" > $@; \
+	echo "MAJOR=$$MAJOR" >> $@; \
+	echo "MINOR=$$MINOR" >> $@; \
+	echo "PATCH=$$PATCH" >> $@; \
+	echo "NEXT_PATCH=$$NEXT_PATCH" >> $@; \
+	echo "NEXT_MINOR=$$NEXT_MINOR" >> $@; \
+	echo "NEXT_MAJOR=$$NEXT_MAJOR" >> $@	
+	
+-include VERSION.mk
+	
 # Help Target
 help:
 	@echo
 	@echo -e "Decklighting2 - raspberry pi / react implemetation of the decklighting"
+	@echo "Version $(VER)"
+	@echo "Next patch $(NEXT_PATCH)"
+	@echo "Next minor $(NEXT_MINOR)"
+	@echo "Next major $(NEXT_MAJOR)"
 	@echo
 	@echo -e "targets:"
 	@echo -e "\tall:\tbuild the decklighting2 executable (default)"
@@ -110,6 +133,18 @@ send:
 	rsync -av --exclude='*.o' src/ p@neopixel.local:/home/p/decklighting2/src
 	rsync -av web/ p@neopixel.local:/home/p/decklighting2/web
 	rsync -av Makefile p@neopixel.local:/home/p/decklighting2/Makefile
+
+
+patch: VERSION.mk save
+	@$(MAKE) do-patch
+
+do-patch:
+
+release: VERSION.mk save
+	@$(MAKE) do-release
+
+do-release:
+
 
 
 $(EXECUTABLE): $(OBJECTS)
