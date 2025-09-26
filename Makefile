@@ -40,12 +40,35 @@ LABEL=Makefile build succeeded
 
 # The main clean target
 clean:
-	rm $(OBJECTS) $(EXECUTABLE)
+	rm -f $(OBJECTS) $(EXECUTABLE)
 
+VERSION.mk:
+	@VER=$$(git describe --tags --abbrev=0 release 2>/dev/null || echo "0.0.0"); \
+	VER=$$(echo $$VER | sed 's/^v//'); \
+	MAJOR=$$(echo $$VER | cut -d. -f1); \
+	MINOR=$$(echo $$VER | cut -d. -f2); \
+	PATCH=$$(echo $$VER | cut -d. -f3); \
+	NEXT_PATCH="$${MAJOR}.$${MINOR}.$$((PATCH+1))"; \
+	NEXT_MINOR="$${MAJOR}.$$((MINOR+1)).0"; \
+	NEXT_MAJOR="$$((MAJOR+1)).0.0"; \
+	echo "VER=$$VER" > $@; \
+	echo "MAJOR=$$MAJOR" >> $@; \
+	echo "MINOR=$$MINOR" >> $@; \
+	echo "PATCH=$$PATCH" >> $@; \
+	echo "NEXT_PATCH=$$NEXT_PATCH" >> $@; \
+	echo "NEXT_MINOR=$$NEXT_MINOR" >> $@; \
+	echo "NEXT_MAJOR=$$NEXT_MAJOR" >> $@	
+	
+-include VERSION.mk
+	
 # Help Target
 help:
 	@echo
 	@echo -e "Decklighting2 - raspberry pi / react implemetation of the decklighting"
+	@echo "Version $(VER)"
+	@echo "Next patch $(NEXT_PATCH)"
+	@echo "Next minor $(NEXT_MINOR)"
+	@echo "Next major $(NEXT_MAJOR)"
 	@echo
 	@echo -e "targets:"
 	@echo -e "\tall:\tbuild the decklighting2 executable (default)"
@@ -111,6 +134,28 @@ send:
 	rsync -av web/ p@neopixel.local:/home/p/decklighting2/web
 	rsync -av Makefile p@neopixel.local:/home/p/decklighting2/Makefile
 
+
+patch: VERSION.mk save
+	@$(MAKE) do-release NEW_TAG=$(NEXT_PATCH)
+
+release: VERSION.mk save
+	@$(MAKE) do-release NEW_TAG=$(NEXT_MINOR)
+
+do-release:
+	git diff-index --quiet HEAD -- && git diff-files --quiet || (echo "Working directory has changes/untracked files, aborting release." >&2; exit 1)
+	@echo "will release as tag $(NEW_TAG)"
+	git checkout history
+	git merge --ff-only main
+	git checkout release
+	git merge --squash main
+	git commit -m "$(NEW_TAG)"
+	git tag "$(NEW_TAG)"
+	git branch -f main
+	git checkout main
+	git push --all
+	@for remote in $$(git remote); do \
+    	git push $$remote "$(NEW_TAG)"; \
+	done
 
 $(EXECUTABLE): $(OBJECTS)
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(CXXLIBS)
