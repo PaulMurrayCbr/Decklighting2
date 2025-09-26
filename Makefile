@@ -159,8 +159,8 @@ do-release:
 	git branch -f main
 	git checkout main
 	@for remote in $$(git remote); do \
-    	git push -f $$remote main \
-    	git push -f $$remote release \
+    	git push -f $$remote main ; \
+    	git push -f $$remote release ; \
     	git push $$remote "$(NEW_TAG)"; \
 	done
 
