@@ -157,12 +157,7 @@ do-release:
 	git checkout main
 	@for remote in $$(git remote); do \
     	git push -f $$remote main \
-	done
-	git push --all
-	@for remote in $$(git remote); do \
-    	git push -f $$remote main; \
-    	git push $$remote history; \
-    	git push $$remote release; \
+    	git push -f $$remote release \
     	git push $$remote "$(NEW_TAG)"; \
 	done
 
