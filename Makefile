@@ -142,8 +142,20 @@ release: VERSION.mk save
 	@$(MAKE) do-release NEW_TAG=$(NEXT_MINOR)
 
 do-release:
+	git diff-index --quiet HEAD -- && git diff-files --quiet || (echo "Working directory has changes/untracked files, aborting release." >&2; exit 1)
 	@echo "will release as tag $(NEW_TAG)"
-
+	git checkout history
+	git merge --ff-only main
+	git checkout release
+	git merge --squash main
+	git commit -m "$(NEW_TAG)"
+	git tag "$(NEW_TAG)"
+	git branch -f main
+	git checkout main
+	git push --all
+	@for remote in $$(git remote); do \
+    	git push $$remote "$(NEW_TAG)"; \
+	done
 
 $(EXECUTABLE): $(OBJECTS)
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(CXXLIBS)
