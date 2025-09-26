@@ -136,15 +136,13 @@ send:
 
 
 patch: VERSION.mk save
-	@$(MAKE) do-patch
-
-do-patch:
+	@$(MAKE) do-patch NEW_TAG=$(NEXT_PATCH)
 
 release: VERSION.mk save
-	@$(MAKE) do-release
+	@$(MAKE) do-release NEW_TAG=$(NEXT_MINOR)
 
 do-release:
-
+	@echo "will release as tag $(NEW_TAG)"
 
 
 $(EXECUTABLE): $(OBJECTS)
