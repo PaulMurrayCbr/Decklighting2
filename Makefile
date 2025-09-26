@@ -101,7 +101,12 @@ save: $(EXECUTABLE) maybe_test
 	$(MAKE) forcesave
 	
 forcesave:
-	@if [ -z "$(LABEL)" ]; then \
+	@CURRENT_BRANCH=$$(git symbolic-ref --short HEAD); \
+	if [ "$$CURRENT_BRANCH" != "main" ]; then \
+		echo "Error: you must be on branch 'main' to save." >&2; \
+		exit 1; \
+	fi
+		@if [ -z "$(LABEL)" ]; then \
 	    echo "Error: LABEL cannot be blank"; \
 	    exit 1; \
 	fi
@@ -153,6 +158,9 @@ do-release:
 	git tag "$(NEW_TAG)"
 	git branch -f main
 	git checkout main
+	@for remote in $$(git remote); do \
+    	git push -f $$remote main \
+	done
 	git push --all
 	@for remote in $$(git remote); do \
     	git push $$remote "$(NEW_TAG)"; \
