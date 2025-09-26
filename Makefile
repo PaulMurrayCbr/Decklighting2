@@ -40,7 +40,7 @@ LABEL=Makefile build succeeded
 
 # The main clean target
 clean:
-	rm $(OBJECTS) $(EXECUTABLE)
+	rm -f $(OBJECTS) $(EXECUTABLE)
 
 # Help Target
 help:
