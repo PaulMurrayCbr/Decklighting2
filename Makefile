@@ -136,7 +136,7 @@ send:
 
 
 patch: VERSION.mk save
-	@$(MAKE) do-patch NEW_TAG=$(NEXT_PATCH)
+	@$(MAKE) do-release NEW_TAG=$(NEXT_PATCH)
 
 release: VERSION.mk save
 	@$(MAKE) do-release NEW_TAG=$(NEXT_MINOR)
