@@ -186,4 +186,3 @@ test/%.test: $(EXECUTABLE)
 		trap "kill $$SERVER_PID 2>/dev/null; wait $$SERVER_PID" EXIT; \
 		sleep 1 ; \
 		/bin/bash -c $(@:.test=.sh)
-		
