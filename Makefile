@@ -106,7 +106,7 @@ forcesave:
 	    exit 1; \
 	fi
 	git add .
-	git commit -m "$(LABEL)" && git push --all || true
+	git commit -m "$(LABEL)" && git push backup main || true
 	
 push: clean $(EXECUTABLE) save
 	@if [ "$(LABEL)" = "Makefile build succeeded" ]; then \
@@ -126,7 +126,7 @@ push: clean $(EXECUTABLE) save
 	git merge --ff-only temp-squash
 	git branch -D temp-squash
 	git checkout main
-	git push --all
+	git push backup main
 	git checkout main
 
 send:
