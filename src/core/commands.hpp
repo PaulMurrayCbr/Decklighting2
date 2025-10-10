@@ -126,7 +126,6 @@ public:
 
 extern void handleCommand(const GlobalOnCommand &cmd);
 extern void handleCommand(const GlobalOffCommand &cmd);
-extern void handleCommand(const GlobalOffCommand &cmd);
 extern void handleCommand(const SectionOnCommand &cmd);
 extern void handleCommand(const SectionOutCommand &cmd);
 extern void handleCommand(const SectionOffCommand &cmd);
