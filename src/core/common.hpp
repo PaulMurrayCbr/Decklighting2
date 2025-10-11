@@ -210,5 +210,11 @@ extern std::ostream& operator<<(std::ostream& os, const RGB& v);
 extern std::ostream& operator<<(std::ostream& os, const HSQ& v);
 
 
+inline bool endsWith(const std::string& str, const std::string& suffix) {
+    if (str.length() < suffix.length()) return false;
+    return str.compare(str.length() - suffix.length(), suffix.length(), suffix) == 0;
+}
+
+
 
 #endif /* SRC_CORE_COMMON_HPP_ */

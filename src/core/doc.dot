@@ -3,9 +3,10 @@ digraph {
 Decklighting;
 common;
 state;
+files [label="./saves"; shape=cylinder];
 
 subgraph  cluster_pix {
-label = "Pixels"
+label = "Pixel thread"
 pixelloop;
 effect;
 pixels;
@@ -13,27 +14,40 @@ interpolate;
 }
 
 subgraph  cluster_web {
-label = "Web"
+commandjson [label="command-json"];
+label = "Web thread"
 webserver;
 api;
 command;
+save;
 }
 
-Decklighting -> pixelloop [label="starts"];
-Decklighting -> webserver [label="starts"];
-Decklighting -> state [label="initializes"];
+Decklighting -> pixelloop [label="starts", arrowhead=empty];
+Decklighting -> webserver [label="starts", arrowhead=empty];
+Decklighting -> state [label="initializes", arrowhead=empty];
 
 
 state -> pixelloop [label="reads in mutex"];
 pixelloop -> effect [label="copied section state"];
 pixelloop -> pixels [label="writes"];
-effect -> pixels 
+effect -> pixels;
 
 interpolate -> effect [label="calculates colours"];
 state -> interpolate [label="specifies method\nanimation state"];
 
 webserver -> api [label="path, params, json"];
-api -> command [label="command objects"];
+api -> command [label="command\nobjects"];
+api -> save [label="save list\njson"; dir=back];
+api -> save [label="save/load\nsection/filename"];
 command -> state [label="writes in mutex"];
+
+save->commandjson [label="apply\njson";];
+save->commandjson [label="get\njson"; dir=back];
+
+commandjson->command[label="command\nobjects"];
+
+commandjson->state[label="reads in mutex"; dir=back];
+
+save->files[label="read/write"; dir=both];
 
 }
