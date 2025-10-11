@@ -78,6 +78,22 @@ namespace {
         }
     }
 
+    inline void ifHasBoolParam(const std::multimap<std::string, std::string> &params, const std::string &key, const std::function<void(bool)> &f) {
+        auto it = params.find(key);
+        if (it != params.end()) {
+            f(toBool(it->second));
+        }
+    }
+
+    inline void requireStringParam(const std::multimap<std::string, std::string> &params, const std::string &key, const std::function<void(std::string)> &f) {
+        auto it = params.find(key);
+        if (it != params.end()) {
+            f(it->second);
+        } else {
+            throw std::invalid_argument("expected " + key);
+        }
+    }
+
     std::pair<int, json> handle_global_on(std::stringstream &path, const std::multimap<std::string, std::string> &params, json &command) {
         GlobalOnCommand cmd;
         ifHasByteParam(params, "brightness", [&cmd](int v) {
@@ -246,6 +262,52 @@ namespace {
         }
     }
 
+    std::pair<int, json> handle_section_load(Section section, std::stringstream &path, const std::multimap<std::string, std::string> &params, json &command) {
+        std::string name;
+
+        requireStringParam(params, "name", [&name](std::string v) {
+            name = v;
+        });
+
+        loadSection(section, name);
+
+        return {200, getSectionState(section)};
+    }
+
+    std::pair<int, json> handle_section_save(Section section, std::stringstream &path, const std::multimap<std::string, std::string> &params, json &command) {
+        std::string name;
+        bool areYouSure = false;
+
+        requireStringParam(params, "name", [&name](std::string v) {
+            name = v;
+        });
+
+        ifHasBoolParam(params, "are-you-sure", [&areYouSure](bool v) {
+            areYouSure = v;
+        });
+
+        try {
+            saveSection(section, name, areYouSure);
+
+            return {200, {
+                    {   "saved", true},
+                    {   "file", name},
+                    {   "saves", getSaves()}
+                }
+            }
+            ;
+        } catch (const AreYouSureException &ex) {
+            // returning a 200 because this is not to be treated as an error at the http level, it's a legitimate return from the method
+            return {200, {
+                    {   "saved", false},
+                    {   "needsAreYouSure", true},
+                    {   "file", ex.file}
+                }
+            };
+        }
+        // we don't catch save exception, we let it go through to the outer-level catch
+    }
+
     std::pair<int, json> handle_section(Section section, std::stringstream &path, const std::multimap<std::string, std::string> &params, json &command) {
         std::string frag;
         std::getline(path, frag, '/');
@@ -263,6 +325,10 @@ namespace {
             return handle_section_color(section, path, params, command);
         } else if (frag == "set") {
             return handle_section_set(section, path, params, command);
+        } else if (frag == "load") {
+            return handle_section_load(section, path, params, command);
+        } else if (frag == "save") {
+            return handle_section_save(section, path, params, command);
         } else {
             throw std::out_of_range(frag + " is not a section command");
         }
