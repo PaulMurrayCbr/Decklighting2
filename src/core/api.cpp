@@ -28,6 +28,7 @@
 
 #include "commands.hpp"
 #include "state.hpp"
+#include "save.hpp"
 
 #include "api.hpp"
 
@@ -278,6 +279,8 @@ namespace {
             return {200, getGlobalState()};
         } else if (frag == "info") {
             return {200, getGlobalInfo()};
+        } else if (frag == "saves") {
+            return {200, getSaves()};
         } else if (frag == "on") {
             return handle_global_on(path, params, command);
         } else if (frag == "off") {
