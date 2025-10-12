@@ -9,7 +9,8 @@
 using json = nlohmann::json;
 
 #include "common.hpp"
-#include "command-json.hpp"
+#include "state.hpp"
+#include "commands.hpp"
 #include "save.hpp"
 
 namespace {
@@ -69,7 +70,7 @@ namespace {
 
         std::string fullPath = path + "/" + name + ext;
 
-        json state = getSectionJson(section);
+        json state = getSectionState(section);
 
         std::ofstream file(fullPath);
 
@@ -106,7 +107,7 @@ namespace {
             throw SaveLoadException(name, "Malformed JSON in savefile " + fullPath);
         }
 
-        applySectionJson(section, state);
+        // TODO! Create and apply the commands! applySectionJson(section, state);
 
     }
 

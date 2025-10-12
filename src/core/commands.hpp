@@ -8,8 +8,11 @@
 #ifndef SRC_CORE_COMMANDS_HPP_
 #define SRC_CORE_COMMANDS_HPP_
 
+#include <functional>
+
 #include "../lib/optional.hpp"
 #include "common.hpp"
+#include "state.hpp"
 
 class SectionCommand {
 public:
@@ -22,21 +25,27 @@ public:
 };
 
 class EffectSOLIDCommand {
-
+public:
+    void load(const EffectSOLIDState &of);
 };
 
 class EffectGRADIENTCommand {
-
+public:
+    void load(const EffectGRADIENTState &of);
 };
 
 class EffectTHEATRECommand {
-
+public:
+    void load(const EffectTHEATREState &of);
 };
 
 class SectionGlobalCommand: public SectionCommand {
 public:
     Optional<int> density;
     Optional<SectionEffectType> effect;
+
+    // todo: this perhaps should be a list of optionals rather than being a union
+    // because unions and C++ copy constructors don't play nice.
 
     union {
         EffectSOLIDCommand solid;
@@ -48,6 +57,8 @@ public:
             SectionCommand(section) {
 
     }
+
+    void load(const SectionState &of);
 };
 
 class SectionOnCommand: public SectionGlobalCommand {
@@ -55,14 +66,16 @@ public:
     SectionOnCommand(Section section) :
             SectionGlobalCommand(section) {
     }
+    std::function<void()> buildExecutor() const;
 };
 
 class SectionOffCommand: public SectionCommand {
 public:
     SectionOffCommand(Section section) :
             SectionCommand(section) {
-
     }
+
+    std::function<void()> buildExecutor() const;
 };
 
 class SectionOutCommand: public SectionCommand {
@@ -71,11 +84,13 @@ public:
             SectionCommand(section) {
 
     }
+    std::function<void()> buildExecutor() const;
 };
 
 class SectionColorRangeCommand: public SectionCommand {
 public:
     int index;
+
     SectionColorRangeCommand(Section section, int index) :
             SectionCommand(section), index(index) {
 
@@ -91,6 +106,9 @@ public:
             SectionColorRangeCommand(section, index), isFrom(isFrom) {
 
     }
+
+    void load(const RGB &of);
+    std::function<void()> buildExecutor() const;
 };
 
 class SectionInterpolationCommand: public SectionColorRangeCommand {
@@ -101,10 +119,14 @@ public:
     Optional<bool> animating;
     Optional<int> frameDuration;
     Optional<int> cycleSpeed;
+
     SectionInterpolationCommand(Section section, int index) :
             SectionColorRangeCommand(section, index) {
 
     }
+
+    void load(const ColorRangeState &of);
+    std::function<void()> buildExecutor() const;
 };
 
 class SectionSetCommand: public SectionGlobalCommand {
@@ -113,6 +135,7 @@ public:
             SectionGlobalCommand(section) {
 
     }
+    std::function<void()> buildExecutor() const;
 };
 
 class GlobalOnCommand {
