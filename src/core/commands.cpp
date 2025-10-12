@@ -219,7 +219,10 @@ SectionColorCommand& SectionColorCommand::load(const json &of) {
 }
 
 SectionInterpolationCommand& SectionInterpolationCommand::load(const json &of) {
-    interpolation = of["interpolation"];
+#define INTERPOLATION(t) if(of["interpolation"] == #t) interpolation=RgbInterpolationType::t;
+INTERPOLATION_TYPE_LIST
+#undef INTERPOLATION
+
     bias = of["bias"];
     seamless = of["seamless"];
     animating = of["animating"];

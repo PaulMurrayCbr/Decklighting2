@@ -14,6 +14,9 @@
 #include <iostream>
 #include <string>
 
+#define boop std::cout << __FILE__ << '(' << __LINE__ << ")\n"
+
+
 #define EFFECT_TYPE_LIST \
     EFFECT(SOLID) \
     EFFECT(GRADIENT) \

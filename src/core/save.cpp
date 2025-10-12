@@ -88,6 +88,7 @@ namespace {
 
     }
 
+
     void local_load(Section section, std::string name) {
         if (!saveExists(name)) {
             throw SaveLoadException(name, "Savefile " + name + " not found");
@@ -136,7 +137,6 @@ namespace {
                 exec();
             }
         });
-
     }
 }
 
