@@ -195,38 +195,36 @@ EffectTHEATRECommand& EffectTHEATRECommand::load(const json &of) {
 
 template<typename T>
 T& SectionGlobalCommandWithLoader<T>::load(const json &of) {
-//    density = of.density;
-//    effect = of.effect;
-//
-//    switch (of.effect) {
-//    case SectionEffectType::SOLID:
-//        eff.solid.load(of.effectState.SOLID);
-//        break;
-//    case SectionEffectType::GRADIENT:
-//        eff.gradient.load(of.effectState.GRADIENT);
-//        break;
-//    case SectionEffectType::THEATRE:
-//        eff.theatre.load(of.effectState.THEATRE);
-//        break;
-//    }
+    density = of["density"];
+    if (of["effect"] == "SOLID") {
+        effect = SectionEffectType::SOLID;
+        eff.solid.load(of);
+    } else if (of["effect"] == "GRADIENT") {
+        effect = SectionEffectType::GRADIENT;
+        eff.gradient.load(of);
+    } else if (of["effect"] == "THEATRE") {
+        effect = SectionEffectType::THEATRE;
+        eff.theatre.load(of);
+    }
+
     return static_cast<T&>(*this);
 }
 
-template SectionOnCommand& SectionGlobalCommandWithLoader<SectionOnCommand>::load(const json &);
-template SectionSetCommand& SectionGlobalCommandWithLoader<SectionSetCommand>::load(const json &);
+template SectionOnCommand& SectionGlobalCommandWithLoader<SectionOnCommand>::load(const json&);
+template SectionSetCommand& SectionGlobalCommandWithLoader<SectionSetCommand>::load(const json&);
 
 SectionColorCommand& SectionColorCommand::load(const json &of) {
-//    rgb = of;
+    rgb = RGB(of.get<std::string>());
     return *this;
 }
 
 SectionInterpolationCommand& SectionInterpolationCommand::load(const json &of) {
-//    interpolation = of.interpolation;
-//    bias = of.bias;
-//    seamless = of.seamless;
-//    animating = of.animation.animating;
-//    frameDuration = of.animation.frameDuration.count();
-//    cycleSpeed = of.animation.cycleSpeed;
+    interpolation = of["interpolation"];
+    bias = of["bias"];
+    seamless = of["seamless"];
+    animating = of["animating"];
+    frameDuration = of["frameDuration"];
+    cycleSpeed = of["cycleSpeed"];
     return *this;
 }
 
