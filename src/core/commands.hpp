@@ -10,7 +10,10 @@
 
 #include <functional>
 
+#include "../lib/json.hpp"
+using json = nlohmann::json;
 #include "../lib/optional.hpp"
+
 #include "common.hpp"
 #include "state.hpp"
 
@@ -26,17 +29,17 @@ public:
 
 class EffectSOLIDCommand {
 public:
-    EffectSOLIDCommand& load(const EffectSOLIDState &of);
+    EffectSOLIDCommand& load(const json &of);
 };
 
 class EffectGRADIENTCommand {
 public:
-    EffectGRADIENTCommand& load(const EffectGRADIENTState &of);
+    EffectGRADIENTCommand& load(const json &of);
 };
 
 class EffectTHEATRECommand {
 public:
-    EffectTHEATRECommand& load(const EffectTHEATREState &of);
+    EffectTHEATRECommand& load(const json &of);
 };
 
 class SectionGlobalCommand: public SectionCommand {
@@ -57,14 +60,23 @@ public:
             SectionCommand(section) {
 
     }
-
-    SectionGlobalCommand& load(const SectionState &of);
 };
 
-class SectionOnCommand: public SectionGlobalCommand {
+template<typename T>
+class SectionGlobalCommandWithLoader: public SectionGlobalCommand {
+public:
+    SectionGlobalCommandWithLoader(Section section) :
+            SectionGlobalCommand(section) {
+
+    }
+
+    T& load(const json &of);
+};
+
+class SectionOnCommand: public SectionGlobalCommandWithLoader<SectionOnCommand> {
 public:
     SectionOnCommand(Section section) :
-            SectionGlobalCommand(section) {
+            SectionGlobalCommandWithLoader(section) {
     }
     std::function<void()> buildExecutor() const;
 };
@@ -107,7 +119,7 @@ public:
 
     }
 
-    SectionColorCommand& load(const RGB &of);
+    SectionColorCommand& load(const json &of);
     std::function<void()> buildExecutor() const;
 };
 
@@ -125,14 +137,14 @@ public:
 
     }
 
-    SectionInterpolationCommand& load(const ColorRangeState &of);
+    SectionInterpolationCommand& load(const json &of);
     std::function<void()> buildExecutor() const;
 };
 
-class SectionSetCommand: public SectionGlobalCommand {
+class SectionSetCommand: public SectionGlobalCommandWithLoader<SectionSetCommand> {
 public:
     SectionSetCommand(Section section) :
-            SectionGlobalCommand(section) {
+            SectionGlobalCommandWithLoader(section) {
 
     }
     std::function<void()> buildExecutor() const;

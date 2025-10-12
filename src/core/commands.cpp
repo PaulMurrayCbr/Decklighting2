@@ -181,48 +181,52 @@ void handleCommand(const SectionInterpolationCommand &cmd) {
     inSharedStateMutex(cmd.buildExecutor());
 }
 
-EffectSOLIDCommand& EffectSOLIDCommand::load(const EffectSOLIDState &of) {
+EffectSOLIDCommand& EffectSOLIDCommand::load(const json &of) {
     return *this;
 }
 
-EffectGRADIENTCommand& EffectGRADIENTCommand::load(const EffectGRADIENTState &of) {
+EffectGRADIENTCommand& EffectGRADIENTCommand::load(const json &of) {
     return *this;
 }
 
-EffectTHEATRECommand& EffectTHEATRECommand::load(const EffectTHEATREState &of) {
+EffectTHEATRECommand& EffectTHEATRECommand::load(const json &of) {
     return *this;
 }
 
-SectionGlobalCommand& SectionGlobalCommand::load(const SectionState &of) {
-    density = of.density;
-    effect = of.effect;
+template<typename T>
+T& SectionGlobalCommandWithLoader<T>::load(const json &of) {
+//    density = of.density;
+//    effect = of.effect;
+//
+//    switch (of.effect) {
+//    case SectionEffectType::SOLID:
+//        eff.solid.load(of.effectState.SOLID);
+//        break;
+//    case SectionEffectType::GRADIENT:
+//        eff.gradient.load(of.effectState.GRADIENT);
+//        break;
+//    case SectionEffectType::THEATRE:
+//        eff.theatre.load(of.effectState.THEATRE);
+//        break;
+//    }
+    return static_cast<T&>(*this);
+}
 
-    switch (of.effect) {
-    case SectionEffectType::SOLID:
-        eff.solid.load(of.effectState.SOLID);
-        break;
-    case SectionEffectType::GRADIENT:
-        eff.gradient.load(of.effectState.GRADIENT);
-        break;
-    case SectionEffectType::THEATRE:
-        eff.theatre.load(of.effectState.THEATRE);
-        break;
-    }
+template SectionOnCommand& SectionGlobalCommandWithLoader<SectionOnCommand>::load(const json &);
+template SectionSetCommand& SectionGlobalCommandWithLoader<SectionSetCommand>::load(const json &);
+
+SectionColorCommand& SectionColorCommand::load(const json &of) {
+//    rgb = of;
     return *this;
 }
 
-SectionColorCommand& SectionColorCommand::load(const RGB &of) {
-    rgb = of;
-    return *this;
-}
-
-SectionInterpolationCommand& SectionInterpolationCommand::load(const ColorRangeState &of) {
-    interpolation = of.interpolation;
-    bias = of.bias;
-    seamless = of.seamless;
-    animating = of.animation.animating;
-    frameDuration = of.animation.frameDuration.count();
-    cycleSpeed = of.animation.cycleSpeed;
+SectionInterpolationCommand& SectionInterpolationCommand::load(const json &of) {
+//    interpolation = of.interpolation;
+//    bias = of.bias;
+//    seamless = of.seamless;
+//    animating = of.animation.animating;
+//    frameDuration = of.animation.frameDuration.count();
+//    cycleSpeed = of.animation.cycleSpeed;
     return *this;
 }
 
