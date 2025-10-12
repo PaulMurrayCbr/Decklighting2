@@ -115,13 +115,13 @@ namespace {
 
         if (state["mode"] == "on") {
             // the on command doesn't need a 'set' command
-            executors.push_back(static_cast<SectionOnCommand&>(SectionOnCommand(section).load(state)).buildExecutor());
+            executors.push_back(SectionOnCommand(section).load(state).buildExecutor());
         } else if (state["mode"] == "off") {
             executors.push_back(SectionOffCommand(section).buildExecutor());
-            executors.push_back(static_cast<SectionSetCommand&>(SectionSetCommand(section).load(state)).buildExecutor());
+            executors.push_back(SectionSetCommand(section).load(state).buildExecutor());
         } else if (state["mode"] == "out") {
             executors.push_back(SectionOutCommand(section).buildExecutor());
-            executors.push_back(static_cast<SectionSetCommand&>(SectionSetCommand(section).load(state)).buildExecutor());
+            executors.push_back(SectionSetCommand(section).load(state).buildExecutor());
         }
 
         json colors = state["color"];
