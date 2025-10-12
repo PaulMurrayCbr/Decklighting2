@@ -7,6 +7,9 @@
 
 #include <algorithm>  // for std::max
 #include <stdexcept>  // for std::max
+#include <string>
+#include <sstream>
+#include <iomanip>
 
 #include "common.hpp"
 
@@ -370,5 +373,23 @@ std::ostream& operator<<(std::ostream& os, const HSQ& v) {
 
 std::ostream& operator<<(std::ostream& os, const RGB& v) {
     return os << v.toString();
+}
+
+RGB::RGB(const std::string& hex) {
+    std::string value = hex;
+
+    // strip leading '#'
+    if (!value.empty() && value[0] == '#') {
+        value.erase(0, 1);
+    }
+
+    if (value.size() != 6) {
+        throw std::invalid_argument("Invalid RGB format: " + hex);
+    }
+
+    // parse hex pairs
+    std::istringstream(value.substr(0, 2)) >> std::hex >> r;
+    std::istringstream(value.substr(2, 2)) >> std::hex >> g;
+    std::istringstream(value.substr(4, 2)) >> std::hex >> b;
 }
 

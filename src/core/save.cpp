@@ -4,12 +4,15 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <vector>
+#include <functional>
 
 #include "../lib/json.hpp"
 using json = nlohmann::json;
 
 #include "common.hpp"
-#include "command-json.hpp"
+#include "state.hpp"
+#include "commands.hpp"
 #include "save.hpp"
 
 namespace {
@@ -69,7 +72,7 @@ namespace {
 
         std::string fullPath = path + "/" + name + ext;
 
-        json state = getSectionJson(section);
+        json state = getSectionState(section);
 
         std::ofstream file(fullPath);
 
@@ -84,6 +87,7 @@ namespace {
         }
 
     }
+
 
     void local_load(Section section, std::string name) {
         if (!saveExists(name)) {
@@ -106,10 +110,34 @@ namespace {
             throw SaveLoadException(name, "Malformed JSON in savefile " + fullPath);
         }
 
-        applySectionJson(section, state);
+        std::vector < std::function < void() >> executors;
 
+        // std::lock_guard<std::mutex> lock(sharedStateMutex);
+
+        if (state["mode"] == "on") {
+            // the on command doesn't need a 'set' command
+            executors.push_back(SectionOnCommand(section).load(state).buildExecutor());
+        } else if (state["mode"] == "off") {
+            executors.push_back(SectionOffCommand(section).buildExecutor());
+            executors.push_back(SectionSetCommand(section).load(state).buildExecutor());
+        } else if (state["mode"] == "out") {
+            executors.push_back(SectionOutCommand(section).buildExecutor());
+            executors.push_back(SectionSetCommand(section).load(state).buildExecutor());
+        }
+
+        json colors = state["color"];
+        for (size_t i = 0; i < colors.size(); ++i) {
+            executors.push_back(SectionInterpolationCommand(section, i).load(colors[i]).buildExecutor());
+            executors.push_back(SectionColorCommand(section, i, true).load(colors[i]["from"]).buildExecutor());
+            executors.push_back(SectionColorCommand(section, i, false).load(colors[i]["to"]).buildExecutor());
+        }
+
+        inSharedStateMutex([&executors] {
+            for (auto &exec : executors) {
+                exec();
+            }
+        });
     }
-
 }
 
 json getSaves() {

@@ -14,6 +14,9 @@
 #include <iostream>
 #include <string>
 
+#define boop std::cout << __FILE__ << '(' << __LINE__ << ")\n"
+
+
 #define EFFECT_TYPE_LIST \
     EFFECT(SOLID) \
     EFFECT(GRADIENT) \
@@ -136,6 +139,8 @@ struct RGB {
             r(r), g(g), b(b) {
     }
 
+    RGB(const std::string &s);
+
     std::string toString() const {
         return "RGB[" + std::to_string(r) + "," + std::to_string(g) + "," + std::to_string(b) + "]";
     }
@@ -203,18 +208,14 @@ struct HSQ {
 extern RGB hsq2rgb(HSQ c);
 extern HSQ rgb2hsq(RGB c);
 
+extern std::ostream& operator<<(std::ostream &os, const HSV &v);
+extern std::ostream& operator<<(std::ostream &os, const RGB &v);
+extern std::ostream& operator<<(std::ostream &os, const HSQ &v);
 
-
-extern std::ostream& operator<<(std::ostream& os, const HSV& v);
-extern std::ostream& operator<<(std::ostream& os, const RGB& v);
-extern std::ostream& operator<<(std::ostream& os, const HSQ& v);
-
-
-inline bool endsWith(const std::string& str, const std::string& suffix) {
-    if (str.length() < suffix.length()) return false;
+inline bool endsWith(const std::string &str, const std::string &suffix) {
+    if (str.length() < suffix.length())
+        return false;
     return str.compare(str.length() - suffix.length(), suffix.length(), suffix) == 0;
 }
-
-
 
 #endif /* SRC_CORE_COMMON_HPP_ */

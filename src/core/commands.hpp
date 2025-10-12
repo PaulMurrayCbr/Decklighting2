@@ -8,8 +8,14 @@
 #ifndef SRC_CORE_COMMANDS_HPP_
 #define SRC_CORE_COMMANDS_HPP_
 
+#include <functional>
+
+#include "../lib/json.hpp"
+using json = nlohmann::json;
 #include "../lib/optional.hpp"
+
 #include "common.hpp"
+#include "state.hpp"
 
 class SectionCommand {
 public:
@@ -22,21 +28,27 @@ public:
 };
 
 class EffectSOLIDCommand {
-
+public:
+    EffectSOLIDCommand& load(const json &of);
 };
 
 class EffectGRADIENTCommand {
-
+public:
+    EffectGRADIENTCommand& load(const json &of);
 };
 
 class EffectTHEATRECommand {
-
+public:
+    EffectTHEATRECommand& load(const json &of);
 };
 
 class SectionGlobalCommand: public SectionCommand {
 public:
     Optional<int> density;
     Optional<SectionEffectType> effect;
+
+    // todo: this perhaps should be a list of optionals rather than being a union
+    // because unions and C++ copy constructors don't play nice.
 
     union {
         EffectSOLIDCommand solid;
@@ -50,19 +62,32 @@ public:
     }
 };
 
-class SectionOnCommand: public SectionGlobalCommand {
+template<typename T>
+class SectionGlobalCommandWithLoader: public SectionGlobalCommand {
+public:
+    SectionGlobalCommandWithLoader(Section section) :
+            SectionGlobalCommand(section) {
+
+    }
+
+    T& load(const json &of);
+};
+
+class SectionOnCommand: public SectionGlobalCommandWithLoader<SectionOnCommand> {
 public:
     SectionOnCommand(Section section) :
-            SectionGlobalCommand(section) {
+            SectionGlobalCommandWithLoader(section) {
     }
+    std::function<void()> buildExecutor() const;
 };
 
 class SectionOffCommand: public SectionCommand {
 public:
     SectionOffCommand(Section section) :
             SectionCommand(section) {
-
     }
+
+    std::function<void()> buildExecutor() const;
 };
 
 class SectionOutCommand: public SectionCommand {
@@ -71,11 +96,13 @@ public:
             SectionCommand(section) {
 
     }
+    std::function<void()> buildExecutor() const;
 };
 
 class SectionColorRangeCommand: public SectionCommand {
 public:
     int index;
+
     SectionColorRangeCommand(Section section, int index) :
             SectionCommand(section), index(index) {
 
@@ -91,6 +118,9 @@ public:
             SectionColorRangeCommand(section, index), isFrom(isFrom) {
 
     }
+
+    SectionColorCommand& load(const json &of);
+    std::function<void()> buildExecutor() const;
 };
 
 class SectionInterpolationCommand: public SectionColorRangeCommand {
@@ -101,18 +131,23 @@ public:
     Optional<bool> animating;
     Optional<int> frameDuration;
     Optional<int> cycleSpeed;
+
     SectionInterpolationCommand(Section section, int index) :
             SectionColorRangeCommand(section, index) {
 
     }
+
+    SectionInterpolationCommand& load(const json &of);
+    std::function<void()> buildExecutor() const;
 };
 
-class SectionSetCommand: public SectionGlobalCommand {
+class SectionSetCommand: public SectionGlobalCommandWithLoader<SectionSetCommand> {
 public:
     SectionSetCommand(Section section) :
-            SectionGlobalCommand(section) {
+            SectionGlobalCommandWithLoader(section) {
 
     }
+    std::function<void()> buildExecutor() const;
 };
 
 class GlobalOnCommand {

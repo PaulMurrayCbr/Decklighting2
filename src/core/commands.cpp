@@ -8,6 +8,7 @@
 #include <stdexcept>
 #include <iostream>
 #include <chrono>
+#include <functional>
 
 #include "common.hpp"
 #include "state.hpp"
@@ -53,27 +54,31 @@ void handleCommand(const GlobalOffCommand &cmd) {
     });
 }
 
-void handleCommand(const SectionOnCommand &cmd) {
-    inSharedStateMutex([cmd] {
-        doSectionGlobal(cmd);
-        SectionState &s = sharedState.section[static_cast<int>(cmd.section)];
+std::function<void()> SectionOnCommand::buildExecutor() const {
+    return [this] {
+        doSectionGlobal(*this);
+        SectionState &s = sharedState.section[static_cast<int>(section)];
         s.mode = SectionMode::on;
         s.touched = true;
         s.needsRepaint = true;
         recompute_sections();
-    });
+    };
 }
 
-void handleCommand(const SectionOutCommand &cmd) {
-    inSharedStateMutex([cmd] {
-        SectionState &s = sharedState.section[static_cast<int>(cmd.section)];
+void handleCommand(const SectionOnCommand &cmd) {
+    inSharedStateMutex(cmd.buildExecutor());
+}
+
+std::function<void()> SectionOutCommand::buildExecutor() const {
+    return [this] {
+        SectionState &s = sharedState.section[static_cast<int>(section)];
         s.mode = SectionMode::out;
         s.touched = true;
         s.needsRepaint = true;
 
         // we also need a repaint of the section before this one now that we are linked
 
-        for (int i = static_cast<int>(cmd.section) - 1; i >= 0; i++) {
+        for (int i = static_cast<int>(section) - 1; i >= 0; i++) {
             if (sharedState.section[i].mode != SectionMode::out) {
                 sharedState.section[i].touched = true;
                 sharedState.section[i].needsRepaint = true;
@@ -82,76 +87,147 @@ void handleCommand(const SectionOutCommand &cmd) {
         }
 
         recompute_sections();
-    });
+
+    };
 }
 
-void handleCommand(const SectionOffCommand &cmd) {
+void handleCommand(const SectionOutCommand &cmd) {
+    inSharedStateMutex(cmd.buildExecutor());
+}
 
-    inSharedStateMutex([cmd] {
-        SectionState &s = sharedState.section[static_cast<int>(cmd.section)];
+std::function<void()> SectionOffCommand::buildExecutor() const {
+    return [this] {
+        SectionState &s = sharedState.section[static_cast<int>(section)];
         s.mode = SectionMode::off;
         s.touched = true;
         s.needsRepaint = true;
         recompute_sections();
-    });
+    };
+}
+
+void handleCommand(const SectionOffCommand &cmd) {
+    inSharedStateMutex(cmd.buildExecutor());
+}
+
+std::function<void()> SectionSetCommand::buildExecutor() const {
+    return [this] {
+        doSectionGlobal(*this);
+    };
 }
 
 void handleCommand(const SectionSetCommand &cmd) {
-    inSharedStateMutex([cmd] {
-        doSectionGlobal(cmd);
-    });
+    inSharedStateMutex(cmd.buildExecutor());
 }
 
-void handleCommand(const SectionColorCommand &cmd) {
-    inSharedStateMutex([cmd] {
-        SectionState &s = sharedState.section[static_cast<int>(cmd.section)];
-        ColorRangeState &r = s.colors[cmd.index];
-        if (cmd.rgb.has_value()) {
-            if (cmd.isFrom) {
-                r.from = *cmd.rgb;
+std::function<void()> SectionColorCommand::buildExecutor() const {
+    return [this] {
+        SectionState &s = sharedState.section[static_cast<int>(section)];
+        ColorRangeState &r = s.colors[index];
+        if (rgb.has_value()) {
+            if (isFrom) {
+                r.from = *rgb;
                 r.fromHsq = rgb2hsq(r.from);
             } else {
-                r.to = *cmd.rgb;
+                r.to = *rgb;
                 r.toHsq = rgb2hsq(r.to);
             }
 
             s.touched = true;
             s.needsRepaint = true;
         }
-    });
+    };
+}
+
+void handleCommand(const SectionColorCommand &cmd) {
+    inSharedStateMutex(cmd.buildExecutor());
+}
+
+std::function<void()> SectionInterpolationCommand::buildExecutor() const {
+    return [this] {
+        SectionState &s = sharedState.section[static_cast<int>(section)];
+        ColorRangeState &r = s.colors[index];
+
+        if (interpolation.has_value()) {
+            r.interpolation = *interpolation;
+            s.touched = true;
+            s.needsRepaint = true;
+        }
+        if (bias.has_value()) {
+            r.bias = *bias;
+            s.touched = true;
+            s.needsRepaint = true;
+        }
+        if (seamless.has_value()) {
+            r.seamless = *seamless;
+            s.touched = true;
+            s.needsRepaint = true;
+        }
+        if (animating.has_value()) {
+            r.animation.setAnimating(*animating);
+            s.touched = true;
+        }
+        if (frameDuration.has_value()) {
+            r.animation.setFrameDuration(*frameDuration);
+            s.touched = true;
+        }
+        if (cycleSpeed.has_value()) {
+            r.animation.setCycleSpeed(*cycleSpeed);
+            s.touched = true;
+        }
+    };
 }
 
 void handleCommand(const SectionInterpolationCommand &cmd) {
-    inSharedStateMutex([cmd] {
-        SectionState &s = sharedState.section[static_cast<int>(cmd.section)];
-        ColorRangeState &r = s.colors[cmd.index];
-
-        if (cmd.interpolation.has_value()) {
-            r.interpolation = *cmd.interpolation;
-            s.touched = true;
-            s.needsRepaint = true;
-        }
-        if (cmd.bias.has_value()) {
-            r.bias = *cmd.bias;
-            s.touched = true;
-            s.needsRepaint = true;
-        }
-        if (cmd.seamless.has_value()) {
-            r.seamless = *cmd.seamless;
-            s.touched = true;
-            s.needsRepaint = true;
-        }
-        if (cmd.animating.has_value()) {
-            r.animation.setAnimating(*cmd.animating);
-            s.touched = true;
-        }
-        if (cmd.frameDuration.has_value()) {
-            r.animation.setFrameDuration(*cmd.frameDuration);
-            s.touched = true;
-        }
-        if (cmd.cycleSpeed.has_value()) {
-            r.animation.setCycleSpeed(*cmd.cycleSpeed);
-            s.touched = true;
-        }
-    });
+    inSharedStateMutex(cmd.buildExecutor());
 }
+
+EffectSOLIDCommand& EffectSOLIDCommand::load(const json &of) {
+    return *this;
+}
+
+EffectGRADIENTCommand& EffectGRADIENTCommand::load(const json &of) {
+    return *this;
+}
+
+EffectTHEATRECommand& EffectTHEATRECommand::load(const json &of) {
+    return *this;
+}
+
+template<typename T>
+T& SectionGlobalCommandWithLoader<T>::load(const json &of) {
+    density = of["density"];
+    if (of["effect"] == "SOLID") {
+        effect = SectionEffectType::SOLID;
+        eff.solid.load(of);
+    } else if (of["effect"] == "GRADIENT") {
+        effect = SectionEffectType::GRADIENT;
+        eff.gradient.load(of);
+    } else if (of["effect"] == "THEATRE") {
+        effect = SectionEffectType::THEATRE;
+        eff.theatre.load(of);
+    }
+
+    return static_cast<T&>(*this);
+}
+
+template SectionOnCommand& SectionGlobalCommandWithLoader<SectionOnCommand>::load(const json&);
+template SectionSetCommand& SectionGlobalCommandWithLoader<SectionSetCommand>::load(const json&);
+
+SectionColorCommand& SectionColorCommand::load(const json &of) {
+    rgb = RGB(of.get<std::string>());
+    return *this;
+}
+
+SectionInterpolationCommand& SectionInterpolationCommand::load(const json &of) {
+#define INTERPOLATION(t) if(of["interpolation"] == #t) interpolation=RgbInterpolationType::t;
+INTERPOLATION_TYPE_LIST
+#undef INTERPOLATION
+
+    bias = of["bias"];
+    seamless = of["seamless"];
+    animating = of["animating"];
+    frameDuration = of["frameDuration"];
+    cycleSpeed = of["cycleSpeed"];
+    return *this;
+}
+
