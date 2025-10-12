@@ -26,17 +26,17 @@ public:
 
 class EffectSOLIDCommand {
 public:
-    void load(const EffectSOLIDState &of);
+    EffectSOLIDCommand& load(const EffectSOLIDState &of);
 };
 
 class EffectGRADIENTCommand {
 public:
-    void load(const EffectGRADIENTState &of);
+    EffectGRADIENTCommand& load(const EffectGRADIENTState &of);
 };
 
 class EffectTHEATRECommand {
 public:
-    void load(const EffectTHEATREState &of);
+    EffectTHEATRECommand& load(const EffectTHEATREState &of);
 };
 
 class SectionGlobalCommand: public SectionCommand {
@@ -58,7 +58,7 @@ public:
 
     }
 
-    void load(const SectionState &of);
+    SectionGlobalCommand& load(const SectionState &of);
 };
 
 class SectionOnCommand: public SectionGlobalCommand {
@@ -107,7 +107,7 @@ public:
 
     }
 
-    void load(const RGB &of);
+    SectionColorCommand& load(const RGB &of);
     std::function<void()> buildExecutor() const;
 };
 
@@ -125,7 +125,7 @@ public:
 
     }
 
-    void load(const ColorRangeState &of);
+    SectionInterpolationCommand& load(const ColorRangeState &of);
     std::function<void()> buildExecutor() const;
 };
 

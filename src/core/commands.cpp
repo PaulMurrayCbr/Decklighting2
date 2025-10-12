@@ -181,16 +181,19 @@ void handleCommand(const SectionInterpolationCommand &cmd) {
     inSharedStateMutex(cmd.buildExecutor());
 }
 
-void EffectSOLIDCommand::load(const EffectSOLIDState &of) {
+EffectSOLIDCommand& EffectSOLIDCommand::load(const EffectSOLIDState &of) {
+    return *this;
 }
 
-void EffectGRADIENTCommand::load(const EffectGRADIENTState &of) {
+EffectGRADIENTCommand& EffectGRADIENTCommand::load(const EffectGRADIENTState &of) {
+    return *this;
 }
 
-void EffectTHEATRECommand::load(const EffectTHEATREState &of) {
+EffectTHEATRECommand& EffectTHEATRECommand::load(const EffectTHEATREState &of) {
+    return *this;
 }
 
-void SectionGlobalCommand::load(const SectionState &of) {
+SectionGlobalCommand& SectionGlobalCommand::load(const SectionState &of) {
     density = of.density;
     effect = of.effect;
 
@@ -205,18 +208,21 @@ void SectionGlobalCommand::load(const SectionState &of) {
         eff.theatre.load(of.effectState.THEATRE);
         break;
     }
+    return *this;
 }
 
-void SectionColorCommand::load(const RGB &of) {
+SectionColorCommand& SectionColorCommand::load(const RGB &of) {
     rgb = of;
+    return *this;
 }
 
-void SectionInterpolationCommand::load(const ColorRangeState &of) {
+SectionInterpolationCommand& SectionInterpolationCommand::load(const ColorRangeState &of) {
     interpolation = of.interpolation;
     bias = of.bias;
     seamless = of.seamless;
     animating = of.animation.animating;
     frameDuration = of.animation.frameDuration.count();
     cycleSpeed = of.animation.cycleSpeed;
+    return *this;
 }
 
