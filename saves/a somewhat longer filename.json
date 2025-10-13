@@ -1,0 +1,27 @@
+{
+    "color": [
+        {
+            "animating": true,
+            "bias": 0.5,
+            "cycleSpeed": 1000,
+            "frameDuration": 100,
+            "from": "#FF0000",
+            "interpolation": "FADE",
+            "seamless": false,
+            "to": "#00FF00"
+        },
+        {
+            "animating": false,
+            "bias": 0.5,
+            "cycleSpeed": 1000,
+            "frameDuration": 100,
+            "from": "#463030",
+            "interpolation": "FADE",
+            "seamless": false,
+            "to": "#304630"
+        }
+    ],
+    "density": 1,
+    "effect": "GRADIENT",
+    "mode": "on"
+}

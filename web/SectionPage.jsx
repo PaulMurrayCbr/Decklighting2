@@ -32,6 +32,11 @@ function SectionPage({ name, loading, pixelState, info, apiSection, apiSave, hom
 		apiSection(name, `color/${selected.color}${url}`);
 	}, [name, selected.color]);
 
+	const pageSaveSection = useCallback((save) => {
+		apiSave(name, save);
+	}, [name]);
+
+
 	function reload() {
 		pageApiSection('');
 	};
@@ -149,7 +154,10 @@ function SectionPage({ name, loading, pixelState, info, apiSection, apiSave, hom
 				)}
 				{selected.page === 'save' && (
 					<SectionSave
-						apiSave={apiSave}
+						apiSave={pageSaveSection}
+						saves={saves}
+						loading={loading}
+						name={name}
 					/>
 				)}
 			</div>
@@ -448,13 +456,13 @@ function SectionLoad({ saves, apiSection, loading }) {
 	}, [saves])
 
 	const sortedSaves = useMemo(
-	  () => (saves && [...saves].sort((a, b) => a.name.localeCompare(b.name))) ?? [],
-	  [saves]
+		() => (saves && [...saves].sort((a, b) => a.name.localeCompare(b.name))) ?? [],
+		[saves]
 	);
-		
-	function loadSelected() {
+
+	function load(name) {
 		if (selected) {
-			apiSection(`load?name=${encodeURIComponent(selected.name)}`)
+			apiSection(`load?name=${encodeURIComponent(name)}`)
 		}
 	}
 
@@ -462,37 +470,68 @@ function SectionLoad({ saves, apiSection, loading }) {
 		return selected === save ? 'active' : '';
 	}
 
-	return (<div><h3>Load</h3>
-		<div className="container py-3">
-			<div className="list-group overflow-auto" style={{ 'maxHeight': '70vh' }}>
-				{sortedSaves.map((save) =>
-						<button className={`list-group-item list-group-item-action d-flex justify-content-between ${rowClass(save)}`}
-							key={save.name}
-							onClick={(event) => setSelected(save)}
-							type="button"
-						>
-							<span>{save.name}</span>
-							<small className="text-muted">{save.date}</small>
-						</button>
-
-					)}
-			</div>
-			<div className="mt-3 text-end">
-				<button className="btn btn-primary"
-					disabled={loading || !selected}
-					onClick={() => loadSelected()}
+	return (<div className="container py-3">
+		<div className="list-group overflow-auto" style={{ 'maxHeight': '70vh' }}>
+			{sortedSaves.map((save) =>
+				<button className={`list-group-item list-group-item-action d-flex justify-content-between ${rowClass(save)}`}
+					key={save.name}
+					onClick={(event) => {setSelected(save); load(save.name);}}
 					type="button"
-				>Load{selected && (' ' + selected.name)}</button>
-			</div>
-		</div>
-	</div >
+				>
+					<span>{save.name}</span>
+					<small className="text-muted">{save.date}</small>
+				</button>
 
+			)}
+		</div>
+	</div>
 	);
 
 }
 
-function SectionSave({ apiSave }) {
-	return (<h3>Save</h3>);
+function SectionSave({ apiSave, saves, loading, name }) {
+	const sortedSaves = useMemo(
+		() => (saves && [...saves].sort((a, b) => a.name.localeCompare(b.name))) ?? [],
+		[saves]
+	);
+
+	const [saveName, setSaveName] = useState('');
+
+	return (
+
+		<div className="container py-3">
+			<label htmlFor="saveName" className="form-label">Save current settings for {name} as</label>
+
+			<div className="input-group mb-3">
+				<input
+					list="existingSaves"
+					id="saveName"
+					className="form-control"
+					placeholder="name..."
+					value={saveName}
+					onChange={(e) => setSaveName(e.target.value)}
+				/>
+
+				<button
+					className="btn btn-primary"
+					type="button"
+					onClick={() => apiSave(saveName)}
+					disabled={!saveName || loading}
+				>
+					Save
+				</button>
+			</div>
+
+			<datalist id="existingSaves">
+				{sortedSaves.map((save) => (
+					<option key={save.name} value={save.name}>
+						{save.name}
+					</option>
+				))}
+			</datalist>
+		</div>
+
+	);
 }
 
 window.SectionPage = SectionPage;

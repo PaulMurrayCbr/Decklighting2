@@ -65,7 +65,33 @@ namespace {
         return result;
     }
 
+    bool isValidFilename(const std::string &name) {
+        const size_t minLength = 3;
+        const size_t maxLength = 50;
+
+        if (name.size() < minLength || name.size() > maxLength) {
+            return false;
+        }
+
+        for (char c : name) {
+            // Allow letters, digits, space, hyphen, underscore, and dot
+            if (std::isalnum(static_cast<unsigned char>(c)) ||
+                c == ' ' || c == '-' || c == '_' || c == '.') {
+                continue;
+            }
+            // Any other character is invalid
+            return false;
+        }
+
+        return true;
+    }
+
     void local_save(Section section, std::string name, bool areYouSure) {
+
+        if(!isValidFilename(name)) {
+            throw SaveLoadException(name, "\"" + name + "\" is not a valid name for a save file");
+        }
+
         if (saveExists(name) && !areYouSure) {
             throw AreYouSureException(name);
         }
