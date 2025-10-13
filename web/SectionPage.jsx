@@ -5,7 +5,10 @@ const { useState, useEffect, useRef, useCallback } = React;
 function SectionPage({ name, loading, pixelState, info, apiSection, home }) {
 
 	const [section, setSection] = useState({});
-	const [selected, setSelected] = useState({ main: true, color: 0 });
+	const [selected, setSelected] = useState({ 
+		page: 'main',
+		color: 0 
+	});
 	const [nColors, setNColors] = useState(0);
 
 	useEffect(() => {
@@ -16,7 +19,7 @@ function SectionPage({ name, loading, pixelState, info, apiSection, home }) {
 		const n = info?.effectInfo[section?.effect]?.ncolorranges ?? 0;
 		setNColors(n);
 
-		if (!selected.main && selected.color >= n) {
+		if (selected.page === 'color' && selected.color >= n) {
 			selectMainPage();
 		}
 	}, [section, info])
@@ -36,28 +39,50 @@ function SectionPage({ name, loading, pixelState, info, apiSection, home }) {
 	function selectMainPage() {
 		setSelected({
 			...selected,
-			main: true
+			page: 'main'
+		});
+	};
+
+	function selectLoadPage() {
+		setSelected({
+			...selected,
+			page: 'load'
+		});
+	};
+
+	function selectSavePage() {
+		setSelected({
+			...selected,
+			page: 'save'
 		});
 	};
 
 	function selectColor(c) {
 		setSelected({
 			...selected,
-			main: false,
+			page: 'color',
 			color: c
 		});
 	};
 
 	function mainPillActive() {
-		return selected.main ? 'active' : '';
+		return selected.page === 'main' ? 'active' : '';
 	}
 
 	function colorPillActive(i) {
-		return !selected.main && selected.color === i ? 'active' : '';
+		return selected.page === 'color' && selected.color === i ? 'active' : '';
 	}
 
 	function colorPillName(i) {
 		return `Color${nColors < 2 ? '' : ' ' + String.fromCharCode(65 + i)}`
+	}
+
+	function savePillActive() {
+		return selected.page === 'save' ? 'active' : '';
+	}
+
+	function loadPillActive() {
+		return selected.page === 'load' ? 'active' : '';
 	}
 
 	return (
@@ -88,20 +113,36 @@ function SectionPage({ name, loading, pixelState, info, apiSection, home }) {
 						>{colorPillName(i)}</button>
 					</li>
 				))}
+				
+				<li className="nav-item">
+					<button className={`nav-link ${loadPillActive()}`} onClick={selectLoadPage} >Load</button>
+				</li>
+				<li className="nav-item">
+					<button className={`nav-link ${savePillActive()}`} onClick={selectSavePage} >Save</button>
+				</li>
+				
 			</ul>
 
-			{selected.main && (
+			{selected.page === 'main' && (
 				<SectionMain
 					section={section}
 					info={info}
 					apiSection={pageApiSection}
 				/>
 			)}
-			{!selected.main && (
+			{selected.page === 'color' && (
 				<SectionColor
 					color={section.color[selected.color]}
 					info={info}
 					apiColor={pageColorSection}
+				/>
+			)}
+			{selected.page === 'load' && (
+				<SectionLoad
+				/>
+			)}
+			{selected.page === 'save' && (
+				<SectionSave
 				/>
 			)}
 
@@ -388,6 +429,14 @@ function SectionColor({ color, info, apiColor }) {
 		</div>
 
 	);
+}
+
+function SectionLoad() {
+	return <h3>Load</h3>;
+}
+
+function SectionSave() {
+	return <h3>Save</h3>;
 }
 
 window.SectionPage = SectionPage;
