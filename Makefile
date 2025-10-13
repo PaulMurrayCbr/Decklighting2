@@ -45,6 +45,8 @@ clean:
 .PHONY: FORCE
 FORCE:	
 
+ifeq ($(UNAME_S),Darwin)
+
 VERSION.mk: FORCE
 	@VER=$$(git describe --tags --abbrev=0 release 2>/dev/null || echo "0.0.0"); \
 	VER=$$(echo $$VER | sed 's/^v//'); \
@@ -63,6 +65,15 @@ VERSION.mk: FORCE
 	echo "NEXT_MAJOR=$$NEXT_MAJOR" >> $@	
 	
 -include VERSION.mk
+
+else ifeq ($(UNAME_S),Linux)
+
+VERSION.mk:
+
+else
+    $(error Unsupported platform: $(UNAME_S))
+endif
+
 	
 # Help Target
 help:

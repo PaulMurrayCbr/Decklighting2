@@ -1,11 +1,14 @@
 
-const { useState, useEffect, useRef, useCallback } = React;
+const { useState, useEffect, useRef, useCallback, useMemo } = React;
 
 
-function SectionPage({ name, loading, pixelState, info, apiSection, home }) {
+function SectionPage({ name, loading, pixelState, info, apiSection, apiSave, home, saves }) {
 
 	const [section, setSection] = useState({});
-	const [selected, setSelected] = useState({ main: true, color: 0 });
+	const [selected, setSelected] = useState({
+		page: 'main',
+		color: 0
+	});
 	const [nColors, setNColors] = useState(0);
 
 	useEffect(() => {
@@ -16,7 +19,7 @@ function SectionPage({ name, loading, pixelState, info, apiSection, home }) {
 		const n = info?.effectInfo[section?.effect]?.ncolorranges ?? 0;
 		setNColors(n);
 
-		if (!selected.main && selected.color >= n) {
+		if (selected.page === 'color' && selected.color >= n) {
 			selectMainPage();
 		}
 	}, [section, info])
@@ -36,28 +39,50 @@ function SectionPage({ name, loading, pixelState, info, apiSection, home }) {
 	function selectMainPage() {
 		setSelected({
 			...selected,
-			main: true
+			page: 'main'
+		});
+	};
+
+	function selectLoadPage() {
+		setSelected({
+			...selected,
+			page: 'load'
+		});
+	};
+
+	function selectSavePage() {
+		setSelected({
+			...selected,
+			page: 'save'
 		});
 	};
 
 	function selectColor(c) {
 		setSelected({
 			...selected,
-			main: false,
+			page: 'color',
 			color: c
 		});
 	};
 
 	function mainPillActive() {
-		return selected.main ? 'active' : '';
+		return selected.page === 'main' ? 'active' : '';
 	}
 
 	function colorPillActive(i) {
-		return !selected.main && selected.color === i ? 'active' : '';
+		return selected.page === 'color' && selected.color === i ? 'active' : '';
 	}
 
 	function colorPillName(i) {
 		return `Color${nColors < 2 ? '' : ' ' + String.fromCharCode(65 + i)}`
+	}
+
+	function savePillActive() {
+		return selected.page === 'save' ? 'active' : '';
+	}
+
+	function loadPillActive() {
+		return selected.page === 'load' ? 'active' : '';
 	}
 
 	return (
@@ -76,7 +101,7 @@ function SectionPage({ name, loading, pixelState, info, apiSection, home }) {
 				</button>
 			</div>
 
-			<ul className="nav nav-pills mb-3">
+			<ul className="nav nav-tabs" id="subpageTabs">
 				<li className="nav-item">
 					<button className={`nav-link ${mainPillActive()}`} onClick={selectMainPage} >Main</button>
 				</li>
@@ -88,22 +113,46 @@ function SectionPage({ name, loading, pixelState, info, apiSection, home }) {
 						>{colorPillName(i)}</button>
 					</li>
 				))}
+
+				<li className="nav-item">
+					<button className={`nav-link ${loadPillActive()}`} onClick={selectLoadPage} >Load</button>
+				</li>
+
+				<li className="nav-item">
+					<button className={`nav-link ${savePillActive()}`} onClick={selectSavePage} >Save</button>
+				</li>
+
 			</ul>
 
-			{selected.main && (
-				<SectionMain
-					section={section}
-					info={info}
-					apiSection={pageApiSection}
-				/>
-			)}
-			{!selected.main && (
-				<SectionColor
-					color={section.color[selected.color]}
-					info={info}
-					apiColor={pageColorSection}
-				/>
-			)}
+			<div className="tab-content p-3">
+
+				{selected.page === 'main' && (
+					<SectionMain
+						section={section}
+						info={info}
+						apiSection={pageApiSection}
+					/>
+				)}
+				{selected.page === 'color' && (
+					<SectionColor
+						color={section.color[selected.color]}
+						info={info}
+						apiColor={pageColorSection}
+					/>
+				)}
+				{selected.page === 'load' && (
+					<SectionLoad
+						saves={saves}
+						apiSection={pageApiSection}
+						loading={loading}
+					/>
+				)}
+				{selected.page === 'save' && (
+					<SectionSave
+						apiSave={apiSave}
+					/>
+				)}
+			</div>
 
 		</div>
 	);
@@ -388,6 +437,62 @@ function SectionColor({ color, info, apiColor }) {
 		</div>
 
 	);
+}
+
+function SectionLoad({ saves, apiSection, loading }) {
+
+	const [selected, setSelected] = useState(undefined);
+
+	useEffect(() => {
+		setSelected(undefined);
+	}, [saves])
+
+	const sortedSaves = useMemo(
+	  () => (saves && [...saves].sort((a, b) => a.name.localeCompare(b.name))) ?? [],
+	  [saves]
+	);
+		
+	function loadSelected() {
+		if (selected) {
+			apiSection(`load?name=${encodeURIComponent(selected.name)}`)
+		}
+	}
+
+	function rowClass(save) {
+		return selected === save ? 'active' : '';
+	}
+
+	return (<div><h3>Load</h3>
+		<div className="container py-3">
+			<div className="list-group overflow-auto" style={{ 'maxHeight': '70vh' }}>
+				{sortedSaves.map((save) =>
+						<button className={`list-group-item list-group-item-action d-flex justify-content-between ${rowClass(save)}`}
+							key={save.name}
+							onClick={(event) => setSelected(save)}
+							type="button"
+						>
+							<span>{save.name}</span>
+							<small className="text-muted">{save.date}</small>
+						</button>
+
+					)}
+			</div>
+			<div className="mt-3 text-end">
+				<button className="btn btn-primary"
+					disabled={loading || !selected}
+					onClick={() => loadSelected()}
+					type="button"
+				>Load{selected && (' ' + selected.name)}</button>
+			</div>
+		</div>
+	</div >
+
+	);
+
+}
+
+function SectionSave({ apiSave }) {
+	return (<h3>Save</h3>);
 }
 
 window.SectionPage = SectionPage;

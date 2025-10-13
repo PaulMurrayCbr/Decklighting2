@@ -15,6 +15,7 @@ function App() {
 		ncolorranges: 0,
 		sections: []
 	});
+	const [saves, setSaves] = useState([]);
 
 
 	const apiFetch = async (url) => {
@@ -58,9 +59,17 @@ function App() {
 			});
 	};
 
+	const apiSave = async (section, savename) => {
+		const json = await apiFetch(`${section}/${url}`);
+		if (json) {
+			console.log(json);
+		}
+	};
+
 	useEffect(() => {
 		apiFetch("status").then(setPixelState);
 		apiFetch("info").then(setInfo);
+		apiFetch("saves").then(setSaves);
 	}, []); // empty deps = run once after first render
 
 	return (
@@ -91,7 +100,9 @@ function App() {
 						pixelState={pixelState}
 						info={info}
 						apiSection={apiSection}
+						apiSave={apiSave}
 						home={() => setActiveTab(SelectedPage.ofHome())}
+						saves={saves}
 					/>
 				)}
 			</div>
