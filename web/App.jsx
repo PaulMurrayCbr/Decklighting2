@@ -17,6 +17,8 @@ function App() {
 	});
 	const [saves, setSaves] = useState([]);
 
+	const [areYouSureInfo, setAreYouSureInfo] = useState(undefined);
+
 
 	const apiFetch = async (url) => {
 		setError(null);
@@ -34,7 +36,6 @@ function App() {
 			return json.result;
 		}
 		catch (err) {
-			console.log(error);
 			setError(err);
 		}
 		finally {
@@ -59,12 +60,36 @@ function App() {
 			});
 	};
 
-	const apiSave = async (section, savename) => {
-		const json = await apiFetch(`${section}/${url}`);
+	const apiSave = async (section, savename, areYouSure = false) => {
+		const json = await apiFetch(`${section}/save?name=${encodeURIComponent(savename)}&are-you-sure=${areYouSure}`);
+
+		console.log(json);
+
 		if (json) {
-			console.log(json);
+			if (json.saved) {
+				setSaves(json.saves);
+				setError({ message: `Current state saved as ${json.file}`, status: 'success' })
+			}
+			else if (json.needsAreYouSure) {
+				setError({ message: `Save file ${json.file} already exists`, status: 'warning' })
+				const info = { section, savename };
+				setAreYouSureInfo(info);
+			}
+			else {
+				// this never happens.
+				setError('${savename} not saved')
+			}
 		}
 	};
+
+
+	function areYouSureReply(result) {
+		const info = areYouSureInfo;
+		setAreYouSureInfo(undefined);
+		if (result) {
+			apiSave(info.section, info.savename, true);
+		}
+	}
 
 	useEffect(() => {
 		apiFetch("status").then(setPixelState);
@@ -111,7 +136,14 @@ function App() {
 				error={error} setError={setError}
 			/>
 
-			<LoadingOverlay loading={loading} />
+			<LoadingOverlay loading={loading || areYouSureInfo} />
+
+			{areYouSureInfo && (
+				<AreYouSureModal
+					name={areYouSureInfo.savename}
+					reply={areYouSureReply}
+				/>
+			)}
 		</div>
 	);
 }
@@ -185,17 +217,35 @@ function LoadingOverlay({ loading }) {
 }
 
 /* Toast container fixed at bottom center */
+/**
+ primary	Main theme color (blue by default)
+ secondary	Secondary theme (gray)
+ success	Success / positive feedback (green)
+ danger	Error / destructive / negative (red)
+ warning	Warning / caution (yellow/orange)
+ info	Informational messages (cyan/light blue)
+ light	Light background / muted (white/light gray)
+ dark	Dark background / text (black/dark gray)  
+*/
+
 function Notifications({ error, setError }) {
+
+	function style() {
+		return `text-bg-${error?.status ?? 'danger'}`
+	}
+
+
 	return (
 		< div
 			className="toast-container position-fixed bottom-0 start-50 translate-middle-x p-3"
-			style={{ zIndex: 1055 }
-			}
+			style={{
+				zIndex: 1055 // above the loading overlay
+			}}
 		>
 
 			{error && (
 				<div
-					className="toast align-items-center text-bg-danger border-0 show"
+					className={`toast align-items-center ${style()} border-0 show`}
 					role="alert"
 					aria-live="assertive"
 					aria-atomic="true"
@@ -211,6 +261,28 @@ function Notifications({ error, setError }) {
 				</div>
 			)}
 		</div >
+	);
+}
+
+function AreYouSureModal({ name, reply }) {
+	return (
+		<div className="modal show d-block" tabIndex="-1"
+			style={{
+				zIndex: 1055 // above the loading overlay
+			}}
+		>
+			<div className="modal-dialog modal-dialog-centered">
+				<div className="modal-content">
+					<div className="modal-body">
+						Save file {name} already exists. Are you sure you want to overwrite it?
+					</div>
+					<div className="modal-footer">
+						<button className="btn btn-primary" onClick={() => reply(true)}>Yes</button>
+						<button className="btn btn-secondary" onClick={() => reply(false)}>Cancel</button>
+					</div>
+				</div>
+			</div>
+		</div>
 	);
 }
 
