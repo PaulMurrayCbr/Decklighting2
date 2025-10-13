@@ -1,13 +1,13 @@
 
-const { useState, useEffect, useRef, useCallback } = React;
+const { useState, useEffect, useRef, useCallback, useMemo } = React;
 
 
-function SectionPage({ name, loading, pixelState, info, apiSection, home }) {
+function SectionPage({ name, loading, pixelState, info, apiSection, apiSave, home, saves }) {
 
 	const [section, setSection] = useState({});
-	const [selected, setSelected] = useState({ 
+	const [selected, setSelected] = useState({
 		page: 'main',
-		color: 0 
+		color: 0
 	});
 	const [nColors, setNColors] = useState(0);
 
@@ -101,7 +101,7 @@ function SectionPage({ name, loading, pixelState, info, apiSection, home }) {
 				</button>
 			</div>
 
-			<ul className="nav nav-pills mb-3">
+			<ul className="nav nav-tabs" id="subpageTabs">
 				<li className="nav-item">
 					<button className={`nav-link ${mainPillActive()}`} onClick={selectMainPage} >Main</button>
 				</li>
@@ -113,38 +113,46 @@ function SectionPage({ name, loading, pixelState, info, apiSection, home }) {
 						>{colorPillName(i)}</button>
 					</li>
 				))}
-				
+
 				<li className="nav-item">
 					<button className={`nav-link ${loadPillActive()}`} onClick={selectLoadPage} >Load</button>
 				</li>
+
 				<li className="nav-item">
 					<button className={`nav-link ${savePillActive()}`} onClick={selectSavePage} >Save</button>
 				</li>
-				
+
 			</ul>
 
-			{selected.page === 'main' && (
-				<SectionMain
-					section={section}
-					info={info}
-					apiSection={pageApiSection}
-				/>
-			)}
-			{selected.page === 'color' && (
-				<SectionColor
-					color={section.color[selected.color]}
-					info={info}
-					apiColor={pageColorSection}
-				/>
-			)}
-			{selected.page === 'load' && (
-				<SectionLoad
-				/>
-			)}
-			{selected.page === 'save' && (
-				<SectionSave
-				/>
-			)}
+			<div className="tab-content p-3">
+
+				{selected.page === 'main' && (
+					<SectionMain
+						section={section}
+						info={info}
+						apiSection={pageApiSection}
+					/>
+				)}
+				{selected.page === 'color' && (
+					<SectionColor
+						color={section.color[selected.color]}
+						info={info}
+						apiColor={pageColorSection}
+					/>
+				)}
+				{selected.page === 'load' && (
+					<SectionLoad
+						saves={saves}
+						apiSection={pageApiSection}
+						loading={loading}
+					/>
+				)}
+				{selected.page === 'save' && (
+					<SectionSave
+						apiSave={apiSave}
+					/>
+				)}
+			</div>
 
 		</div>
 	);
@@ -431,12 +439,60 @@ function SectionColor({ color, info, apiColor }) {
 	);
 }
 
-function SectionLoad() {
-	return <h3>Load</h3>;
+function SectionLoad({ saves, apiSection, loading }) {
+
+	const [selected, setSelected] = useState(undefined);
+
+	useEffect(() => {
+		setSelected(undefined);
+	}, [saves])
+
+	const sortedSaves = useMemo(
+	  () => (saves && [...saves].sort((a, b) => a.name.localeCompare(b.name))) ?? [],
+	  [saves]
+	);
+		
+	function loadSelected() {
+		if (selected) {
+			apiSection(`load?name=${encodeURIComponent(selected.name)}`)
+		}
+	}
+
+	function rowClass(save) {
+		return selected === save ? 'active' : '';
+	}
+
+	return (<div><h3>Load</h3>
+		<div className="container py-3">
+			<div className="list-group overflow-auto" style={{ 'maxHeight': '70vh' }}>
+				{sortedSaves.map((save) =>
+						<button className={`list-group-item list-group-item-action d-flex justify-content-between ${rowClass(save)}`}
+							key={save.name}
+							onClick={(event) => setSelected(save)}
+							type="button"
+						>
+							<span>{save.name}</span>
+							<small className="text-muted">{save.date}</small>
+						</button>
+
+					)}
+			</div>
+			<div className="mt-3 text-end">
+				<button className="btn btn-primary"
+					disabled={loading || !selected}
+					onClick={() => loadSelected()}
+					type="button"
+				>Load{selected && (' ' + selected.name)}</button>
+			</div>
+		</div>
+	</div >
+
+	);
+
 }
 
-function SectionSave() {
-	return <h3>Save</h3>;
+function SectionSave({ apiSave }) {
+	return (<h3>Save</h3>);
 }
 
 window.SectionPage = SectionPage;
