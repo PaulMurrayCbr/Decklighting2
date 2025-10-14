@@ -1,0 +1,60 @@
+digraph {
+    graph [fontname="Arial"];
+    node  [fontname="Arial"];
+    edge  [fontname="Arial"];
+
+Decklighting [name="Decklighting2\nexecutable" shape="box3d"];
+
+common[shape="rectangle", label="common.cpp\ntypes, utilitites\ndescription of our\nneopixels"];
+state [shape="rectangle", label="state.cpp️\nshared volatile state", fontname="Apple Color Emoji"];
+files [label="./saves\nsection JSON"; shape=cylinder];
+web [label="./web\nstatic content\nreact source"; shape=cylinder];
+
+subgraph  cluster_pix {
+label = "Pixel thread"
+pixelloop [shape="component"];
+effect;
+pixels [shape="parallelogram"];
+interpolate;
+dummypix [shape="hexagon" label="OSX\ndummy\npixels"];
+}
+
+subgraph  cluster_web {
+label = "Web thread"
+webserver [label="webserver.cpp\nplain httplib webserver", shape="component"];
+api[label="api.cpp\nparse http uri\nand querystrings"];
+command;
+save;
+}
+
+realpix [shape="hexagon" label="Pi\nreal\npixels"];
+
+
+Decklighting -> pixelloop [label="starts", arrowhead=empty];
+Decklighting -> webserver [label="starts", arrowhead=empty];
+Decklighting -> state [label="initializes", arrowhead=empty];
+
+
+state -> pixelloop [label="reads in mutex"];
+pixelloop -> effect [label="copied section state"];
+pixelloop -> pixels [label="writes\ndispatches"];
+effect -> pixels[label="writes"];
+
+effect -> interpolate [label="calculate colours", dir="back"];
+
+webserver -> api [label="path, params, json"];
+webserver -> web [dir="back"];
+api -> command [label="command\nobjects"];
+api -> save [label="save list\njson"; dir=back];
+api -> save [label="save/load\nsection/filename"];
+command -> state [label="writes in mutex"];
+
+save->state [label="get section state\nin mutex", dir="back"];
+save->command[label="create/apply\ncommands"];
+save->files[label="read/write"; dir=both];
+
+pixels->dummypix[label="OSX", arrowtail="empty", dir="back"];
+pixels->realpix[label="Pi", arrowtail="empty", dir="back"];
+
+}
+

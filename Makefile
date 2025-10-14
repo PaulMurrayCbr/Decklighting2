@@ -191,10 +191,13 @@ $(EXECUTABLE): $(OBJECTS)
 clear:
 	clear && printf '\e[3J'
 
-doc: src/core/doc.png
+doc: doc/doc.png doc/doc.pdf
 
-src/core/doc.png: src/core/doc.dot
+doc/doc.png: doc/doc.dot
 	dot -Tpng -o $@ $<
+
+doc/doc.pdf: doc/doc.dot
+	dot -Tpdf -o $@ $<
 
 test: clear $(TESTRESULTS) $(EXECUTABLE)
 
