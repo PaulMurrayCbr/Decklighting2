@@ -3,7 +3,7 @@ digraph {
     node  [fontname="Arial"];
     edge  [fontname="Arial"];
 
-Decklighting [name="Decklighting2\nexecutable" shape="box3d"];
+Decklighting [label="Decklighting2\nexecutable" shape="box3d"];
 
 common[shape="rectangle", label="common.cpp\ntypes, utilitites\ndescription of our\nneopixels"];
 state [shape="rectangle", label="state.cpp️\nshared volatile state", fontname="Apple Color Emoji"];
