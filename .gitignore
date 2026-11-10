@@ -1,0 +1,7 @@
+/.*
+*.o
+/Debug
+/decklighting2
+/out/
+VERSION.mk
+/saves

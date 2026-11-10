@@ -290,12 +290,12 @@ function SectionColor({ color, info, apiColor }) {
 
 	const apiColorStable = (url) => apiColorStableRef.current(url);
 
-	const [fromColorState, setFromColorState] = useState(0);
+	const [fromColorState, setFromColorState] = useState('#000000');
 	const fromColorDebouncer = useRef(new Debouncer(100, setFromColorState,
 		(value) => apiColorStable(`/from?${toRgb(value)}`)
 	));
 
-	const [toColorState, setToColorState] = useState(0);
+	const [toColorState, setToColorState] = useState('#000000');
 	const toColorDebouncer = useRef(new Debouncer(100, setToColorState,
 		(value) => apiColorStable(`/to?${toRgb(value)}`)
 	));
@@ -338,20 +338,8 @@ function SectionColor({ color, info, apiColor }) {
 			<div className="row mb-3">
 				<label className="col-sm-3 col-form-label">From/To</label>
 				<div className="col-sm-9">
-					<input
-						type="color"
-						className="form-control-color"
-						value={fromColorState}
-						onChange={e => fromColorDebouncer.current.set(e.target.value)}
-						onInput={e => fromColorDebouncer.current.set(e.target.value)}
-					/>
-					<input
-						type="color"
-						className="form-control-color"
-						value={toColorState}
-						onChange={e => toColorDebouncer.current.set(e.target.value)}
-						onInput={e => toColorDebouncer.current.set(e.target.value)}
-					/>
+					<ColorButton color={fromColorState} onChange={v => fromColorDebouncer.current.set(v)} />
+					<ColorButton color={toColorState} onChange={v => toColorDebouncer.current.set(v)} />
 				</div>
 			</div>
 
